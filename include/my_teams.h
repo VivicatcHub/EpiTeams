@@ -5,8 +5,8 @@
 ** my_teams.h
 */
 
-#ifndef my_teams_H
-    #define my_teams_H
+#ifndef MY_TEAMS_H
+    #define MY_TEAMS_H
 
     #include <string.h>
     #include <stdlib.h>

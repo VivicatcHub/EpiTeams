@@ -8,7 +8,7 @@
 SRC = $(shell find src -type f -name "*.c")
 OBJ = $(SRC:.c=.o)
 
-NAME = myftp
+NAME = my_teams
 
 CFLAGS = -Wall -Wextra -Werror -I./include
 
