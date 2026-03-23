@@ -1,0 +1,37 @@
+/*
+** EPITECH PROJECT, 2026
+** my_teams
+** File description:
+** protocol.h
+*/
+
+#ifndef PROTOCOL_H
+    #define PROTOCOL_H
+
+    #define CRLF "\r\n"
+
+    #define CODE_FILE_STATUS_OK "150"
+    #define CODE_COMMAND_OK "200"
+    #define CODE_SYSTEM_STATUS "211"
+    #define CODE_HELP_MESSAGE "214"
+    #define CODE_SYSTEM_TYPE "215"
+    #define CODE_SERVICE_READY "220"
+    #define CODE_QUIT "221"
+    #define CODE_TRANSFER_COMPLETE "226"
+    #define CODE_PASSIVE_MODE "227"
+    #define CODE_LOGIN_SUCCESS "230"
+    #define CODE_FILE_ACTION_OK "250"
+    #define CODE_PATHNAME_CREATED "257"
+    #define CODE_PASSWORD_REQUIRED "331"
+    #define CODE_FILE_ACTION_PENDING "350"
+    #define CODE_SERVICE_NOT_AVAILABLE "421"
+    #define CODE_CANNOT_OPEN_DATA "425"
+    #define CODE_CONNECTION_CLOSED "426"
+    #define CODE_ACTION_ABORTED "451"
+    #define CODE_SYNTAX_ERROR "500"
+    #define CODE_SYNTAX_ERROR_PARAM "501"
+    #define CODE_COMMAND_NOT_IMPLEMENTED "502"
+    #define CODE_BAD_SEQUENCE "503"
+    #define CODE_NOT_LOGGED_IN "530"
+    #define CODE_FILE_UNAVAILABLE "550"
+#endif
