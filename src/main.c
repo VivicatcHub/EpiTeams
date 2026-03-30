@@ -44,7 +44,7 @@ static int validate_args(int argc, char **argv)
 int main(int argc, char **argv)
 {
     if (argc == 2 && (strcmp(argv[1], "-h") == 0 ||
-            strcmp(argv[1], "--help") == 0)) {
+        strcmp(argv[1], "--help") == 0)) {
         display_usage();
         return 0;
     }

@@ -20,7 +20,7 @@ int open_data_conn(client_t *client)
         if (data_fd < 0)
             return -1;
         if (connect(data_fd, (struct sockaddr *)&client->data_addr,
-                sizeof(client->data_addr)) < 0) {
+            sizeof(client->data_addr)) < 0) {
             close(data_fd);
             return -1;
         }

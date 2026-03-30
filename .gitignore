@@ -60,3 +60,4 @@ my_teams
 
 *.txt
 *.pdf
+.editorconfig

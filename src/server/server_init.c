@@ -17,10 +17,10 @@ static void set_server_socket(server_t *server)
         exit(EXIT_FAILURE);
     }
     if (setsockopt(server->socket,
-            SOL_SOCKET,
-            SO_REUSEADDR,
-            &opt,
-            sizeof(opt)) == -1) {
+        SOL_SOCKET,
+        SO_REUSEADDR,
+        &opt,
+        sizeof(opt)) == -1) {
         perror("setsockopt");
         close(server->socket);
         exit(EXIT_FAILURE);
@@ -36,8 +36,8 @@ static void bind_server(server_t *server)
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = htons(server->port);
     if (bind(server->socket,
-            (struct sockaddr *)&server_addr,
-            sizeof(server_addr)) == -1) {
+        (struct sockaddr *)&server_addr,
+        sizeof(server_addr)) == -1) {
         perror("bind");
         close(server->socket);
         exit(EXIT_FAILURE);
