@@ -47,9 +47,6 @@ void dispatch_command(client_t *client, char *line)
 
     parse_command(line, name, &args);
     for (int i = 0; commands[i].name != NULL; i++) {
-        printf("Received command %s from client %s:%d\n", name,
-            get_ip_address(&client->address.sin_addr),
-            get_port(&client->address.sin_port));
         if (strcasecmp(commands[i].name, name) != 0)
             continue;
         if (!no_auth_required(name) && client->state != AUTHENTICATED) {
