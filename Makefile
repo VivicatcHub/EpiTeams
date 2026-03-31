@@ -48,7 +48,6 @@ CFLAGS	+=	-Wunused-parameter
 ## NOTE: dev environment will compile using gcc for faster compilation
 ifeq ($(ENV), dev)
 	CC = gcc
-	CXX = g++
 	CFLAGS	+=	-g3 -DENV_DEV
 else
 	CFLAGS	+=	-O2 -fno-builtin
@@ -59,7 +58,8 @@ TESTS_PATH	=	tests/
 all:	$(NAME_SERVER) $(NAME_CLI)
 
 $(NAME_SERVER):	$(OBJS_SERVER)
-	@$(CC) -I./include/server/ -I./libs/myteams/ $(CFLAGS) $(OBJS_SERVER) -o $(NAME_SERVER) \
+	@$(CC) -I./include/server/ -I./libs/myteams/ $(CFLAGS) $(OBJS_SERVER) -o \
+	$(NAME_SERVER) \
 	&& $(call PRINT,COMPILED,$(BOLD_)$(NAME_SERVER)) \
 	|| $(call ERROR,BUILD FAILED,$@)
 
@@ -93,5 +93,8 @@ fclean: clean
 	&& $(call REMOVE,REMOVE,$(NAME_CLI))
 
 re:	fclean all
+
+mango:
+	mango -Ef libs/*
 
 .PHONY: all clean fclean re

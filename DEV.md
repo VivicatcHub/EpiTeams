@@ -7,8 +7,8 @@
 
 ## 🏗️ Général / Infrastructure
 
-- [ ] **Makefile** avec les règles `all`, `re`, `clean`, `fclean` pour les deux binaires
-- [ ] **Bibliothèque de logging** présente dans `libs/myteams/` à la racine du dépôt
+- [x] **Makefile** avec les règles `all`, `re`, `clean`, `fclean` pour les deux binaires
+- [x] **Bibliothèque de logging** présente dans `libs/myteams/` à la racine du dépôt
   - [ ] Utiliser **uniquement** les fonctions de la lib pour afficher les événements (sur stderr)
   - [ ] Ne jamais écrire manuellement sur stderr — utiliser stdout pour les erreurs perso
 - [ ] **RFC** — Rédiger une documentation de protocole au style RFC
