@@ -1,14 +1,16 @@
-/*
-** EPITECH PROJECT, 2026
-** MyTeams
-** File description:
-** main.cpp
-*/
-
 #include "client.hpp"
+#include "class/Flags.hpp"
 
-int main() {
-    std::cout << "Hello World!" << std::endl;
+int main(int ac, char **av) {
+    Flags flags;
+    flags.getFlags(ac, av);
 
-    return 0;
+    if (flags.isHelpFlag()) {
+        flags.printHelp(av[0]);
+        return NOERROR;
+    }
+
+    std::cout << "IP: " << flags.getIp() << std::endl;
+    std::cout << "Port: " << flags.getPort() << std::endl;
+    return NOERROR;
 }

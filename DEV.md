@@ -107,8 +107,8 @@
 
 ### Démarrage & usage
 
-- [ ] Vérifier les arguments : `./myteams_cli <ip> <port>`
-  - [ ] Afficher le message d'usage si `--help` ou arguments invalides
+- [x] Vérifier les arguments : `./myteams_cli <ip> <port>`
+  - [x] Afficher le message d'usage si `--help` ou arguments invalides
 - [ ] Se connecter au serveur via TCP
 
 ### Réseau
