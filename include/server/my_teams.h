@@ -37,6 +37,8 @@
     #define MAX_DESCRIPTION_LENGTH 255
     #define MAX_BODY_LENGTH 512
 
+    #define EXIT_ERROR 84
+
 typedef struct args_parser_s {
     int h1;
     int h2;

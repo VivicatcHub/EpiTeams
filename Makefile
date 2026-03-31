@@ -71,6 +71,7 @@ $(NAME_CLI):	$(OBJS_CLI)
 # Build object files into the build/ directory, creating dirs as needed
 $(OBJDIR_SERVER)/%.o: src/server/%.c
 	@mkdir -p $(dir $@)
+
 	@$(CC) -c $< -o $@ -I./include/server/ -I./libs/myteams/ $(CFLAGS) \
 	&& $(call PRINT,COMPILED,$(BOLD_)$@) \
 	|| $(call ERROR,BUILD FAILED,$@)
