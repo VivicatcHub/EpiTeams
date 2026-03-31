@@ -21,8 +21,6 @@ int add_client(server_t *server, int fd, struct sockaddr_in *addr)
     client = create_client(fd, addr);
     if (!client)
         return -1;
-    client->server = (struct server_s *)server;
-    client->current_dir = strdup(server->root_path);
     server->clients[i] = client;
     printf("New client connected: %s:%d\n",
         get_ip_address(&addr->sin_addr), get_port(&addr->sin_port));

@@ -41,13 +41,10 @@ typedef struct client_s {
     enum client_mode mode;
     enum client_permission permission;
     char *username;
-    char *current_dir;
     char buffer[MAX_BUFFER];
     int buffer_position;
-    int child_process_pid;
     int data_socket;
     struct sockaddr_in data_addr;
-    struct server_s *server;
 } client_t;
 
 void accept_client(server_t *server);

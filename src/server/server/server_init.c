@@ -14,7 +14,7 @@ static void set_server_socket(server_t *server)
     server->socket = socket(AF_INET, SOCK_STREAM, 0);
     if (server->socket == -1) {
         perror("socket");
-        exit(EXIT_FAILURE);
+        exit(EXIT_ERROR);
     }
     if (setsockopt(server->socket,
             SOL_SOCKET,
@@ -23,7 +23,7 @@ static void set_server_socket(server_t *server)
             sizeof(opt)) == -1) {
         perror("setsockopt");
         close(server->socket);
-        exit(EXIT_FAILURE);
+        exit(EXIT_ERROR);
     }
 }
 
@@ -40,7 +40,7 @@ static void bind_server(server_t *server)
             sizeof(server_addr)) == -1) {
         perror("bind");
         close(server->socket);
-        exit(EXIT_FAILURE);
+        exit(EXIT_ERROR);
     }
 }
 

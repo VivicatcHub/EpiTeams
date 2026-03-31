@@ -7,21 +7,6 @@
 
 #include "my_teams.h"
 
-void reap_children(server_t *server)
-{
-    int status;
-
-    for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (!server->clients[i] ||
-            server->clients[i]->child_process_pid <= 0)
-            continue;
-        if (waitpid(server->clients[i]->child_process_pid,
-                &status, WNOHANG) > 0) {
-            server->clients[i]->child_process_pid = 0;
-        }
-    }
-}
-
 static void build_stdin_pollfd(struct pollfd *fds, client_t **client_map,
     int *nfds)
 {
@@ -60,7 +45,7 @@ static int do_poll(struct pollfd *fds, int nfds)
     if (poll(fds, nfds, -1) != -1)
         return 0;
     if (errno == EINTR)
-        return 1;
+        return EXIT_FAILURE;
     perror("poll");
     return -1;
 }
@@ -101,6 +86,5 @@ void run_server(server_t *server)
             break;
         if (ret == 0)
             handle_events(server, fds, client_map, nfds);
-        reap_children(server);
     }
 }
