@@ -33,7 +33,7 @@ define REMOVE
 endef
 
 ## FLAGS ##
-CFLAGS	=	-I./include/
+CFLAGS	=	-I./include/server -I./include/cli
 CFLAGS	+=	-Wall
 CFLAGS	+=	-Wextra
 CFLAGS	+=	-Wpedantic
