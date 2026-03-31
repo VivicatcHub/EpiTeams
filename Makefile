@@ -15,11 +15,16 @@ CYAN_	:=	\e[36m
 
 ## KEYWORDS ##
 CC	=	epiclang
+CXX	=	g++
 RM	=	rm
-NAME	=	myteams
-SRCS	=	$(shell find src -type f -name "*.c")
-OBJDIR	=	build
-OBJS	=	$(patsubst %.c,$(OBJDIR)/%.o,$(SRCS))
+NAME_SERVER	=	myteams_server
+NAME_CLI	=	myteams_cli
+SRCS_SERVER	=	$(shell find src/server -type f -name "*.c")
+SRCS_CLI	=	$(shell find src/cli -type f -name "*.cpp")
+OBJDIR_SERVER	=	build/server
+OBJDIR_CLI	=	build/cli
+OBJS_SERVER	=	$(patsubst src/server/%.c,$(OBJDIR_SERVER)/%.o,$(SRCS_SERVER))
+OBJS_CLI	=	$(patsubst src/cli/%.cpp,$(OBJDIR_CLI)/%.o,$(SRCS_CLI))
 
 ## MESSAGES ##
 define PRINT
@@ -33,8 +38,7 @@ define REMOVE
 endef
 
 ## FLAGS ##
-CFLAGS	=	-I./include/server -I./include/cli
-CFLAGS	+=	-Wall
+CFLAGS	=	-Wall
 CFLAGS	+=	-Wextra
 CFLAGS	+=	-Wpedantic
 CFLAGS	+=	-Wunused
@@ -44,6 +48,7 @@ CFLAGS	+=	-Wunused-parameter
 ## NOTE: dev environment will compile using gcc for faster compilation
 ifeq ($(ENV), dev)
 	CC = gcc
+	CXX = g++
 	CFLAGS	+=	-g3 -DENV_DEV
 else
 	CFLAGS	+=	-O2 -fno-builtin
@@ -51,29 +56,41 @@ endif
 
 TESTS_PATH	=	tests/
 
-all:	$(NAME)
+all:	$(NAME_SERVER) $(NAME_CLI)
 
-$(NAME):	$(OBJS)
-	@$(CC) $(OBJS) -o $(NAME) $(CFLAGS) \
-	&& $(call PRINT,COMPILED,$(BOLD_)$(NAME)) \
+$(NAME_SERVER):	$(OBJS_SERVER)
+	@$(CC) -I./include/server/ -I./libs/myteams/ $(CFLAGS) $(OBJS_SERVER) -o $(NAME_SERVER) \
+	&& $(call PRINT,COMPILED,$(BOLD_)$(NAME_SERVER)) \
+	|| $(call ERROR,BUILD FAILED,$@)
+
+$(NAME_CLI):	$(OBJS_CLI)
+	@$(CXX) -I./include/cli/ $(CFLAGS) $(OBJS_CLI) -o $(NAME_CLI) -lstdc++ \
+	&& $(call PRINT,COMPILED,$(BOLD_)$(NAME_CLI)) \
 	|| $(call ERROR,BUILD FAILED,$@)
 
 # Build object files into the build/ directory, creating dirs as needed
-$(OBJDIR)/%.o: %.c
+$(OBJDIR_SERVER)/%.o: src/server/%.c
 	@mkdir -p $(dir $@)
-	@$(CC) -c $< -o $@ $(CFLAGS) \
+	@$(CC) -c $< -o $@ -I./include/server/ -I./libs/myteams/ $(CFLAGS) \
+	&& $(call PRINT,COMPILED,$(BOLD_)$@) \
+	|| $(call ERROR,BUILD FAILED,$@)
+
+$(OBJDIR_CLI)/%.o: src/cli/%.cpp
+	@mkdir -p $(dir $@)
+	@$(CXX) -c $< -o $@ -I./include/cli/ $(CFLAGS) \
 	&& $(call PRINT,COMPILED,$(BOLD_)$@) \
 	|| $(call ERROR,BUILD FAILED,$@)
 
 clean:
-	@$(RM) -f $(OBJS) \
-	&& $(RM) -rf $(OBJDIR) \
+	@$(RM) -f $(OBJS_SERVER) $(OBJS_CLI) \
+	&& $(RM) -rf $(OBJDIR_SERVER) $(OBJDIR_CLI) \
 	&& $(call REMOVE,REMOVE,.o files) \
 	&& $(call REMOVE,REMOVE,.hi files)
 
 fclean: clean
-	@$(RM) -f $(NAME) \
-	&& $(call REMOVE,REMOVE,$(NAME))
+	@$(RM) -f $(NAME_SERVER) $(NAME_CLI) \
+	&& $(call REMOVE,REMOVE,$(NAME_SERVER)) \
+	&& $(call REMOVE,REMOVE,$(NAME_CLI))
 
 re:	fclean all
 
