@@ -56,7 +56,8 @@ dkms.conf
 
 # my_teams
 my_teams
-!include/libmyteams.so
+
+build/
 
 *.txt
 *.pdf

@@ -16,7 +16,7 @@ void reap_children(server_t *server)
             server->clients[i]->child_process_pid <= 0)
             continue;
         if (waitpid(server->clients[i]->child_process_pid,
-            &status, WNOHANG) > 0) {
+                &status, WNOHANG) > 0) {
             server->clients[i]->child_process_pid = 0;
         }
     }

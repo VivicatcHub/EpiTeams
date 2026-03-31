@@ -1,10 +1,9 @@
 ##
 ## EPITECH PROJECT, 2026
-## MyTeams
+## my_teams
 ## File description:
 ## Makefile
 ##
-
 
 ## STYLE ##
 ECHO	:=	/bin/echo
@@ -14,11 +13,10 @@ RED_	:=	\e[31m
 GREEN_	:=	\e[32m
 CYAN_	:=	\e[36m
 
-
 ## KEYWORDS ##
 CC	=	epiclang
 RM	=	rm
-NAME	=	my_teams
+NAME	=	myteams
 SRCS	=	$(shell find src -type f -name "*.c")
 OBJDIR	=	build
 OBJS	=	$(patsubst %.c,$(OBJDIR)/%.o,$(SRCS))
@@ -43,7 +41,9 @@ CFLAGS	+=	-Wunused
 CFLAGS	+=	-Wunused-parameter
 
 ## for doing debug execute "make ENV=dev"
+## NOTE: dev environment will compile using gcc for faster compilation
 ifeq ($(ENV), dev)
+	CC = gcc
 	CFLAGS	+=	-g3 -DENV_DEV
 else
 	CFLAGS	+=	-O2 -fno-builtin

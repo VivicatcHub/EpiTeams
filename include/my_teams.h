@@ -33,6 +33,10 @@
 
     #define UNUSED __attribute__((unused))
 
+    #define MAX_NAME_LENGTH 32
+    #define MAX_DESCRIPTION_LENGTH 255
+    #define MAX_BODY_LENGTH 512
+
 typedef struct args_parser_s {
     int h1;
     int h2;
