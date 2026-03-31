@@ -7,31 +7,38 @@
 
 #include "my_teams.h"
 
+static int handle_full_buffer(server_t *server, client_t *client)
+{
+    if (strstr(client->buffer, CRLF) != NULL)
+        return 0;
+    send_response(client, CODE_SYNTAX_ERROR_PARAM,
+        "Command too long (missing CRLF).");
+    remove_client(server, client);
+    return -1;
+}
+
 static int read_from_client(client_t *client)
 {
-    int bytes = read(client->socket,
+    int bytes;
+
+    if (client->buffer_position >= MAX_BUFFER - 1)
+        return 0;
+    bytes = read(client->socket,
         client->buffer + client->buffer_position,
         MAX_BUFFER - client->buffer_position - 1);
-
-    if (bytes <= 0) {
+    if (bytes <= 0)
         return -1;
-    }
     client->buffer_position += bytes;
     client->buffer[client->buffer_position] = '\0';
     return 0;
 }
 
-void handle_client_data(server_t *server, client_t *client)
+static void crlf_search(client_t *client)
 {
-    char *crlf;
+    char *crlf = strstr(client->buffer, CRLF);
     char command[MAX_BUFFER];
     int cmd_len;
 
-    if (read_from_client(client) == -1) {
-        remove_client(server, client);
-        return;
-    }
-    crlf = strstr(client->buffer, CRLF);
     while (crlf != NULL) {
         cmd_len = crlf - client->buffer;
         memcpy(command, client->buffer, cmd_len);
@@ -43,4 +50,16 @@ void handle_client_data(server_t *server, client_t *client)
         dispatch_command(client, command);
         crlf = strstr(client->buffer, CRLF);
     }
+}
+
+void handle_client_data(server_t *server, client_t *client)
+{
+    if (read_from_client(client) == -1) {
+        remove_client(server, client);
+        return;
+    }
+    if (client->buffer_position >= MAX_BUFFER - 1 &&
+        handle_full_buffer(server, client) == -1)
+        return;
+    crlf_search(client);
 }
