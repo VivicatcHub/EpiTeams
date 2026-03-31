@@ -55,7 +55,10 @@ dkms.conf
 *.dwo
 
 # my_teams
-my_teams
+myteams_cli
+myteams_server
+
+!libs/myteams/libmyteams.so
 
 build/
 
