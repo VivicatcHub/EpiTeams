@@ -10,21 +10,11 @@
 const command_t commands[] = {
     {"USER", cmd_user},
     {"PASS", cmd_pass},
-    {"CWD", cmd_cwd},
-    {"CDUP", cmd_cdup},
     {"QUIT", cmd_quit},
-    {"DELE", cmd_dele},
-    {"PWD", cmd_pwd},
     {"PASV", cmd_pasv},
     {"PORT", cmd_port},
     {"HELP", cmd_help},
     {"NOOP", cmd_noop},
-    {"RETR", cmd_retr},
-    {"STOR", cmd_stor},
-    {"LIST", cmd_list},
-    {"SYST", cmd_syst},
-    {"FEAT", cmd_feat},
-    {"SHUTDOWN", cmd_shutdown},
     {NULL, NULL}
 };
 
