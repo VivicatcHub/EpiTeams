@@ -76,6 +76,7 @@ bool Client::run(const std::string &ip, int port) {
             if (response.empty()) { break; }
 
             std::cout << response << std::endl;
+            
             displayPrompt();
         }
     }

@@ -70,12 +70,10 @@ bool CommandHandler::handleUnsubscribe(const std::vector<std::string> &args) {
 
 bool CommandHandler::handleSubscribed(const std::vector<std::string> &args) {
     if (args.size() == 0) { return sendCommand("SUBSCRIBED"); }
-
     if (args.size() == 1) {
         std::string cmd = "SUBSCRIBED " + args[0];
         return sendCommand(cmd);
     }
-
     return false;
 }
 
@@ -86,11 +84,8 @@ bool CommandHandler::handleUse(const std::vector<std::string> &args) {
     }
 
     if (args.size() >= 1) { context.setTeamUuid(args[0]); }
-
     if (args.size() >= 2) { context.setChannelUuid(args[1]); }
-
     if (args.size() >= 3) { context.setThreadUuid(args[2]); }
-
     return args.size() <= 3;
 }
 
