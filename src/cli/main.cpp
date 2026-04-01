@@ -10,7 +10,8 @@ int main(int ac, char **av) {
         return NOERROR;
     }
 
-    std::cout << "IP: " << flags.getIp() << std::endl;
-    std::cout << "Port: " << flags.getPort() << std::endl;
+    Client client;
+    if (!client.run(flags.getIp(), flags.getPort())) { return ERROR; }
+
     return NOERROR;
 }
