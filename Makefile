@@ -43,7 +43,7 @@ CFLAGS	+=	-Wextra
 CFLAGS	+=	-Wpedantic
 CFLAGS	+=	-Wunused
 CFLAGS	+=	-Wunused-parameter
-CFLAGS	+=	-lmyteams -L./libs/myteams/libmy
+CFLAGS	+=	-L./libs/myteams/libmy
 
 ## for doing debug execute "make ENV=dev"
 ## NOTE: dev environment will compile using gcc for faster compilation

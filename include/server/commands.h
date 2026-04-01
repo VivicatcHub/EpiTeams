@@ -25,6 +25,8 @@ void cmd_port(client_t *client, char *args);
 void cmd_help(client_t *client, char *args);
 void cmd_noop(client_t *client, char *args);
 
+void cmd_placeholder(client_t *client, char *args); // For debugging
+
 void dispatch_command(client_t *client, char *line);
 
 extern const command_t commands[];

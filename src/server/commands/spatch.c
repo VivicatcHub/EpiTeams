@@ -8,6 +8,7 @@
 #include "my_teams.h"
 
 const command_t commands[] = {
+    {"USERS", cmd_placeholder},
     {"USER", cmd_user},
     {"PASS", cmd_pass},
     {"QUIT", cmd_quit},
@@ -20,7 +21,8 @@ const command_t commands[] = {
 
 static int no_auth_required(char const *name)
 {
-    return strcasecmp(name, "USER") == 0
+    return strcasecmp(name, "USERS") == 0
+        || strcasecmp(name, "USER") == 0
         || strcasecmp(name, "PASS") == 0
         || strcasecmp(name, "QUIT") == 0
         || strcasecmp(name, "HELP") == 0;
