@@ -40,35 +40,30 @@ bool CommandHandler::handleUsers() { return sendCommand("USERS"); }
 
 bool CommandHandler::handleUser(const std::vector<std::string> &args) {
     if (args.size() != 1) { return false; }
-
     std::string cmd = "USER " + args[0];
     return sendCommand(cmd);
 }
 
 bool CommandHandler::handleSend(const std::vector<std::string> &args) {
     if (args.size() != 2) { return false; }
-
     std::string cmd = "SEND " + args[0] + " " + args[1];
     return sendCommand(cmd);
 }
 
 bool CommandHandler::handleMessages(const std::vector<std::string> &args) {
     if (args.size() != 1) { return false; }
-
     std::string cmd = "MESSAGES " + args[0];
     return sendCommand(cmd);
 }
 
 bool CommandHandler::handleSubscribe(const std::vector<std::string> &args) {
     if (args.size() != 1) { return false; }
-
     std::string cmd = "SUBSCRIBE " + args[0];
     return sendCommand(cmd);
 }
 
 bool CommandHandler::handleUnsubscribe(const std::vector<std::string> &args) {
     if (args.size() != 1) { return false; }
-
     std::string cmd = "UNSUBSCRIBE " + args[0];
     return sendCommand(cmd);
 }
@@ -101,7 +96,6 @@ bool CommandHandler::handleUse(const std::vector<std::string> &args) {
 
 bool CommandHandler::handleCreate(const std::vector<std::string> &args) {
     if (args.size() == 0) { return false; }
-
     if (!context.isTeamContext()) {
         if (args.size() != 2) { return false; }
         std::string cmd = "CREATE_TEAM " + args[0] + " " + args[1];
@@ -121,7 +115,6 @@ bool CommandHandler::handleCreate(const std::vector<std::string> &args) {
     }
 
     if (args.size() != 1) { return false; }
-
     std::string cmd = "CREATE_COMMENT " + context.getThreadUuid() + " " + args[0];
     return sendCommand(cmd);
 }

@@ -109,11 +109,11 @@
 
 - [x] Vérifier les arguments : `./myteams_cli <ip> <port>`
   - [x] Afficher le message d'usage si `--help` ou arguments invalides
-- [ ] Se connecter au serveur via TCP
+- [x] Se connecter au serveur via TCP
 
 ### Réseau
 
-- [ ] Lire les commandes depuis **stdin** et les envoyer au serveur
+- [x] Lire les commandes depuis **stdin** et les envoyer au serveur
 - [ ] Recevoir et afficher les réponses du serveur (via la bibliothèque de display)
 - [ ] Utiliser `poll` pour gérer simultanément stdin et la socket serveur
 
