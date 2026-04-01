@@ -84,6 +84,10 @@ void run_server(server_t *server)
         ret = do_poll(fds, nfds);
         if (ret == -1)
             break;
+        if (ret == EXIT_FAILURE) {
+            server->state = STOPPING;
+            break;
+        }
         if (ret == 0)
             handle_events(server, fds, client_map, nfds);
     }

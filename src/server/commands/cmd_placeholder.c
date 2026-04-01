@@ -7,10 +7,11 @@
 
 #include "my_teams.h"
 
-void cmd_placeholder(client_t *client, char *args)
+void cmd_placeholder(server_t *server, client_t *client, char *args)
 {
     char buf[MAX_BUFFER];
 
+    (void)server;
     (void)args;
     snprintf(buf, sizeof(buf), "If you see this, it means you somehow"
         " reached a placeholder :p");

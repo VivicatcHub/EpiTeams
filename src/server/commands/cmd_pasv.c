@@ -66,11 +66,12 @@ static void send_pasv_response(client_t *client, int sock,
     send_response(client, CODE_PASSIVE_MODE, msg);
 }
 
-void cmd_pasv(client_t *client, char *args UNUSED)
+void cmd_pasv(server_t *server, client_t *client, char *args UNUSED)
 {
     struct sockaddr_in bound;
     int sock;
 
+    (void)server;
     if (client->data_socket != -1) {
         close(client->data_socket);
         client->data_socket = -1;

@@ -7,10 +7,11 @@
 
 #include "my_teams.h"
 
-void cmd_port(client_t *client, char *args)
+void cmd_port(server_t *server, client_t *client, char *args)
 {
     args_parser_t p = { 0 };
 
+    (void)server;
     if (!args || sscanf(args, "%d,%d,%d,%d,%d,%d",
             &p.h1, &p.h2, &p.h3, &p.h4, &p.p1, &p.p2) != 6) {
         send_response(client, CODE_SYNTAX_ERROR_PARAM,

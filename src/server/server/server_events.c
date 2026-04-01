@@ -11,8 +11,10 @@ void handle_server_events(server_t *server)
 {
     char *line = NULL;
     size_t len = 0;
+    int ret;
 
-    if (getline(&line, &len, stdin) == -1 ||
+    ret = getline(&line, &len, stdin);
+    if (ret == -1 ||
         strcasecmp(line, "QUIT\n") == 0 ||
         strcasecmp(line, "EXIT\n") == 0 ||
         strcasecmp(line, "SHUTDOWN\n") == 0) {

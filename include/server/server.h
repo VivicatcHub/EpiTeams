@@ -9,6 +9,7 @@
     #define SERVER_H
 
     #include "client.h"
+    #include "data_structures.h"
 
     #define MAX_CLIENTS 2048
 
@@ -22,6 +23,7 @@ typedef struct server_s {
     int socket;
     enum server_state state;
     client_t *clients[MAX_CLIENTS];
+    server_data_t data;
 } server_t;
 
 int start_server(char *port_str);

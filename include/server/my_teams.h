@@ -30,12 +30,9 @@
     #include "client.h"
     #include "protocol.h"
     #include "commands.h"
+    #include "serialization.h"
 
     #define UNUSED __attribute__((unused))
-
-    #define MAX_NAME_LENGTH 32
-    #define MAX_DESCRIPTION_LENGTH 255
-    #define MAX_BODY_LENGTH 512
 
     #define EXIT_ERROR 84
 
@@ -47,11 +44,6 @@ typedef struct args_parser_s {
     int p1;
     int p2;
 } args_parser_t;
-
-typedef struct help_entries_s {
-    char const *name;
-    char const *description;
-} help_entries_t;
 
 char *get_ip_address(struct in_addr *addr);
 int get_port(in_port_t *port);

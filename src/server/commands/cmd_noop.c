@@ -7,8 +7,9 @@
 
 #include "my_teams.h"
 
-void cmd_noop(client_t *client, char *args UNUSED)
+void cmd_noop(server_t *server, client_t *client, char *args UNUSED)
 {
+    (void)server;
     if (args && args[0] != '\0') {
         send_response(client, CODE_SYNTAX_ERROR_PARAM,
             "NOOP command does not take any parameters.");

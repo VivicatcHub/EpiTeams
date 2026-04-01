@@ -7,19 +7,17 @@
 
 #include "my_teams.h"
 
-void cmd_user(client_t *client, char *args)
+void cmd_user(server_t *server, client_t *client, char *args)
 {
+    (void)server;
     if (!args || args[0] == '\0') {
         send_response(client, CODE_SYNTAX_ERROR_PARAM,
             "Syntax error in parameters.");
         return;
     }
     if (args) {
-        free(client->username);
-        client->username = strdup(args);
-        client->state = USER_PROVIDED;
-        send_response(client, CODE_PASSWORD_REQUIRED,
-            "User name okay, need password.");
-        return;
+        client->state = CONNECTED;
+        send_response(client, CODE_LOGIN_SUCCESS,
+            "User logged in successfully.");
     }
 }

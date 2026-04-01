@@ -33,7 +33,7 @@ static int read_from_client(client_t *client)
     return 0;
 }
 
-static void crlf_search(client_t *client)
+static void crlf_search(server_t *server, client_t *client)
 {
     char *crlf = strstr(client->buffer, CRLF);
     char command[MAX_BUFFER];
@@ -47,7 +47,7 @@ static void crlf_search(client_t *client)
             client->buffer_position - cmd_len - 2);
         client->buffer_position -= cmd_len + 2;
         client->buffer[client->buffer_position] = '\0';
-        dispatch_command(client, command);
+        dispatch_command(server, client, command);
         crlf = strstr(client->buffer, CRLF);
     }
 }
@@ -61,5 +61,5 @@ void handle_client_data(server_t *server, client_t *client)
     if (client->buffer_position >= MAX_BUFFER - 1 &&
         handle_full_buffer(server, client) == -1)
         return;
-    crlf_search(client);
+    crlf_search(server, client);
 }
