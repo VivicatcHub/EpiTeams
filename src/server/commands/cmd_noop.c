@@ -7,7 +7,7 @@
 
 #include "my_teams.h"
 
-void cmd_noop(client_t *client, char *args UNUSED)
+void cmd_noop(server_t *server UNUSED, client_t *client, char *args UNUSED)
 {
     if (args && args[0] != '\0') {
         send_response(client, CODE_SYNTAX_ERROR_PARAM,

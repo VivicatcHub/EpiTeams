@@ -12,11 +12,6 @@
 
 typedef struct server_s server_t;
 
-typedef struct user_s {
-    char const *username;
-    char const *password;
-} user_t;
-
 enum client_state {
     CONNECTED,
     USER_PROVIDED,
@@ -55,5 +50,4 @@ client_t *create_client(int socket, struct sockaddr_in *address);
 void destroy_client(client_t *client);
 void send_response(client_t *client, char const *code, char const *msg);
 
-extern const user_t users[];
 #endif

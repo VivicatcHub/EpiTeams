@@ -61,6 +61,7 @@ myteams_server
 !libs/myteams/libmyteams.so
 
 build/
+data/
 
 *.txt
 *.pdf

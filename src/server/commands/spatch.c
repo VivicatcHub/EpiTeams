@@ -10,12 +10,9 @@
 const command_t commands[] = {
     {"USERS", cmd_placeholder},
     {"USER", cmd_user},
-    {"PASS", cmd_pass},
     {"QUIT", cmd_quit},
     {"PASV", cmd_pasv},
     {"PORT", cmd_port},
-    {"HELP", cmd_help},
-    {"NOOP", cmd_noop},
     {NULL, NULL}
 };
 
@@ -42,7 +39,7 @@ static void parse_command(char *line, char *name, char **args)
     }
 }
 
-void dispatch_command(client_t *client, char *line)
+void dispatch_command(server_t *server, client_t *client, char *line)
 {
     char name[16];
     char *args;
@@ -55,7 +52,7 @@ void dispatch_command(client_t *client, char *line)
             send_response(client, CODE_NOT_LOGGED_IN, "Not logged in.");
             return;
         }
-        commands[i].handler(client, args);
+        commands[i].handler(server, client, args);
         return;
     }
     send_response(client, CODE_SYNTAX_ERROR, "Unknown command.");

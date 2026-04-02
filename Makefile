@@ -44,6 +44,7 @@ CFLAGS	+=	-Wpedantic
 CFLAGS	+=	-Wunused
 CFLAGS	+=	-Wunused-parameter
 CFLAGS	+=	-L./libs/myteams/ -lmyteams
+CFLAGS	+=	-luuid
 
 ## for doing debug execute "make ENV=dev"
 ## NOTE: dev environment will compile using gcc for faster compilation
@@ -59,7 +60,7 @@ TESTS_PATH	=	tests/
 all:	$(NAME_SERVER) $(NAME_CLI)
 
 $(NAME_SERVER):	$(OBJS_SERVER)
-	@$(CC) -I./include/server/ -I./libs/myteams/ $(CFLAGS) $(OBJS_SERVER) -o \
+	@$(CC) -I./include/server/ -I./libs/myteams/ $(OBJS_SERVER) $(CFLAGS) -o \
 	$(NAME_SERVER) \
 	&& $(call PRINT,COMPILED,$(BOLD_)$(NAME_SERVER)) \
 	|| $(call ERROR,BUILD FAILED,$@)
@@ -72,7 +73,6 @@ $(NAME_CLI):	$(OBJS_CLI)
 # Build object files into the build/ directory, creating dirs as needed
 $(OBJDIR_SERVER)/%.o: src/server/%.c
 	@mkdir -p $(dir $@)
-
 	@$(CC) -c $< -o $@ -I./include/server/ -I./libs/myteams/ $(CFLAGS) \
 	&& $(call PRINT,COMPILED,$(BOLD_)$@) \
 	|| $(call ERROR,BUILD FAILED,$@)
