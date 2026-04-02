@@ -7,9 +7,8 @@
 
 #include "my_teams.h"
 
-void cmd_user(server_t *server, client_t *client, char *args)
+void cmd_user(server_t *server UNUSED, client_t *client, char *args)
 {
-    (void)server;
     if (!args || args[0] == '\0') {
         send_response(client, CODE_SYNTAX_ERROR_PARAM,
             "Syntax error in parameters.");
