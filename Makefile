@@ -43,8 +43,8 @@ CFLAGS	+=	-Wextra
 CFLAGS	+=	-Wpedantic
 CFLAGS	+=	-Wunused
 CFLAGS	+=	-Wunused-parameter
-CFLAGS	+=	-L./libs/myteams/ -lmyteams
-CFLAGS	+=	-luuid
+
+LDFLAGS	=	-L./libs/myteams/ -lmyteams -luuid
 
 ## for doing debug execute "make ENV=dev"
 ## NOTE: dev environment will compile using gcc for faster compilation
@@ -60,13 +60,14 @@ TESTS_PATH	=	tests/
 all:	$(NAME_SERVER) $(NAME_CLI)
 
 $(NAME_SERVER):	$(OBJS_SERVER)
-	@$(CC) -I./include/server/ -I./libs/myteams/ $(OBJS_SERVER) $(CFLAGS) -o \
-	$(NAME_SERVER) \
+	@$(CC) -I./include/server/ -I./libs/myteams/ $(OBJS_SERVER) $(CFLAGS) \
+	$(LDFLAGS) -o $(NAME_SERVER) \
 	&& $(call PRINT,COMPILED,$(BOLD_)$(NAME_SERVER)) \
 	|| $(call ERROR,BUILD FAILED,$@)
 
 $(NAME_CLI):	$(OBJS_CLI)
-	@$(CXX) -I./include/cli/ $(CFLAGS) $(OBJS_CLI) -o $(NAME_CLI) -lstdc++ \
+	@$(CXX) -I./include/cli/ -I./libs/myteams/ $(OBJS_CLI) $(CFLAGS) \
+	$(LDFLAGS) -o $(NAME_CLI) -lstdc++ \
 	&& $(call PRINT,COMPILED,$(BOLD_)$(NAME_CLI)) \
 	|| $(call ERROR,BUILD FAILED,$@)
 
