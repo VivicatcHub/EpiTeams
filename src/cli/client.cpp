@@ -3,16 +3,17 @@
 #include <poll.h>
 #include <unistd.h>
 
-Client::Client() : handler(tcp_client, context), is_connected(false) {}
+Client::Client() : handler(tcp_client, context), is_connected(false), waiting_for_response(false) {}
 
 void Client::displayPrompt() {
-    std::cout << "[myteams]> ";
+    std::cout << "\n╭─ \033[32mmyteams\033[0m\n╰─$ ";
     std::cout.flush();
 }
 
 bool Client::handleUserInput(const std::string &input) {
     if (!parser.parse(input)) {
         std::cerr << "Error: Invalid command format" << std::endl;
+        displayPrompt();
         return true;
     }
 
@@ -21,8 +22,10 @@ bool Client::handleUserInput(const std::string &input) {
 
     if (!handler.execute(cmd, args)) {
         std::cerr << "Error: Invalid command or arguments" << std::endl;
+        displayPrompt();
         return cmd != "logout";
     }
+    waiting_for_response = true;
     return cmd != "logout";
 }
 
@@ -36,14 +39,11 @@ bool Client::run(const std::string &ip, int port) {
     std::cout << "Connected to " << ip << ":" << port << std::endl;
     std::cout << "Type /help for available commands" << std::endl;
 
-    displayPrompt();
-
     struct pollfd fds[2];
     fds[0].fd = STDIN_FILENO;
     fds[0].events = POLLIN;
     fds[1].fd = tcp_client.getSocketFd();
     fds[1].events = POLLIN;
-
     std::string input_buffer;
     char buffer[256];
 
@@ -56,28 +56,27 @@ bool Client::run(const std::string &ip, int port) {
         }
 
         if (fds[0].revents & POLLIN) {
-            if (fgets(buffer, sizeof(buffer), stdin) == NULL) { break; }
-
-            input_buffer = buffer;
-            if (!input_buffer.empty() && input_buffer.back() == '\n') { input_buffer.pop_back(); }
-
-            if (input_buffer.empty()) {
-                displayPrompt();
-                continue;
+            // Only process user input if not waiting for a response
+            if (!waiting_for_response) {
+                if (fgets(buffer, sizeof(buffer), stdin) == NULL) { break; }
+                input_buffer = buffer;
+                if (!input_buffer.empty() && input_buffer.back() == '\n') { input_buffer.pop_back(); }
+                if (input_buffer.empty()) {
+                    displayPrompt();
+                    continue;
+                }
+                if (!handleUserInput(input_buffer)) { is_connected = false; }
             }
-
-            if (!handleUserInput(input_buffer)) { is_connected = false; }
-
-            displayPrompt();
         }
 
         if (fds[1].revents & POLLIN) {
             std::string response = tcp_client.receive();
             if (response.empty()) { break; }
-
             std::cout << response << std::endl;
-            
-            displayPrompt();
+            waiting_for_response = false;
+            if (is_connected) {
+                displayPrompt();
+            }
         }
     }
 

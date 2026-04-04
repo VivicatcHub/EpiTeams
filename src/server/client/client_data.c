@@ -47,6 +47,8 @@ static void crlf_search(server_t *server, client_t *client)
             client->buffer_position - cmd_len - 2);
         client->buffer_position -= cmd_len + 2;
         client->buffer[client->buffer_position] = '\0';
+        printf("Received command from client %d: %s\n", client->socket,
+            command);
         dispatch_command(server, client, command);
         crlf = strstr(client->buffer, CRLF);
     }

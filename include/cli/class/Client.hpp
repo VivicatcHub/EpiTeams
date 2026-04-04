@@ -13,6 +13,7 @@ private:
     Context context;
     CommandHandler handler;
     bool is_connected;
+    bool waiting_for_response;
 
     void displayPrompt();
     bool handleUserInput(const std::string &input);
