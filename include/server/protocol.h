@@ -18,6 +18,7 @@
     #define CODE_SYSTEM_TYPE "215"
     #define CODE_SERVICE_READY "220"
     #define CODE_QUIT "221"
+    #define CODE_MESSAGE_RECEIVED "225"
     #define CODE_TRANSFER_COMPLETE "226"
     #define CODE_PASSIVE_MODE "227"
     #define CODE_LOGIN_SUCCESS "230"
@@ -37,6 +38,7 @@
     #define CODE_SYNTAX_ERROR_PARAM "501"
     #define CODE_COMMAND_NOT_IMPLEMENTED "502"
     #define CODE_BAD_SEQUENCE "503"
+    #define CODE_USER_ALREADY_CONNECTED "540"
     #define CODE_NOT_LOGGED_IN "530"
     #define CODE_FILE_UNAVAILABLE "550"
 #endif

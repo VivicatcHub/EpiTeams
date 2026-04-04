@@ -30,17 +30,6 @@ static int check_arg(client_t *client, char *arg)
     return 0;
 }
 
-user_t *find_user_by_name(server_t *server, char *username)
-{
-    user_t *user = NULL;
-
-    TAILQ_FOREACH(user, &server->data.users, entries) {
-        if (strcmp(user->name, username) == 0)
-            return user;
-    }
-    return NULL;
-}
-
 static void login_existing_user(client_t *client, char *username)
 {
     char buf[MAX_BUFFER];
@@ -72,14 +61,36 @@ static void create_user_and_persist(server_t *server, client_t *client,
     send_response(client, CODE_LOGIN_SUCCESS, "New user created.");
 }
 
-static void handle_user(client_t *client, server_t *server, char *username)
+static int is_name_connected(server_t *server, char const *name)
+{
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (!server->clients[i])
+            continue;
+        if (!server->clients[i]->username)
+            continue;
+        if (strcmp(server->clients[i]->username, name) == 0)
+            return 1;
+    }
+    return 0;
+}
+
+static int handle_user(client_t *client, server_t *server, char *username)
 {
     user_t *user = find_user_by_name(server, username);
+    char uuid_buf[UUID_STR_LEN];
 
-    if (user)
+    if (user) {
+        if (is_name_connected(server, username)) {
+            send_response(client, CODE_USER_ALREADY_CONNECTED,
+                "User already connected.");
+            return -1;
+        }
         login_existing_user(client, username);
-    else
+        uuid_to_string(user->uuid, uuid_buf);
+        server_event_user_logged_in(uuid_buf);
+    } else
         create_user_and_persist(server, client, username);
+    return 0;
 }
 
 void cmd_login(server_t *server, client_t *client, char *args)
@@ -96,6 +107,7 @@ void cmd_login(server_t *server, client_t *client, char *args)
     }
     if (check_arg(client, args) == -1)
         return;
-    handle_user(client, server, args);
+    if (handle_user(client, server, args) == -1)
+        return;
     send_response(client, CODE_COMMAND_OK, "Username accepted.");
 }
