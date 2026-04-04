@@ -100,4 +100,12 @@ re:	fclean all
 mango:
 	mango -Ef libs/*
 
+test_client: $(NAME_CLI)
+	@$(ECHO) -e "[$(CYAN_)✔$(DEF_)] Running client tests..." \
+	&& LD_LIBRARY_PATH=libs/myteams ./myteams_cli 127.0.0.1 4242
+
+test_server: $(NAME_SERVER)
+	@$(ECHO) -e "[$(CYAN_)✔$(DEF_)] Running server tests..." \
+	&& LD_LIBRARY_PATH=libs/myteams ./myteams_server 4242
+
 .PHONY: all clean fclean re
