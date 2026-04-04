@@ -9,6 +9,7 @@
 
 const command_t commands[] = {
     {"USERS", cmd_placeholder},
+    {"LOGIN", cmd_login},
     {"USER", cmd_user},
     {"QUIT", cmd_quit},
     {"PASV", cmd_pasv},
@@ -18,7 +19,7 @@ const command_t commands[] = {
 
 static int no_auth_required(char const *name)
 {
-    return strcasecmp(name, "USERS") == 0
+    return strcasecmp(name, "LOGIN") == 0
         || strcasecmp(name, "USER") == 0
         || strcasecmp(name, "PASS") == 0
         || strcasecmp(name, "QUIT") == 0

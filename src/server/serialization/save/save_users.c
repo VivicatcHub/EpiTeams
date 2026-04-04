@@ -20,8 +20,8 @@ int save_users(struct user_queue_s *users)
     user = TAILQ_FIRST(users);
     while (user) {
         uuid_to_string(user->uuid, uuid_str);
-        fprintf(file, "{\"uuid\":\"%s\",\"name\":\"%s\",\"status\":%d}",
-            uuid_str, user->name, user->status);
+        fprintf(file, "{\"uuid\":\"%s\",\"name\":\"%s\"}",
+            uuid_str, user->name);
         user = TAILQ_NEXT(user, entries);
         if (user)
             fprintf(file, ",");

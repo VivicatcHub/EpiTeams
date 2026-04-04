@@ -55,11 +55,14 @@ int load_threads(struct thread_queue_s *threads)
     file = open_load_file(THREADS_FILE);
     if (!file)
         return 0;
+    printf("Loading threads...\n");
+    fscanf(file, "[");
     while (fscanf(file, "{\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
         if (append_thread(threads, file, uuid_str) == -1) {
             fclose(file);
             return -1;
         }
+        fscanf(file, ",");
     }
     fclose(file);
     return 0;

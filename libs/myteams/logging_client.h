@@ -6,9 +6,9 @@
 */
 
 #ifndef LIB_MYTEAMS_LOGGING_CLIENT_H
-#define LIB_MYTEAMS_LOGGING_CLIENT_H
+    #define LIB_MYTEAMS_LOGGING_CLIENT_H
 
-#include <time.h>
+    #include <time.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,8 +20,8 @@ extern "C" {
     **
     ** The other functions are called in response to one of your action.
     **
-    ** Ex: I received a private message (I did nothing to do so) so the function
-    ** to call is one with event in it's name.
+    ** Ex: I received a private message (I did nothing to do so)
+    ** so the function to call is one with event in it's name.
     ** Ex: I asked the server to join a team (I initiated this action) so the
     ** function to call is one that does not have event in it's name.
     */
@@ -32,8 +32,10 @@ extern "C" {
 
     /*
     ** To receive team related events you MUST be subscribed to the team
-    ** Ex: to receive client_event_thread_reply_received you must be subscribed to
-    ** the team, that have the channel, that have the thread,
+    ** Ex: to receive client_event_thread_reply_received
+    ** you must be subscribed to the team,
+    ** that have the channel,
+    ** that have the thread,
     ** that got the new reply
     */
 
@@ -44,8 +46,10 @@ extern "C" {
     */
 
     /**
-    ** @brief Must be called when a user successfully login to the server (/login).
-    ** When you log in (/login) you should also receive from the server this event.
+    ** @brief Must be called when a user
+    ** successfully login to the server (/login).
+    ** When you log in (/login) you should also receive
+    ** from the server this event.
     ** @param user_uuid The id of the user who logged in
     ** @param user_name The name of the user who logged in
     **
@@ -55,7 +59,8 @@ extern "C" {
     int client_event_logged_in(char const *user_uuid, const char *user_name);
 
     /**
-    ** @brief Must be called when a user logged out (/logout or lost connexion).
+    ** @brief Must be called when a user logged out
+    ** (/logout or lost connexion).
     ** When you log out (/logout) you should also receive the event
     ** before quitting.
     ** @param user_uuid The id of the user who logged out
@@ -97,7 +102,8 @@ extern "C" {
 
     /**
     ** @brief Must be called when a new team is created
-    ** Every logged user should receive this event (the creator of the team too)
+    ** Every logged user should receive this event
+    ** (the creator of the team too)
     ** @param team_uuid The id of the created team
     ** @param team_name The name of the created team
     ** @param team_description The description of the created team
@@ -143,8 +149,10 @@ extern "C" {
         char const *thread_body);
 
     /**
-    ** @brief Must be called when you requested a list of users from the server
-    ** ex: asking the subscribed users to a team / the list of users in a domain
+    ** @brief Must be called when you requested
+    ** a list of users from the server
+    ** ex: asking the subscribed users to a team
+    **     or the list of users in a domain
     ** This function should be called once per user in the list
     ** This function should be called even if the list only has one entry
     ** @param user_uuid The id of a user
@@ -181,7 +189,8 @@ extern "C" {
         char const *team_description);
 
     /**
-    ** @brief Must be called when you requested a list of channels from the server
+    ** @brief Must be called when you requested
+    ** a list of channels from the server
     ** ex: asking the channels in a team
     ** This function should be called one per channel in the list
     ** This function should be called even if the list only has one entry
@@ -198,7 +207,8 @@ extern "C" {
         char const *channel_description);
 
     /**
-    ** @brief Must be called when you requested a list of threads from the server
+    ** @brief Must be called when you requested
+    ** a list of threads from the server
     ** ex: asking the threads in a channel
     ** This function should be called one per thread in the list
     ** This function should be called even if the list only has one entry
@@ -219,7 +229,8 @@ extern "C" {
         char const *thread_body);
 
     /**
-    ** @brief Must be called when you requested a list of replies from the server
+    ** @brief Must be called when you requested
+    ** a list of replies from the server
     ** ex: asking the replies in a thread
     ** This function should be called one per reply in the list
     ** This function should be called even if the list only has one entry
@@ -243,7 +254,8 @@ extern "C" {
     ** This function should be called one per private  message in the list
     ** This function should be called even if the list only has one entry
     ** @param sender_uuid The id of the user who sent a private message
-    ** @param message_timestamp The unix timestamp of a private message creation
+    ** @param message_timestamp The unix timestamp of
+    ** a private message creation
     ** @param message_body The content of a private message
     **
     ** Commands:
@@ -309,8 +321,8 @@ extern "C" {
     int client_error_unknown_user(char const *user_uuid);
 
     /**
-    ** @brief Must be called when the user try to do an action he is not allowed
-    ** to perform.
+    ** @brief Must be called when the user try to do an action
+    ** he is not allowed to perform.
     ** Ex: create a thread in a team he is not subscribed
     ** Ex: create a team when he is not logged in
     **
@@ -337,7 +349,8 @@ extern "C" {
     ** ex: get the current logged user, get information about a user
     ** @param user_uuid The id of the user
     ** @param user_name The name of the user
-    ** @param user_status The status of the user (0: not connected; 1: connected)
+    ** @param user_status The status of the user
+    ** (0: not connected; 1: connected)
     **
     ** Commands:
     ** /user "user_uuid"
@@ -415,7 +428,7 @@ extern "C" {
     ** @brief Must be called when you create channel successfully
     ** @param channel_uuid The id of the channel that was created
     ** @param channel_name The name of the channel that was created
-    ** @param channel_description The description of the channel that was created
+    ** @param channel_description The description of the created channel
     **
     ** Commands:
     ** /create "channel_name" "channel_description"
@@ -467,7 +480,9 @@ extern "C" {
     ** Commands:
     ** /subscribe "team_uuid"
     **/
-    int client_print_subscribed(char const *user_uuid, char const *team_uuid);
+    int client_print_subscribed(
+        char const *user_uuid,
+        char const *team_uuid);
 
     /**
     ** @brief Must be called when you unsubscribe from a team successfully
@@ -477,7 +492,9 @@ extern "C" {
     ** Commands:
     ** /unsubscribe "team_uuid"
     **/
-    int client_print_unsubscribed(char const *user_uuid, char const *team_uuid);
+    int client_print_unsubscribed(
+        char const *user_uuid,
+        char const *team_uuid);
 
 #ifdef __cplusplus
 }

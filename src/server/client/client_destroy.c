@@ -15,5 +15,7 @@ void destroy_client(client_t *client)
         close(client->socket);
     if (client->data_socket != -1)
         close(client->data_socket);
+    if (client->username)
+        free(client->username);
     free(client);
 }

@@ -31,12 +31,12 @@ static int setup_server(server_t *server, char *port_str)
 
 static int load_and_init(server_t *server)
 {
-    printf("Loading server data...\n");
     if (load_server_data(&server->data) == -1) {
         printf("Error: Failed to load server data\n");
         return EXIT_ERROR;
     }
-    printf("Starting myteams server on port %d\n", server->port);
+    printf("Server data loaded successfully\n");
+    printf("Starting \"myteams\" server on port %d\n", server->port);
     if (init_server(server) == -1) {
         printf("Error: Failed to create server\n");
         cleanup_server_data(&server->data);

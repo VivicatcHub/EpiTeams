@@ -49,11 +49,14 @@ int load_channels(struct channel_queue_s *channels)
     file = open_load_file(CHANNELS_FILE);
     if (!file)
         return 0;
+    printf("Loading channels...\n");
+    fscanf(file, "[");
     while (fscanf(file, "{\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
         if (append_channel(channels, file, uuid_str) == -1) {
             fclose(file);
             return -1;
         }
+        fscanf(file, ",");
     }
     fclose(file);
     return 0;
