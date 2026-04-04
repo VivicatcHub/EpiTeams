@@ -16,6 +16,7 @@ client_t *create_client(int socket, struct sockaddr_in *address)
     client->socket = socket;
     client->address = *address;
     client->state = CONNECTED;
+    client->username = NULL;
     client->mode = NONE;
     client->permission = USER;
     client->data_socket = -1;

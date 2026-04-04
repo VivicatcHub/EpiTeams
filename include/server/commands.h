@@ -17,8 +17,9 @@ typedef struct command_s {
     cmd_handler_t handler;
 } command_t;
 
-void cmd_user(server_t *server, client_t *client, char *args);
 void cmd_login(server_t *server, client_t *client, char *args);
+void cmd_users(server_t *server, client_t *client, char *args);
+void cmd_user(server_t *server, client_t *client, char *args);
 void cmd_quit(server_t *server, client_t *client, char *args);
 void cmd_pasv(server_t *server, client_t *client, char *args);
 void cmd_port(server_t *server, client_t *client, char *args);
