@@ -21,6 +21,7 @@ void cmd_user(server_t *server, client_t *client, char *args);
 void cmd_quit(server_t *server, client_t *client, char *args);
 void cmd_pasv(server_t *server, client_t *client, char *args);
 void cmd_port(server_t *server, client_t *client, char *args);
+void cmd_laugh(server_t *server, client_t *client, char *args);
 
 // For debugging
 void cmd_placeholder(server_t *server, client_t *client, char *args);

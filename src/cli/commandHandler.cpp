@@ -163,6 +163,7 @@ bool CommandHandler::execute(const std::string &command, const std::vector<std::
     if (command == "create") { return handleCreate(args); }
     if (command == "list") { return handleList(); }
     if (command == "info") { return handleInfo(); }
+    if (command == "laugh") { return sendCommand("LAUGH"); }
 
     return false;
 }
