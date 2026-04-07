@@ -14,8 +14,6 @@ const command_t commands[] = {
     {"MESSAGES", cmd_messages},
     {"USER", cmd_user},
     {"QUIT", cmd_quit},
-    {"PASV", cmd_pasv},
-    {"PORT", cmd_port},
     {"LAUGH", cmd_laugh},
     {NULL, NULL}
 };
