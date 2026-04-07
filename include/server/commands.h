@@ -23,6 +23,9 @@ void cmd_user(server_t *server, client_t *client, char *args);
 void cmd_send(server_t *server, client_t *client, char *args);
 void cmd_messages(server_t *server, client_t *client, char *args);
 void cmd_quit(server_t *server, client_t *client, char *args);
+void cmd_pasv(server_t *server, client_t *client, char *args);
+void cmd_port(server_t *server, client_t *client, char *args);
+void cmd_laugh(server_t *server, client_t *client, char *args);
 
 // For debugging
 void cmd_placeholder(server_t *server, client_t *client, char *args);
@@ -34,4 +37,5 @@ user_t *find_user_by_uuid(server_t *server, uuid_t uuid);
 void dispatch_command(server_t *server, client_t *client, char *line);
 
 extern const command_t commands[];
+
 #endif

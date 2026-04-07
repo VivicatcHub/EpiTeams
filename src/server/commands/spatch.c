@@ -14,6 +14,9 @@ const command_t commands[] = {
     {"MESSAGES", cmd_messages},
     {"USER", cmd_user},
     {"QUIT", cmd_quit},
+    {"PASV", cmd_pasv},
+    {"PORT", cmd_port},
+    {"LAUGH", cmd_laugh},
     {NULL, NULL}
 };
 
@@ -21,7 +24,8 @@ static int no_auth_required(char const *name)
 {
     return strcasecmp(name, "LOGIN") == 0
         || strcasecmp(name, "QUIT") == 0
-        || strcasecmp(name, "HELP") == 0;
+        || strcasecmp(name, "HELP") == 0
+        || strcasecmp(name, "LAUGH") == 0;
 }
 
 static void parse_command(char *line, char *name, char **args)
