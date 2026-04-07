@@ -30,12 +30,12 @@ static int check_arg(client_t *client, char *arg)
     return 0;
 }
 
-static user_t *find_user_by_name(server_t *server, char *username)
+user_t *find_user_by_name(server_t *server, char *username)
 {
     user_t *user = NULL;
 
     TAILQ_FOREACH(user, &server->data.users, entries) {
-        if (strcasecmp(user->name, username) == 0)
+        if (strcmp(user->name, username) == 0)
             return user;
     }
     return NULL;
@@ -46,7 +46,7 @@ static void login_existing_user(client_t *client, char *username)
     char buf[MAX_BUFFER];
 
     client->username = strdup(username);
-    client->state = CONNECTED;
+    client->state = AUTHENTICATED;
     snprintf(buf, MAX_BUFFER, "Logged in as %s.", username);
     send_response(client, CODE_LOGIN_SUCCESS, buf);
 }
@@ -68,7 +68,7 @@ static void create_user_and_persist(server_t *server, client_t *client,
     TAILQ_INSERT_TAIL(&server->data.users, new_user, entries);
     server_event_user_created(uuid_buf, username);
     client->username = strdup(username);
-    client->state = CONNECTED;
+    client->state = AUTHENTICATED;
     send_response(client, CODE_LOGIN_SUCCESS, "New user created.");
 }
 
@@ -82,14 +82,14 @@ static void handle_user(client_t *client, server_t *server, char *username)
         create_user_and_persist(server, client, username);
 }
 
-void cmd_login(server_t *server UNUSED, client_t *client, char *args)
+void cmd_login(server_t *server, client_t *client, char *args)
 {
     if (!args) {
         send_response(client, CODE_SYNTAX_ERROR_PARAM,
             "Syntax error in parameters.");
         return;
     }
-    if (client->state != CONNECTED) {
+    if (client->state == AUTHENTICATED) {
         send_response(client, CODE_BAD_SEQUENCE,
             "Already logged in.");
         return;

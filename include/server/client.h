@@ -14,7 +14,6 @@ typedef struct server_s server_t;
 
 enum client_state {
     CONNECTED,
-    USER_PROVIDED,
     AUTHENTICATED
 };
 
