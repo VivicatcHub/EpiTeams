@@ -15,18 +15,18 @@ static int load_single_thread(FILE *file, char *uuid_str, thread_t *thread)
     long created_at;
 
     string_to_uuid(uuid_str, thread->uuid);
-    fscanf(file, ",\"channel_uuid\":\"%36[^\"]\"", channel_uuid_str);
+    fscanf(file, ",\n\t\t\"channel_uuid\":\"%36[^\"]\"", channel_uuid_str);
     string_to_uuid(channel_uuid_str, thread->channel_uuid);
-    fscanf(file, ",\"team_uuid\":\"%36[^\"]\"", team_uuid_str);
+    fscanf(file, ",\n\t\t\"team_uuid\":\"%36[^\"]\"", team_uuid_str);
     string_to_uuid(team_uuid_str, thread->team_uuid);
-    fscanf(file, ",\"author_uuid\":\"%36[^\"]\"", author_uuid_str);
+    fscanf(file, ",\n\t\t\"author_uuid\":\"%36[^\"]\"", author_uuid_str);
     string_to_uuid(author_uuid_str, thread->author_uuid);
-    fscanf(file, ",\"title\":\"%31[^\"]\"", thread->title);
-    fscanf(file, ",\"message\":\"%511[^\"]\"", thread->message);
-    fscanf(file, ",\"created_at\":%ld", &created_at);
+    fscanf(file, ",\n\t\t\"title\":\"%31[^\"]\"", thread->title);
+    fscanf(file, ",\n\t\t\"message\":\"%511[^\"]\"", thread->message);
+    fscanf(file, ",\n\t\t\"created_at\":%ld", &created_at);
     thread->created_at = (time_t)created_at;
     TAILQ_INIT(&thread->comments);
-    fscanf(file, "}");
+    fscanf(file, "\n\t}");
     return 0;
 }
 
@@ -54,10 +54,10 @@ int load_threads(struct thread_queue_s *threads)
     TAILQ_INIT(threads);
     file = open_load_file(THREADS_FILE);
     if (!file)
-        return 0;
+        return -1;
     printf("Loading threads...\n");
     fscanf(file, "[");
-    while (fscanf(file, "{\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
+    while (fscanf(file, "\n\t{\n\t\t\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
         if (append_thread(threads, file, uuid_str) == -1) {
             fclose(file);
             return -1;

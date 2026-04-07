@@ -14,14 +14,14 @@ static int load_single_comment(FILE *file, char *uuid_str, comment_t *comment)
     long created_at;
 
     string_to_uuid(uuid_str, comment->uuid);
-    fscanf(file, ",\"thread_uuid\":\"%36[^\"]\"", thread_uuid_str);
+    fscanf(file, ",\n\t\t\"thread_uuid\":\"%36[^\"]\"", thread_uuid_str);
     string_to_uuid(thread_uuid_str, comment->thread_uuid);
-    fscanf(file, ",\"author_uuid\":\"%36[^\"]\"", author_uuid_str);
+    fscanf(file, ",\n\t\t\"author_uuid\":\"%36[^\"]\"", author_uuid_str);
     string_to_uuid(author_uuid_str, comment->author_uuid);
-    fscanf(file, ",\"body\":\"%511[^\"]\"", comment->body);
-    fscanf(file, ",\"created_at\":%ld", &created_at);
+    fscanf(file, ",\n\t\t\"body\":\"%511[^\"]\"", comment->body);
+    fscanf(file, ",\n\t\t\"created_at\":%ld", &created_at);
     comment->created_at = (time_t)created_at;
-    fscanf(file, "}");
+    fscanf(file, "\n\t}");
     return 0;
 }
 
@@ -49,10 +49,10 @@ int load_comments(struct comment_queue_s *comments)
     TAILQ_INIT(comments);
     file = open_load_file(COMMENTS_FILE);
     if (!file)
-        return 0;
+        return -1;
     printf("Loading comments...\n");
     fscanf(file, "[");
-    while (fscanf(file, "{\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
+    while (fscanf(file, "\n\t{\n\t\t\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
         if (append_comment(comments, file, uuid_str) == -1) {
             fclose(file);
             return -1;

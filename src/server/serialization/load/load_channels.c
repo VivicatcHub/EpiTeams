@@ -13,14 +13,14 @@ static int load_single_channel(FILE *file, char *uuid_str, channel_t *channel)
     long created_at;
 
     string_to_uuid(uuid_str, channel->uuid);
-    fscanf(file, ",\"team_uuid\":\"%36[^\"]\"", team_uuid_str);
+    fscanf(file, ",\n\t\t\"team_uuid\":\"%36[^\"]\"", team_uuid_str);
     string_to_uuid(team_uuid_str, channel->team_uuid);
-    fscanf(file, ",\"name\":\"%31[^\"]\"", channel->name);
-    fscanf(file, ",\"description\":\"%254[^\"]\"", channel->description);
-    fscanf(file, ",\"created_at\":%ld", &created_at);
+    fscanf(file, ",\n\t\t\"name\":\"%31[^\"]\"", channel->name);
+    fscanf(file, ",\n\t\t\"description\":\"%254[^\"]\"", channel->description);
+    fscanf(file, ",\n\t\t\"created_at\":%ld", &created_at);
     channel->created_at = (time_t)created_at;
     TAILQ_INIT(&channel->threads);
-    fscanf(file, "}");
+    fscanf(file, "\n\t}");
     return 0;
 }
 
@@ -48,10 +48,10 @@ int load_channels(struct channel_queue_s *channels)
     TAILQ_INIT(channels);
     file = open_load_file(CHANNELS_FILE);
     if (!file)
-        return 0;
+        return -1;
     printf("Loading channels...\n");
     fscanf(file, "[");
-    while (fscanf(file, "{\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
+    while (fscanf(file, "\n\t{\n\t\t\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
         if (append_channel(channels, file, uuid_str) == -1) {
             fclose(file);
             return -1;

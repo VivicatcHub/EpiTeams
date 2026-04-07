@@ -22,7 +22,7 @@ void string_to_uuid(char const *str, uuid_t uuid)
     uuid_parse(str, uuid);
 }
 
-void save_dir_exists(void)
+int save_dir_exists(void)
 {
     struct stat st;
 
@@ -34,6 +34,7 @@ void save_dir_exists(void)
     }
     if (errno == ENOENT) {
         mkdir(SAVE_DIR, 0755);
+        return 1;
     }
 }
 

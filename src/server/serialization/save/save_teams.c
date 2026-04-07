@@ -12,8 +12,11 @@ static void save_single_team(FILE *file, team_t *team)
     char uuid_str[UUID_STR_LEN];
 
     uuid_to_string(team->uuid, uuid_str);
-    fprintf(file, "{\"uuid\":\"%s\",\"name\":\"%s\",\"description\":\"%s\","
-        "\"created_at\":%ld}",
+    fprintf(file, "\t{\n\t\t\"uuid\":\"%s\","
+        "\n\t\t\"name\":\"%s\","
+        "\n\t\t\"description\":\"%s\","
+        "\n\t\t\"created_at\":%ld"
+        "\n\t}",
         uuid_str, team->name, team->description, team->created_at);
 }
 
@@ -27,13 +30,15 @@ int save_teams(struct team_queue_s *teams)
         return -1;
     fprintf(file, "[");
     team = TAILQ_FIRST(teams);
+    if (team)
+        fprintf(file, "\n");
     while (team) {
         save_single_team(file, team);
         team = TAILQ_NEXT(team, entries);
         if (team)
-            fprintf(file, ",");
+            fprintf(file, ",\n");
     }
-    fprintf(file, "]\n");
+    fprintf(file, "\n]\n");
     fclose(file);
     return 0;
 }

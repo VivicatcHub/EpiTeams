@@ -11,10 +11,10 @@
 static int load_single_user(FILE *file, char *uuid_str, user_t *user)
 {
     string_to_uuid(uuid_str, user->uuid);
-    if (fscanf(file, ",\"name\":\"%31[^\"]\"", user->name) != 1)
+    if (fscanf(file, ",\n\t\t\"name\":\"%31[^\"]\"", user->name) != 1)
         return -1;
     TAILQ_INIT(&user->subscribed_teams);
-    fscanf(file, "}");
+    fscanf(file, "\n\t}");
     return 0;
 }
 
@@ -45,10 +45,10 @@ int load_users(struct user_queue_s *users)
     TAILQ_INIT(users);
     file = open_load_file(USERS_FILE);
     if (!file)
-        return 0;
+        return -1;
     printf("Loading users...\n");
     fscanf(file, "[");
-    while (fscanf(file, "{\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
+    while (fscanf(file, "\n\t{\n\t\t\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
         if (append_user(users, file, uuid_str) == -1) {
             fclose(file);
             return -1;

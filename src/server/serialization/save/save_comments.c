@@ -16,8 +16,12 @@ static void save_single_comment(FILE *file, comment_t *comment)
     uuid_to_string(comment->uuid, uuid_str);
     uuid_to_string(comment->thread_uuid, thread_uuid_str);
     uuid_to_string(comment->author_uuid, author_uuid_str);
-    fprintf(file, "{\"uuid\":\"%s\",\"thread_uuid\":\"%s\","
-        "\"author_uuid\":\"%s\",\"body\":\"%s\",\"created_at\":%ld}",
+    fprintf(file, "\t{\n\t\t\"uuid\":\"%s\","
+        "\n\t\t\"thread_uuid\":\"%s\","
+        "\n\t\t\"author_uuid\":\"%s\","
+        "\n\t\t\"body\":\"%s\","
+        "\n\t\t\"created_at\":%ld"
+        "\n\t}",
         uuid_str, thread_uuid_str, author_uuid_str, comment->body,
         comment->created_at);
 }
@@ -32,13 +36,15 @@ int save_comments(struct comment_queue_s *comments)
         return -1;
     fprintf(file, "[");
     comment = TAILQ_FIRST(comments);
+    if (comment)
+        fprintf(file, "\n");
     while (comment) {
         save_single_comment(file, comment);
         comment = TAILQ_NEXT(comment, entries);
         if (comment)
-            fprintf(file, ",");
+            fprintf(file, ",\n");
     }
-    fprintf(file, "]\n");
+    fprintf(file, "\n]\n");
     fclose(file);
     return 0;
 }

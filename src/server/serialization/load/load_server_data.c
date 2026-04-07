@@ -9,7 +9,8 @@
 
 int load_server_data(server_data_t *data)
 {
-    save_dir_exists();
+    if (save_dir_exists() == 1)
+        save_server_data(data);
     if (load_users(&data->users) == -1)
         return -1;
     if (load_teams(&data->teams) == -1)

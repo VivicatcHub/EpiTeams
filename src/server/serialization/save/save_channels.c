@@ -14,8 +14,12 @@ static void save_single_channel(FILE *file, channel_t *channel)
 
     uuid_to_string(channel->uuid, uuid_str);
     uuid_to_string(channel->team_uuid, team_uuid_str);
-    fprintf(file, "{\"uuid\":\"%s\",\"team_uuid\":\"%s\",\"name\":\"%s\","
-        "\"description\":\"%s\",\"created_at\":%ld}",
+    fprintf(file, "\t{\n\t\t\"uuid\":\"%s\","
+        "\n\t\t\"team_uuid\":\"%s\","
+        "\n\t\t\"name\":\"%s\","
+        "\n\t\t\"description\":\"%s\","
+        "\n\t\t\"created_at\":%ld"
+        "\n\t}",
         uuid_str, team_uuid_str, channel->name, channel->description,
         channel->created_at);
 }
@@ -30,13 +34,15 @@ int save_channels(struct channel_queue_s *channels)
         return -1;
     fprintf(file, "[");
     channel = TAILQ_FIRST(channels);
+    if (channel)
+        fprintf(file, "\n");
     while (channel) {
         save_single_channel(file, channel);
         channel = TAILQ_NEXT(channel, entries);
         if (channel)
-            fprintf(file, ",");
+            fprintf(file, ",\n");
     }
-    fprintf(file, "]\n");
+    fprintf(file, "\n]\n");
     fclose(file);
     return 0;
 }

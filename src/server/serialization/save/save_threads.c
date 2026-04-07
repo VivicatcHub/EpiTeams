@@ -18,9 +18,14 @@ static void save_single_thread(FILE *file, thread_t *thread)
     uuid_to_string(thread->channel_uuid, channel_uuid_str);
     uuid_to_string(thread->team_uuid, team_uuid_str);
     uuid_to_string(thread->author_uuid, author_uuid_str);
-    fprintf(file, "{\"uuid\":\"%s\",\"channel_uuid\":\"%s\","
-        "\"team_uuid\":\"%s\",\"author_uuid\":\"%s\",\"title\":\"%s\","
-        "\"message\":\"%s\",\"created_at\":%ld}",
+    fprintf(file, "\t{\n\t\t\"uuid\":\"%s\","
+        "\n\t\t\"channel_uuid\":\"%s\","
+        "\n\t\t\"team_uuid\":\"%s\","
+        "\n\t\t\"author_uuid\":\"%s\","
+        "\n\t\t\"title\":\"%s\","
+        "\n\t\t\"message\":\"%s\","
+        "\n\t\t\"created_at\":%ld"
+        "\n\t}",
         uuid_str, channel_uuid_str, team_uuid_str, author_uuid_str,
         thread->title, thread->message, thread->created_at);
 }
@@ -35,13 +40,15 @@ int save_threads(struct thread_queue_s *threads)
         return -1;
     fprintf(file, "[");
     thread = TAILQ_FIRST(threads);
+    if (thread)
+        fprintf(file, "\n");
     while (thread) {
         save_single_thread(file, thread);
         thread = TAILQ_NEXT(thread, entries);
         if (thread)
-            fprintf(file, ",");
+            fprintf(file, ",\n");
     }
-    fprintf(file, "]\n");
+    fprintf(file, "\n]\n");
     fclose(file);
     return 0;
 }
