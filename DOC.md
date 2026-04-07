@@ -46,7 +46,7 @@
 - Args: `["user_name"]`
 - Server:
   - Send: `LOGIN <user_name>`
-  - Return: `230`/`530`
+  - Return: `230`/`530`/`540`
 
 Args:
 
