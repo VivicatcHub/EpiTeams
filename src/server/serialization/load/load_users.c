@@ -10,12 +10,9 @@
 
 static int load_single_user(FILE *file, char *uuid_str, user_t *user)
 {
-    int status;
-
     string_to_uuid(uuid_str, user->uuid);
-    fscanf(file, ",\"name\":\"%31[^\"]\"", user->name);
-    fscanf(file, ",\"status\":%d", &status);
-    user->status = (user_status_t)status;
+    if (fscanf(file, ",\"name\":\"%31[^\"]\"", user->name) != 1)
+        return -1;
     TAILQ_INIT(&user->subscribed_teams);
     fscanf(file, "}");
     return 0;
@@ -34,6 +31,7 @@ static int append_user(struct user_queue_s *users, FILE *file, char *uuid_str)
         return -1;
     }
     uuid_to_string(user->uuid, uuid_buf);
+    user->status = OFFLINE;
     server_event_user_loaded(uuid_buf, user->name);
     TAILQ_INSERT_TAIL(users, user, entries);
     return 0;
@@ -48,11 +46,14 @@ int load_users(struct user_queue_s *users)
     file = open_load_file(USERS_FILE);
     if (!file)
         return 0;
+    printf("Loading users...\n");
+    fscanf(file, "[");
     while (fscanf(file, "{\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
         if (append_user(users, file, uuid_str) == -1) {
             fclose(file);
             return -1;
         }
+        fscanf(file, ",");
     }
     fclose(file);
     return 0;

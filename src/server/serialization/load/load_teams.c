@@ -46,11 +46,14 @@ int load_teams(struct team_queue_s *teams)
     file = open_load_file(TEAMS_FILE);
     if (!file)
         return 0;
+    printf("Loading teams...\n");
+    fscanf(file, "[");
     while (fscanf(file, "{\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
         if (append_team(teams, file, uuid_str) == -1) {
             fclose(file);
             return -1;
         }
+        fscanf(file, ",");
     }
     fclose(file);
     return 0;

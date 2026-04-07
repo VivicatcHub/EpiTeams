@@ -50,11 +50,14 @@ int load_comments(struct comment_queue_s *comments)
     file = open_load_file(COMMENTS_FILE);
     if (!file)
         return 0;
+    printf("Loading comments...\n");
+    fscanf(file, "[");
     while (fscanf(file, "{\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
         if (append_comment(comments, file, uuid_str) == -1) {
             fclose(file);
             return -1;
         }
+        fscanf(file, ",");
     }
     fclose(file);
     return 0;

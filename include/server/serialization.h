@@ -52,5 +52,4 @@ void string_to_uuid(char const *str, uuid_t uuid);
 FILE *open_save_file(char const *filepath);
 FILE *open_load_file(char const *filepath);
 void save_dir_exists(void);
-
 #endif

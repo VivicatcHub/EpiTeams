@@ -6,14 +6,15 @@
 */
 
 #ifndef LIB_MYTEAMS_LOGGING_SERVER_H
-#define LIB_MYTEAMS_LOGGING_SERVER_H
+    #define LIB_MYTEAMS_LOGGING_SERVER_H
 
-#ifdef __cplusplus
+    #ifdef __cplusplus
 extern "C" {
-#endif
+    #endif
 
     /*
-    ** As the server never initialize an action all function here are called events
+    ** As the server never initialize an action
+    ** all function here are called events
     */
 
     /**
@@ -84,7 +85,9 @@ extern "C" {
     ** Commands:
     ** /subscribe "team_uuid"
     **/
-    int server_event_user_subscribed(char const *team_uuid, char const *user_uuid);
+    int server_event_user_subscribed(
+        char const *team_uuid,
+        char const *user_uuid);
 
     /**
     ** @brief Must be called when a user unsubscribe from a team
@@ -106,7 +109,9 @@ extern "C" {
     ** Commands:
     ** /login "user_name"
     **/
-    int server_event_user_created(char const *user_uuid, char const *user_name);
+    int server_event_user_created(
+        char const *user_uuid,
+        char const *user_name);
 
     /**
     ** @brief Must be called when a user was loaded from the save file
@@ -118,7 +123,9 @@ extern "C" {
     ** Commands:
     ** None, should be used at server start
     **/
-    int server_event_user_loaded(char const *user_uuid, char const *user_name);
+    int server_event_user_loaded(
+        char const *user_uuid,
+        char const *user_name);
 
     /**
     ** @brief Must be called when a user logged in
@@ -153,8 +160,8 @@ extern "C" {
         char const *receiver_uuid,
         char const *message_body);
 
-#ifdef __cplusplus
+    #ifdef __cplusplus
 }
-#endif
+    #endif
 
 #endif /* LIB_MYTEAMS_LOGGING_SERVER_H */

@@ -17,6 +17,9 @@ void Flags::getFlags(int ac, char **av) {
         return;
     }
 
+    if (arg == "localhost")
+        arg = "127.0.0.1";
+
     if (ac == 3) {
         try {
             ip = arg;

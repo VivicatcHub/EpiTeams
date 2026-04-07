@@ -51,11 +51,14 @@ int load_messages(struct message_queue_s *messages)
     file = open_load_file(MESSAGES_FILE);
     if (!file)
         return 0;
+    printf("Loading messages...\n");
+    fscanf(file, "[");
     while (fscanf(file, "{\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
         if (append_message(messages, file, uuid_str) == -1) {
             fclose(file);
             return -1;
         }
+        fscanf(file, ",");
     }
     fclose(file);
     return 0;
