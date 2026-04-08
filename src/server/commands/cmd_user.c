@@ -41,15 +41,28 @@ static void send_user_info(client_t *client, user_t *user, int online)
     send_response(client, CODE_COMMAND_OK, buf);
 }
 
+static int resolve_user_arg(server_t *server, char *args, uuid_t target)
+{
+    user_t *name;
+
+    if (uuid_parse(args, target) == 0)
+        return 0;
+    name = find_user_by_name(server, args);
+    if (!name)
+        return -1;
+    memcpy(target, name->uuid, sizeof(uuid_t));
+    return 0;
+}
+
 void cmd_user(server_t *server UNUSED, client_t *client, char *args)
 {
-    user_t *user = NULL;
+    user_t *user;
     uuid_t target;
-    int online = 0;
+    int online;
 
     if (check_arg(client, args) == -1)
         return;
-    if (uuid_parse(args, target) != 0) {
+    if (resolve_user_arg(server, args, target) != 0) {
         send_response(client, CODE_SYNTAX_ERROR_PARAM,
             "Invalid UUID.");
         return;

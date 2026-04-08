@@ -14,9 +14,11 @@ static int find_receiver_by_args(server_t *server, char *args,
 
     if (!args || args[0] == '\0')
         return -1;
-    if (uuid_parse(args, target) != 0)
-        return -1;
-    *receiver = find_user_by_uuid(server, target);
+    if (uuid_parse(args, target) == 0) {
+        *receiver = find_user_by_uuid(server, target);
+        return (*receiver != NULL) ? 0 : 1;
+    }
+    *receiver = find_user_by_name(server, args);
     return (*receiver != NULL) ? 0 : 1;
 }
 

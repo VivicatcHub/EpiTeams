@@ -8,7 +8,22 @@
 #include "my_teams.h"
 #include "logging_server.h"
 
-static int parse_send_args(char *args, uuid_t target, char **out_body)
+static int resolve_identifier_to_uuid(server_t *server, char *token,
+    uuid_t target)
+{
+    user_t *user = NULL;
+
+    if (uuid_parse(token, target) == 0)
+        return 0;
+    user = find_user_by_name(server, token);
+    if (!user)
+        return -1;
+    memcpy(target, user->uuid, sizeof(uuid_t));
+    return 0;
+}
+
+static int parse_send_args(server_t *server, char *args, uuid_t target,
+    char **out_body)
 {
     char *space = NULL;
 
@@ -19,7 +34,7 @@ static int parse_send_args(char *args, uuid_t target, char **out_body)
         return -1;
     *space = '\0';
     *out_body = space + 1;
-    if (uuid_parse(args, target) != 0)
+    if (resolve_identifier_to_uuid(server, args, target) != 0)
         return -1;
     return 0;
 }
@@ -46,6 +61,8 @@ static void notify_connected_receiver(server_t *server, user_t *receiver,
 {
     char buf[MAX_BUFFER];
 
+    if (!receiver)
+        return;
     for (int i = 0; i < MAX_CLIENTS; i++) {
         if (!server->clients[i])
             continue;
@@ -102,7 +119,7 @@ void cmd_send(server_t *server, client_t *client, char *args)
     user_t *sender = NULL;
     private_message_t *message = NULL;
 
-    if (parse_send_args(args, target, &msg_body) == -1) {
+    if (parse_send_args(server, args, target, &msg_body) == -1) {
         send_response(client, CODE_SYNTAX_ERROR_PARAM,
             "Syntax error in parameters.");
         return;
