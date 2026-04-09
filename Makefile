@@ -25,6 +25,8 @@ OBJDIR_SERVER	=	build/server
 OBJDIR_CLI	=	build/cli
 OBJS_SERVER	=	$(patsubst src/server/%.c,$(OBJDIR_SERVER)/%.o,$(SRCS_SERVER))
 OBJS_CLI	=	$(patsubst src/cli/%.cpp,$(OBJDIR_CLI)/%.o,$(SRCS_CLI))
+DEPS_SERVER	=	$(OBJS_SERVER:.o=.d)
+DEPS_CLI	=	$(OBJS_CLI:.o=.d)
 
 ## MESSAGES ##
 define PRINT
@@ -74,13 +76,14 @@ $(NAME_CLI):	$(OBJS_CLI)
 # Build object files into the build/ directory, creating dirs as needed
 $(OBJDIR_SERVER)/%.o: src/server/%.c
 	@mkdir -p $(dir $@)
-	@$(CC) -c $< -o $@ -I./include/server/ -I./libs/myteams/ $(CFLAGS) \
+	@$(CC) -MMD -MP -c $< -o $@ -I./include/server/ -I./libs/myteams/ \
+	$(CFLAGS) \
 	&& $(call PRINT,COMPILED,$(BOLD_)$@) \
 	|| $(call ERROR,BUILD FAILED,$@)
 
 $(OBJDIR_CLI)/%.o: src/cli/%.cpp
 	@mkdir -p $(dir $@)
-	@$(CXX) -c $< -o $@ -I./include/cli/ -I./libs/myteams/ $(CFLAGS) \
+	@$(CXX) -MMD -MP -c $< -o $@ -I./include/cli/ -I./libs/myteams/ $(CFLAGS) \
 	&& $(call PRINT,COMPILED,$(BOLD_)$@) \
 	|| $(call ERROR,BUILD FAILED,$@)
 
@@ -109,3 +112,5 @@ test_server: $(NAME_SERVER)
 	&& LD_LIBRARY_PATH=libs/myteams ./myteams_server 4242
 
 .PHONY: all clean fclean re
+
+-include $(DEPS_SERVER) $(DEPS_CLI)
