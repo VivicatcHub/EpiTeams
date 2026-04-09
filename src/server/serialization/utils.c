@@ -36,6 +36,7 @@ int save_dir_exists(void)
         mkdir(SAVE_DIR, 0755);
         return 1;
     }
+    return 0;
 }
 
 FILE *open_save_file(char const *filepath)
