@@ -1,53 +1,104 @@
 #include "client.hpp"
+#include <cctype>
 #include <iostream>
 #include <poll.h>
 #include <unistd.h>
 
-Client::Client() : handler(tcp_client, context), is_connected(false), waiting_for_response(false) {}
+Client::Client()
+    : _handler(_tcp_client, _context),
+    _is_connected(false),
+    _waiting_for_response(false),
+    _disconnect_after_response(false),
+    _stdin_closed(false),
+    _interactive_mode(false) {
+}
 
-void Client::displayPrompt() {
+bool Client::__isFinalResponseCode(const std::string &response)
+{
+    if (response.size() < 3
+        || !std::isdigit(response[0])
+        || !std::isdigit(response[1])
+        || !std::isdigit(response[2])) return true;
+    std::string code = response.substr(0, 3);
+    if (code[0] == '2' || code[0] == '4' || code[0] == '5') return true;
+    return false;
+}
+
+void Client::__displayPrompt() {
     std::cout << "\n╭─ \033[32mmyteams\033[0m\n╰─$ ";
     std::cout.flush();
 }
 
-bool Client::handleUserInput(const std::string &input) {
-    if (!parser.parse(input)) {
+bool Client::__queueUserInput(const std::string &input) {
+    if (!_parser.parse(input)) {
         std::cerr << "Error: Invalid command format" << std::endl;
-        displayPrompt();
         return true;
     }
 
-    const std::string &cmd = parser.getCommand();
-    const std::vector<std::string> &args = parser.getArgs();
-
-    if (!handler.execute(cmd, args)) {
-        std::cerr << "Error: Invalid command or arguments" << std::endl;
-        displayPrompt();
-        return cmd != "logout";
+    const std::string &cmd = _parser.getCommand();
+    if (cmd == "help") {
+        if (!_handler.execute(cmd, _parser.getArgs())) std::cerr << "Error: Invalid command or arguments" << std::endl;
+        return true;
     }
-    waiting_for_response = true;
-    return cmd != "logout";
+
+    _command_queue.push(input);
+    return true;
 }
 
-bool Client::run(const std::string &ip, int port) {
-    if (!tcp_client.connect(ip, port)) {
-        std::cerr << "Error: Failed to connect to server" << std::endl;
-        return false;
+void Client::__processQueuedCommands() {
+    while (_is_connected && !_waiting_for_response && !_command_queue.empty()) {
+        std::string input = _command_queue.front();
+        _command_queue.pop();
+
+        if (!_parser.parse(input)) {
+            std::cerr << "Error: Invalid command format" << std::endl;
+            continue;
+        }
+
+        const std::string &cmd = _parser.getCommand();
+        const std::vector<std::string> &args = _parser.getArgs();
+
+        if (!_handler.execute(cmd, args)) {
+            std::cerr << "Error: Invalid command or arguments" << std::endl;
+            continue;
+        }
+
+        if (cmd == "use") continue;
+        _waiting_for_response = true;
+        if (cmd == "logout") _disconnect_after_response = true;
     }
 
-    is_connected = true;
-    std::cout << "Connected to " << ip << ":" << port << std::endl;
-    std::cout << "Type /help for available commands" << std::endl;
+    if (_stdin_closed && _command_queue.empty() && !_waiting_for_response) _is_connected = false;
+}
 
+bool Client::__runEcho() {
     struct pollfd fds[2];
-    fds[0].fd = STDIN_FILENO;
+
+    fds[0].fd = -1;
     fds[0].events = POLLIN;
-    fds[1].fd = tcp_client.getSocketFd();
+    fds[1].fd = _tcp_client.getSocketFd();
     fds[1].events = POLLIN;
-    std::string input_buffer;
+
     char buffer[256];
 
-    while (is_connected) {
+    while (fgets(buffer, sizeof(buffer), stdin) != NULL) {
+        std::string input = CommandParser::normalizeInput(buffer);
+        std::vector<std::string> commands = CommandParser::splitCommands(input);
+
+        for (size_t i = 0; i < commands.size(); i++) {
+            std::string command = CommandParser::normalizeInput(commands[i]);
+
+            if (command.empty()) continue;
+            if (!__queueUserInput(command)) {
+                _is_connected = false;
+                break;
+            }
+        }
+        if (!_is_connected) break;
+    }
+    _stdin_closed = true;
+
+    while (_is_connected) {
         int poll_result = poll(fds, 2, -1);
 
         if (poll_result < 0) {
@@ -55,39 +106,111 @@ bool Client::run(const std::string &ip, int port) {
             break;
         }
 
-        if (fds[0].revents & POLLIN) {
-            // Only process user input if not waiting for a response
-            if (!waiting_for_response) {
-                if (fgets(buffer, sizeof(buffer), stdin) == NULL) { break; }
-                input_buffer = buffer;
-                if (!input_buffer.empty() && input_buffer.back() == '\n') { input_buffer.pop_back(); }
-                if (input_buffer.empty()) {
-                    displayPrompt();
-                    continue;
-                }
-                if (!handleUserInput(input_buffer)) { is_connected = false; }
-            }
-        }
-
         if (fds[1].revents & POLLIN) {
-            std::string response = tcp_client.receive();
-            if (response.empty()) { break; }
+            std::string response = _tcp_client.receive();
+            if (response.empty()) {
+                _is_connected = false;
+                break;
+            }
             std::cout << response << std::endl;
-            waiting_for_response = false;
-            if (is_connected) {
-                displayPrompt();
+
+            if (_waiting_for_response && __isFinalResponseCode(response)) {
+                _waiting_for_response = false;
+                if (_disconnect_after_response) _is_connected = false;
             }
         }
+        __processQueuedCommands();
     }
 
     disconnect();
     return true;
 }
 
+bool Client::__runInteractive() {
+    struct pollfd fds[2];
+    fds[0].fd = STDIN_FILENO;
+    fds[0].events = POLLIN;
+    fds[1].fd = _tcp_client.getSocketFd();
+    fds[1].events = POLLIN;
+
+    char buffer[256];
+
+    __displayPrompt();
+    while (_is_connected) {
+        int poll_result = poll(fds, 2, -1);
+
+        if (poll_result < 0) {
+            std::cerr << "Error: Poll failed" << std::endl;
+            break;
+        }
+
+        if (fds[0].fd >= 0 && (fds[0].revents & POLLIN)) {
+            if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
+                _stdin_closed = true;
+                fds[0].fd = -1;
+            } else {
+                std::string input = CommandParser::normalizeInput(buffer);
+                std::vector<std::string> commands = CommandParser::splitCommands(input);
+
+                if (!commands.empty()) {
+                    for (size_t i = 0; i < commands.size(); i++) {
+                        std::string command = CommandParser::normalizeInput(commands[i]);
+
+                        if (command.empty()) continue;
+                        if (!__queueUserInput(command)) {
+                            _is_connected = false;
+                            break;
+                        }
+                    }
+                } else if (!_waiting_for_response && _command_queue.empty()) __displayPrompt();
+            }
+        }
+
+        if (fds[0].fd >= 0 && (fds[0].revents & (POLLHUP | POLLERR | POLLNVAL))) {
+            _stdin_closed = true;
+            fds[0].fd = -1;
+        }
+
+        if (fds[1].revents & POLLIN) {
+            std::string response = _tcp_client.receive();
+            if (response.empty()) {
+                _is_connected = false;
+                break;
+            }
+            std::cout << response << std::endl;
+
+            if (_waiting_for_response && __isFinalResponseCode(response)) {
+                _waiting_for_response = false;
+                if (_disconnect_after_response) _is_connected = false;
+            }
+        }
+        __processQueuedCommands();
+        if (_is_connected && !_waiting_for_response && _command_queue.empty()) __displayPrompt();
+    }
+
+    disconnect();
+    return true;
+}
+
+bool Client::run(const std::string &ip, int port) {
+    if (!_tcp_client.connect(ip, port)) {
+        std::cerr << "Error: Failed to connect to server" << std::endl;
+        return false;
+    }
+
+    _is_connected = true;
+    _interactive_mode = isatty(STDIN_FILENO);
+    std::cout << "Connected to " << ip << ":" << port << std::endl;
+    std::cout << "Type /help for available commands" << std::endl;
+
+    if (_interactive_mode) return __runInteractive();
+    return __runEcho();
+}
+
 void Client::disconnect() {
-    if (is_connected) {
-        tcp_client.disconnect();
-        is_connected = false;
+    if (_is_connected) {
+        _tcp_client.disconnect();
+        _is_connected = false;
         std::cout << "Disconnected from server" << std::endl;
     }
 }
