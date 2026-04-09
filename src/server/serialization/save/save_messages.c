@@ -16,8 +16,12 @@ static void save_single_message(FILE *file, private_message_t *msg)
     uuid_to_string(msg->uuid, uuid_str);
     uuid_to_string(msg->sender_uuid, sender_uuid_str);
     uuid_to_string(msg->receiver_uuid, receiver_uuid_str);
-    fprintf(file, "{\"uuid\":\"%s\",\"sender_uuid\":\"%s\","
-        "\"receiver_uuid\":\"%s\",\"body\":\"%s\",\"created_at\":%ld}",
+    fprintf(file, "\t{\n\t\t\"uuid\":\"%s\","
+        "\n\t\t\"sender_uuid\":\"%s\","
+        "\n\t\t\"receiver_uuid\":\"%s\","
+        "\n\t\t\"body\":\"%s\","
+        "\n\t\t\"created_at\":%ld"
+        "\n\t}",
         uuid_str, sender_uuid_str, receiver_uuid_str, msg->body,
         msg->created_at);
 }
@@ -32,13 +36,15 @@ int save_messages(struct message_queue_s *messages)
         return -1;
     fprintf(file, "[");
     msg = TAILQ_FIRST(messages);
+    if (msg)
+        fprintf(file, "\n");
     while (msg) {
         save_single_message(file, msg);
         msg = TAILQ_NEXT(msg, entries);
         if (msg)
-            fprintf(file, ",");
+            fprintf(file, ",\n");
     }
-    fprintf(file, "]\n");
+    fprintf(file, "\n]\n");
     fclose(file);
     return 0;
 }

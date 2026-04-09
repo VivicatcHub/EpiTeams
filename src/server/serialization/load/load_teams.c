@@ -12,13 +12,13 @@ static int load_single_team(FILE *file, char *uuid_str, team_t *team)
     long created_at;
 
     string_to_uuid(uuid_str, team->uuid);
-    fscanf(file, ",\"name\":\"%31[^\"]\"", team->name);
-    fscanf(file, ",\"description\":\"%254[^\"]\"", team->description);
-    fscanf(file, ",\"created_at\":%ld", &created_at);
+    fscanf(file, ",\n\t\t\"name\":\"%31[^\"]\"", team->name);
+    fscanf(file, ",\n\t\t\"description\":\"%254[^\"]\"", team->description);
+    fscanf(file, ",\n\t\t\"created_at\":%ld", &created_at);
     team->created_at = (time_t)created_at;
     TAILQ_INIT(&team->members);
     TAILQ_INIT(&team->channels);
-    fscanf(file, "}");
+    fscanf(file, "\n\t}");
     return 0;
 }
 
@@ -45,10 +45,10 @@ int load_teams(struct team_queue_s *teams)
     TAILQ_INIT(teams);
     file = open_load_file(TEAMS_FILE);
     if (!file)
-        return 0;
+        return -1;
     printf("Loading teams...\n");
     fscanf(file, "[");
-    while (fscanf(file, "{\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
+    while (fscanf(file, "\n\t{\n\t\t\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
         if (append_team(teams, file, uuid_str) == -1) {
             fclose(file);
             return -1;

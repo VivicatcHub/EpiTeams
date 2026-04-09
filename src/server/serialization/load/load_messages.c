@@ -15,14 +15,14 @@ static int load_single_message(FILE *file, char *uuid_str,
     long created_at;
 
     string_to_uuid(uuid_str, msg->uuid);
-    fscanf(file, ",\"sender_uuid\":\"%36[^\"]\"", sender_uuid_str);
+    fscanf(file, ",\n\t\t\"sender_uuid\":\"%36[^\"]\"", sender_uuid_str);
     string_to_uuid(sender_uuid_str, msg->sender_uuid);
-    fscanf(file, ",\"receiver_uuid\":\"%36[^\"]\"", receiver_uuid_str);
+    fscanf(file, ",\n\t\t\"receiver_uuid\":\"%36[^\"]\"", receiver_uuid_str);
     string_to_uuid(receiver_uuid_str, msg->receiver_uuid);
-    fscanf(file, ",\"body\":\"%511[^\"]\"", msg->body);
-    fscanf(file, ",\"created_at\":%ld", &created_at);
+    fscanf(file, ",\n\t\t\"body\":\"%511[^\"]\"", msg->body);
+    fscanf(file, ",\n\t\t\"created_at\":%ld", &created_at);
     msg->created_at = (time_t)created_at;
-    fscanf(file, "}");
+    fscanf(file, "\n\t}");
     return 0;
 }
 
@@ -50,10 +50,10 @@ int load_messages(struct message_queue_s *messages)
     TAILQ_INIT(messages);
     file = open_load_file(MESSAGES_FILE);
     if (!file)
-        return 0;
+        return -1;
     printf("Loading messages...\n");
     fscanf(file, "[");
-    while (fscanf(file, "{\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
+    while (fscanf(file, "\n\t{\n\t\t\"uuid\":\"%36[^\"]\"", uuid_str) == 1) {
         if (append_message(messages, file, uuid_str) == -1) {
             fclose(file);
             return -1;
