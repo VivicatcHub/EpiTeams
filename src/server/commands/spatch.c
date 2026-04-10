@@ -10,6 +10,7 @@
 const command_t commands[] = {
     {"USERS", cmd_users},
     {"LOGIN", cmd_login},
+    {"LOGOUT", cmd_logout},
     {"SEND", cmd_send},
     {"MESSAGES", cmd_messages},
     {"USER", cmd_user},

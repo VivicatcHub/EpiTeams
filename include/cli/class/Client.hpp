@@ -17,7 +17,6 @@ private:
     ResponseHandler _response_handler;
     bool _is_connected;
     bool _waiting_for_response;
-    bool _disconnect_after_response;
     bool _stdin_closed;
     bool _interactive_mode;
     std::queue<std::string> _command_queue;

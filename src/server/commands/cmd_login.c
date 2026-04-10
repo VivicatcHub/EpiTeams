@@ -6,7 +6,7 @@
 */
 
 #include "my_teams.h"
-#include "logging_server.h"
+
 
 static int check_arg(client_t *client, char *arg)
 {
@@ -32,12 +32,8 @@ static int check_arg(client_t *client, char *arg)
 
 static void login_existing_user(client_t *client, char *username)
 {
-    char buf[MAX_BUFFER];
-
     client->username = strdup(username);
     client->state = AUTHENTICATED;
-    snprintf(buf, MAX_BUFFER, "Logged in as %s.", username);
-    send_response(client, CODE_LOGIN_SUCCESS, buf);
 }
 
 static void create_user_and_persist(server_t *server, client_t *client,
@@ -45,6 +41,7 @@ static void create_user_and_persist(server_t *server, client_t *client,
 {
     user_t *new_user = malloc(sizeof(user_t));
     char uuid_buf[UUID_STR_LEN];
+    char buf[MAX_BUFFER];
 
     if (!new_user)
         return;
@@ -58,7 +55,8 @@ static void create_user_and_persist(server_t *server, client_t *client,
     server_event_user_created(uuid_buf, username);
     client->username = strdup(username);
     client->state = AUTHENTICATED;
-    send_response(client, CODE_LOGIN_SUCCESS, "New user created.");
+    snprintf(buf, MAX_BUFFER, "Logged in as %s (%s).", username, uuid_buf);
+    send_response(client, CODE_LOGIN_SUCCESS, buf);
 }
 
 static int is_name_connected(server_t *server, char const *name)
@@ -78,6 +76,7 @@ static int handle_user(client_t *client, server_t *server, char *username)
 {
     user_t *user = find_user_by_name(server, username);
     char uuid_buf[UUID_STR_LEN];
+    char buf[MAX_BUFFER];
 
     if (user) {
         if (is_name_connected(server, username)) {
@@ -88,6 +87,8 @@ static int handle_user(client_t *client, server_t *server, char *username)
         login_existing_user(client, username);
         uuid_to_string(user->uuid, uuid_buf);
         server_event_user_logged_in(uuid_buf);
+        snprintf(buf, MAX_BUFFER, "Logged in as %s (%s).", username, uuid_buf);
+        send_response(client, CODE_LOGIN_SUCCESS, buf);
     } else
         create_user_and_persist(server, client, username);
     return 0;

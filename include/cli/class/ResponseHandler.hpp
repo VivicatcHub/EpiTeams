@@ -17,6 +17,10 @@ private:
     void __printStyled(const std::string &code, const std::string &message) const;
     void __dispatchLogging(const std::string &code, const std::string &message) const;
 
+    void __handleLoginSuccess(const std::string &message) const;
+    void __handlePrivateMessageReceived(const std::string &message) const;
+    void __handleLogoutSuccess(const std::string &message) const;
+
 public:
     ResponseHandler();
     void setCommandContext(const std::string &command,

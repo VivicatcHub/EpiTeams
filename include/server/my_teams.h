@@ -32,6 +32,8 @@
     #include "commands.h"
     #include "serialization.h"
 
+    #include "logging_server.h"
+
     #define UNUSED __attribute__((unused))
 
     #define EXIT_ERROR 84
