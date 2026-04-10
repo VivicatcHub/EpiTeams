@@ -5,14 +5,16 @@
 
 class CommandParser {
 private:
-    std::string command;
-    std::vector<std::string> args;
+    std::string _command;
+    std::vector<std::string> _args;
 
-    bool parseQuotedString(const std::string &input, size_t &pos, std::string &result);
-    bool isValidArgument(const std::string &arg);
+    bool __parseQuotedString(const std::string &input, size_t &pos, std::string &result);
+    bool __isValidArgument(const std::string &arg);
 
 public:
     CommandParser();
+    static std::string normalizeInput(std::string input);
+    static std::vector<std::string> splitCommands(const std::string &input);
     bool parse(const std::string &input);
     const std::string &getCommand() const;
     const std::vector<std::string> &getArgs() const;

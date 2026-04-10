@@ -4,7 +4,31 @@
 
 CommandParser::CommandParser() {}
 
-bool CommandParser::parseQuotedString(const std::string &input, size_t &pos, std::string &result) {
+std::string CommandParser::normalizeInput(std::string input) {
+    while (!input.empty() && input.back() == '\n') input.pop_back();
+    return input;
+}
+
+std::vector<std::string> CommandParser::splitCommands(const std::string &input)
+{
+    std::vector<std::string> commands;
+    std::string current;
+
+    for (size_t i = 0; i < input.size(); i++) {
+        if (input[i] == '\n') {
+            if (!current.empty()) {
+                commands.push_back(current);
+                current.clear();
+            }
+            continue;
+        }
+        current += input[i];
+    }
+    if (!current.empty()) commands.push_back(current);
+    return commands;
+}
+
+bool CommandParser::__parseQuotedString(const std::string &input, size_t &pos, std::string &result) {
     if (pos >= input.length() || input[pos] != '"') { return false; }
 
     pos++;
@@ -21,13 +45,13 @@ bool CommandParser::parseQuotedString(const std::string &input, size_t &pos, std
     return true;
 }
 
-bool CommandParser::isValidArgument(const std::string &arg) { return !arg.empty(); }
+bool CommandParser::__isValidArgument(const std::string &arg) { return !arg.empty(); }
 
 bool CommandParser::parse(const std::string &input) {
     if (input.empty()) { return false; }
 
-    command.clear();
-    args.clear();
+    _command.clear();
+    _args.clear();
 
     size_t pos = 0;
     while (pos < input.length() && input[pos] == ' ') { pos++; }
@@ -41,7 +65,7 @@ bool CommandParser::parse(const std::string &input) {
 
     while (pos < input.length() && input[pos] != ' ') { pos++; }
 
-    command = input.substr(cmd_start, pos - cmd_start);
+    _command = input.substr(cmd_start, pos - cmd_start);
 
     while (pos < input.length()) {
         while (pos < input.length() && input[pos] == ' ') { pos++; }
@@ -51,18 +75,18 @@ bool CommandParser::parse(const std::string &input) {
         if (input[pos] != '"') { return false; }
 
         std::string arg;
-        if (!parseQuotedString(input, pos, arg)) { return false; }
+        if (!__parseQuotedString(input, pos, arg)) { return false; }
 
-        if (!isValidArgument(arg)) { return false; }
+        if (!__isValidArgument(arg)) { return false; }
 
-        args.push_back(arg);
+        _args.push_back(arg);
     }
 
     return true;
 }
 
-const std::string &CommandParser::getCommand() const { return command; }
+const std::string &CommandParser::getCommand() const { return _command; }
 
-const std::vector<std::string> &CommandParser::getArgs() const { return args; }
+const std::vector<std::string> &CommandParser::getArgs() const { return _args; }
 
-int CommandParser::getArgCount() const { return args.size(); }
+int CommandParser::getArgCount() const { return _args.size(); }
