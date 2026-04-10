@@ -57,6 +57,7 @@ void Client::__processQueuedCommands() {
 
         const std::string &cmd = _parser.getCommand();
         const std::vector<std::string> &args = _parser.getArgs();
+        _response_handler.setCommandContext(cmd, args);
 
         if (!_handler.execute(cmd, args)) {
             std::cerr << "Error: Invalid command or arguments" << std::endl;
@@ -112,7 +113,7 @@ bool Client::__runEcho() {
                 _is_connected = false;
                 break;
             }
-            std::cout << response << std::endl;
+            _response_handler.handleServerResponse(response);
 
             if (_waiting_for_response && __isFinalResponseCode(response)) {
                 _waiting_for_response = false;
@@ -177,7 +178,7 @@ bool Client::__runInteractive() {
                 _is_connected = false;
                 break;
             }
-            std::cout << response << std::endl;
+            _response_handler.handleServerResponse(response);
 
             if (_waiting_for_response && __isFinalResponseCode(response)) {
                 _waiting_for_response = false;

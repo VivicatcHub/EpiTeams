@@ -6,6 +6,7 @@
 #include "class/CommandParser.hpp"
 #include "class/Context.hpp"
 #include "class/CommandHandler.hpp"
+#include "class/ResponseHandler.hpp"
 
 class Client {
 private:
@@ -13,6 +14,7 @@ private:
     CommandParser _parser;
     Context _context;
     CommandHandler _handler;
+    ResponseHandler _response_handler;
     bool _is_connected;
     bool _waiting_for_response;
     bool _disconnect_after_response;
