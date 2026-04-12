@@ -5,6 +5,10 @@
 
 ResponseHandler::ResponseHandler() {}
 
+std::string ResponseHandler::getLastCommand() const { return _last_command; }
+
+std::vector<std::string> ResponseHandler::getLastArgs() const { return _last_args; }
+
 void ResponseHandler::setCommandContext(const std::string &command,
     const std::vector<std::string> &args)
 {

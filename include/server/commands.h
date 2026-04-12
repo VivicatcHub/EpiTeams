@@ -34,6 +34,7 @@ void cmd_create_team(server_t *server, client_t *client, char *args);
 void cmd_create_channel(server_t *server, client_t *client, char *args);
 void cmd_create_thread(server_t *server, client_t *client, char *args);
 void cmd_create_comment(server_t *server, client_t *client, char *args);
+void cmd_use(server_t *server, client_t *client, char *args);
 
 // Helpers
 user_t *find_user_by_name(server_t *server, char const *username);
@@ -41,6 +42,9 @@ user_t *find_user_by_uuid(server_t *server, uuid_t uuid);
 team_t *find_team_by_uuid(server_t *server, uuid_t uuid);
 channel_t *find_channel_by_uuid(server_t *server, uuid_t uuid);
 thread_t *find_thread_by_uuid(server_t *server, uuid_t uuid);
+team_t *find_team_by_name(server_t *server, char const *name);
+channel_t *find_channel_by_name(server_t *server, char const *name);
+thread_t *find_thread_by_title(server_t *server, char const *title);
 
 void dispatch_command(server_t *server, client_t *client, char *line);
 
@@ -69,6 +73,12 @@ typedef struct comment_init_s {
     uuid_t author_uuid;
     char *body;
 } comment_init_t;
+
+typedef struct use_context_s {
+    server_t *server;
+    client_t *client;
+    team_t *team;
+} use_context_t;
 
 extern const command_t commands[];
 #endif
