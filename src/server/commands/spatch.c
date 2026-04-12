@@ -13,6 +13,10 @@ const command_t commands[] = {
     {"SEND", cmd_send},
     {"MESSAGES", cmd_messages},
     {"USER", cmd_user},
+    {"CREATE_TEAM", cmd_create_team},
+    {"CREATE_CHANNEL", cmd_create_channel},
+    {"CREATE_THREAD", cmd_create_thread},
+    {"CREATE_COMMENT", cmd_create_comment},
     {"QUIT", cmd_quit},
     {"LAUGH", cmd_laugh},
     {NULL, NULL}
