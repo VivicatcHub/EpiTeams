@@ -151,15 +151,15 @@ void cmd_create_thread(server_t *server, client_t *client, char *args)
     char *channel_str = NULL;
     char *title = NULL;
     char *msg = NULL;
-    thread_create_params_t p;
-    
+    thread_create_params_t tcp;
+
     if (parse_create_thread_args(args, &channel_str, &title, &msg) == -1) {
         send_response(client, CODE_SYNTAX_ERROR_PARAM,
             "Syntax error in parameters.");
         return;
     }
-    p.channel_str = channel_str;
-    p.title = title;
-    p.msg = msg;
-    process_create_thread_tokens(server, client, &p);
+    tcp.channel_str = channel_str;
+    tcp.title = title;
+    tcp.msg = msg;
+    process_create_thread_tokens(server, client, &tcp);
 }
