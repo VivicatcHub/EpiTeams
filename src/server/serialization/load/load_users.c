@@ -7,12 +7,49 @@
 
 #include "my_teams.h"
 
+static int has_next_comma(FILE *file)
+{
+    int c = fgetc(file);
+
+    while (c == ' ' || c == '\n' || c == '\r' || c == '\t')
+        c = fgetc(file);
+    if (c != ',') {
+        ungetc(c, file);
+        return 0;
+    }
+    ungetc(c, file);
+    return 1;
+}
+
+static int parse_subscribed_teams(FILE *file, user_t *user)
+{
+    char team_uuid_str[UUID_STR_LEN];
+
+    fscanf(file, ",\n\t\t\"subscribed_teams\":\n\t\t[");
+    while (fscanf(file, "\n\t\t\t{\n\t\t\t\t\"team_uuid\":\"%36[^\"]\"\n\t\t\t}",
+            team_uuid_str) == 1) {
+        team_subscription_t *sub = malloc(sizeof(team_subscription_t));
+
+        if (!sub)
+            return -1;
+        string_to_uuid(team_uuid_str, sub->team_uuid);
+        TAILQ_INSERT_TAIL(&user->subscribed_teams, sub, entries);
+        fscanf(file, ",");
+    }
+    fscanf(file, "\n\t\t]");
+    return 0;
+}
+
 static int load_single_user(FILE *file, char *uuid_str, user_t *user)
 {
     string_to_uuid(uuid_str, user->uuid);
     if (fscanf(file, ",\n\t\t\"name\":\"%31[^\"]\"", user->name) != 1)
         return -1;
     TAILQ_INIT(&user->subscribed_teams);
+    if (has_next_comma(file)) {
+        if (parse_subscribed_teams(file, user) == -1)
+            return -1;
+    }
     fscanf(file, "\n\t}");
     return 0;
 }

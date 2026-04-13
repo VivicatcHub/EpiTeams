@@ -35,6 +35,9 @@ void cmd_create_team(server_t *server, client_t *client, char *args);
 void cmd_create_channel(server_t *server, client_t *client, char *args);
 void cmd_create_thread(server_t *server, client_t *client, char *args);
 void cmd_create_comment(server_t *server, client_t *client, char *args);
+void cmd_subscribe(server_t *server, client_t *client, char *args);
+void cmd_unsubscribe(server_t *server, client_t *client, char *args);
+void cmd_subscribed(server_t *server, client_t *client, char *args);
 
 // Helpers
 user_t *find_user_by_name(server_t *server, char const *username);
@@ -42,6 +45,9 @@ user_t *find_user_by_uuid(server_t *server, uuid_t uuid);
 team_t *find_team_by_uuid(server_t *server, uuid_t uuid);
 channel_t *find_channel_by_uuid(server_t *server, uuid_t uuid);
 thread_t *find_thread_by_uuid(server_t *server, uuid_t uuid);
+team_t *find_team_by_name(server_t *server, char const *name);
+channel_t *find_channel_by_name(server_t *server, char const *name);
+thread_t *find_thread_by_title(server_t *server, char const *title);
 
 void dispatch_command(server_t *server, client_t *client, char *line);
 

@@ -85,7 +85,7 @@ static int parse_and_get_channel(server_t *server, client_t *client,
 {
     uuid_t chan_uuid;
 
-    if (uuid_parse(channel_str, chan_uuid) != 0) {
+    if (string_to_uuid(channel_str, chan_uuid) != 0) {
         send_response(client, CODE_SYNTAX_ERROR_PARAM,
             "Invalid channel uuid.");
         return -1;

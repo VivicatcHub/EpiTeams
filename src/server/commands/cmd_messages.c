@@ -14,7 +14,7 @@ static int find_receiver_by_args(server_t *server, char *args,
 
     if (!args || args[0] == '\0')
         return -1;
-    if (uuid_parse(args, target) == 0) {
+    if (string_to_uuid(args, target) == 0) {
         *receiver = find_user_by_uuid(server, target);
         return (*receiver != NULL) ? 0 : 1;
     }

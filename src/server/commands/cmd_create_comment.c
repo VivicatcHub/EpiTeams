@@ -112,7 +112,7 @@ static int process_create_comment_tokens(
     user_t *author = NULL;
     comment_init_t init;
 
-    if (uuid_parse(thread_str, thread_uuid) != 0) {
+    if (string_to_uuid(thread_str, thread_uuid) != 0) {
         send_response(client, CODE_SYNTAX_ERROR_PARAM,
             "Invalid thread uuid.");
         return -1;

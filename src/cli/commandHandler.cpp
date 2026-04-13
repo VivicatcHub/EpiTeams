@@ -85,6 +85,8 @@ bool CommandHandler::handleUse(const std::vector<std::string> &args) {
         return true;
     }
 
+    if (args.size() > 3) return false;
+
     if (args.size() >= 1) { context.setTeamUuid(args[0]); }
     if (args.size() >= 2) { context.setChannelUuid(args[1]); }
     if (args.size() >= 3) { context.setThreadUuid(args[2]); }

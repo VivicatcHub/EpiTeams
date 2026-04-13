@@ -18,6 +18,9 @@ const command_t commands[] = {
     {"CREATE_CHANNEL", cmd_create_channel},
     {"CREATE_THREAD", cmd_create_thread},
     {"CREATE_COMMENT", cmd_create_comment},
+    {"SUBSCRIBE", cmd_subscribe},
+    {"UNSUBSCRIBE", cmd_unsubscribe},
+    {"SUBSCRIBED", cmd_subscribed},
     {"QUIT", cmd_quit},
     {"LAUGH", cmd_laugh},
     {NULL, NULL}

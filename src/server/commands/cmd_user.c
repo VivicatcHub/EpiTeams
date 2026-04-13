@@ -45,7 +45,7 @@ static int resolve_user_arg(server_t *server, char *args, uuid_t target)
 {
     user_t *name;
 
-    if (uuid_parse(args, target) == 0)
+    if (string_to_uuid(args, target) == 0)
         return 0;
     name = find_user_by_name(server, args);
     if (!name)

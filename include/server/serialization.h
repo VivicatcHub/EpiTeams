@@ -48,7 +48,7 @@ void cleanup_comments(struct comment_queue_s *comments);
 void cleanup_messages(struct message_queue_s *messages);
 
 void uuid_to_string(uuid_t uuid, char *str);
-void string_to_uuid(char const *str, uuid_t uuid);
+int string_to_uuid(char const *str, uuid_t uuid);
 FILE *open_save_file(char const *filepath);
 FILE *open_load_file(char const *filepath);
 int save_dir_exists(void);

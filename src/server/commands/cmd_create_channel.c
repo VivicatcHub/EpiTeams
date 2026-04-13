@@ -70,7 +70,7 @@ static int process_create_channel_tokens(server_t *server,
     team_t *team = NULL;
     channel_t *channel = NULL;
 
-    if (uuid_parse(p->team_str, team_uuid) != 0) {
+    if (string_to_uuid(p->team_str, team_uuid) != 0) {
         send_response(client, CODE_SYNTAX_ERROR_PARAM,
             "Invalid team uuid.");
         return -1;
