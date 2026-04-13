@@ -34,7 +34,6 @@ void cmd_create_team(server_t *server, client_t *client, char *args);
 void cmd_create_channel(server_t *server, client_t *client, char *args);
 void cmd_create_thread(server_t *server, client_t *client, char *args);
 void cmd_create_comment(server_t *server, client_t *client, char *args);
-void cmd_use(server_t *server, client_t *client, char *args);
 void cmd_subscribe(server_t *server, client_t *client, char *args);
 void cmd_unsubscribe(server_t *server, client_t *client, char *args);
 void cmd_subscribed(server_t *server, client_t *client, char *args);
