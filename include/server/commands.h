@@ -18,6 +18,7 @@ typedef struct command_s {
 } command_t;
 
 void cmd_login(server_t *server, client_t *client, char *args);
+void cmd_logout(server_t *server, client_t *client, char *args);
 void cmd_users(server_t *server, client_t *client, char *args);
 void cmd_user(server_t *server, client_t *client, char *args);
 void cmd_send(server_t *server, client_t *client, char *args);

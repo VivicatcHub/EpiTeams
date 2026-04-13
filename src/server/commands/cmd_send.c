@@ -6,7 +6,7 @@
 */
 
 #include "my_teams.h"
-#include "logging_server.h"
+
 
 static int resolve_identifier_to_uuid(server_t *server, char *token,
     uuid_t target)
@@ -57,7 +57,7 @@ static private_message_t *create_and_store_message(server_t *server,
 }
 
 static void notify_connected_receiver(server_t *server, user_t *receiver,
-    user_t *sender)
+    user_t *sender, char const *message_body)
 {
     char buf[MAX_BUFFER];
 
@@ -69,7 +69,8 @@ static void notify_connected_receiver(server_t *server, user_t *receiver,
         if (!server->clients[i]->username)
             continue;
         if (strcmp(server->clients[i]->username, receiver->name) == 0) {
-            snprintf(buf, MAX_BUFFER, "New message from %s.", sender->name);
+            snprintf(buf, MAX_BUFFER, "New message from %s : \"%s\"",
+                sender->name, message_body);
             send_response(server->clients[i], CODE_MESSAGE_RECEIVED, buf);
             return;
         }
@@ -88,7 +89,7 @@ static void notify_and_respond(server_t *server, client_t *client,
     uuid_to_string(msg->receiver_uuid, receiver_uuid_str);
     server_event_private_message_sended(
         sender_uuid_str, receiver_uuid_str, msg->body);
-    notify_connected_receiver(server, receiver, sender);
+    notify_connected_receiver(server, receiver, sender, msg->body);
     send_response(client, CODE_COMMAND_OK, "Message sent.");
 }
 

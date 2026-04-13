@@ -5,8 +5,7 @@
 ** load_users.c
 */
 
-#include "serialization.h"
-#include "logging_server.h"
+#include "my_teams.h"
 
 static int load_single_user(FILE *file, char *uuid_str, user_t *user)
 {

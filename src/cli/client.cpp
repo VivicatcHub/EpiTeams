@@ -8,7 +8,6 @@ Client::Client()
     : _handler(_tcp_client, _context),
     _is_connected(false),
     _waiting_for_response(false),
-    _disconnect_after_response(false),
     _stdin_closed(false),
     _interactive_mode(false) {
 }
@@ -41,6 +40,9 @@ bool Client::__queueUserInput(const std::string &input) {
         return true;
     }
 
+    if (cmd == "quit" || cmd == "exit")
+        return false;
+
     _command_queue.push(input);
     return true;
 }
@@ -66,7 +68,6 @@ void Client::__processQueuedCommands() {
 
         if (cmd == "use") continue;
         _waiting_for_response = true;
-        if (cmd == "logout") _disconnect_after_response = true;
     }
 
     if (_stdin_closed && _command_queue.empty() && !_waiting_for_response) _is_connected = false;
@@ -117,7 +118,6 @@ bool Client::__runEcho() {
 
             if (_waiting_for_response && __isFinalResponseCode(response)) {
                 _waiting_for_response = false;
-                if (_disconnect_after_response) _is_connected = false;
             }
         }
         __processQueuedCommands();
@@ -182,7 +182,6 @@ bool Client::__runInteractive() {
 
             if (_waiting_for_response && __isFinalResponseCode(response)) {
                 _waiting_for_response = false;
-                if (_disconnect_after_response) _is_connected = false;
             }
         }
         __processQueuedCommands();

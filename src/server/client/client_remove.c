@@ -6,7 +6,7 @@
 */
 
 #include "my_teams.h"
-#include "logging_server.h"
+
 
 static void disconnect_client(client_t *client)
 {

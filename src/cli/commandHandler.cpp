@@ -25,6 +25,8 @@ bool CommandHandler::handleHelp() {
     std::cout << "/create \"...\" - Create team/channel/thread/comment" << std::endl;
     std::cout << "/list - List teams/channels/threads/comments" << std::endl;
     std::cout << "/info - Get current user/team/channel/thread info" << std::endl;
+    std::cout << "/quit - Exit the client" << std::endl;
+    std::cout << "/exit - Exit the client" << std::endl;
     return true;
 }
 

@@ -86,6 +86,56 @@ void ResponseHandler::__printStyled(const std::string &code,
     std::cout << "  ╰─> " << message << std::endl;
 }
 
+void ResponseHandler::__handleLoginSuccess(const std::string &message) const
+{
+    // Message format: "Logged in as <user_name> (<user_uuid>)."
+    const std::string prefix = "Logged in as ";
+    const std::string suffix = ".";
+
+    if (message.compare(0, prefix.size(), prefix) == 0 && message.size() > prefix.size() + suffix.size()) {
+        size_t open_pos = message.find(" (", prefix.size());
+        size_t close_pos = message.find(").", open_pos);
+        if (open_pos != std::string::npos && close_pos != std::string::npos && open_pos < close_pos) {
+            std::string user_name = message.substr(prefix.size(), open_pos - prefix.size());
+            std::string user_uuid = message.substr(open_pos + 2, close_pos - (open_pos + 2));
+            client_event_logged_in(user_uuid.c_str(), user_name.c_str());
+        }
+    }
+}
+
+void ResponseHandler::__handlePrivateMessageReceived(const std::string &message) const
+{
+    // Message received format: "New message from <sender_name> : "<message_body>""
+    std::string prefix = "New message from ";
+    
+    if (message.compare(0, prefix.size(), prefix) == 0) {
+        std::string rest = message.substr(prefix.size());
+        size_t colon_pos = rest.find(" : \"");
+        if (colon_pos != std::string::npos && rest.size() > colon_pos + 4) {
+            std::string sender_name = rest.substr(0, colon_pos);
+            std::string message_body = rest.substr(colon_pos + 4, rest.size() - (colon_pos + 5));
+            client_event_private_message_received(sender_name.c_str(), message_body.c_str());
+        }
+    }
+}
+
+void ResponseHandler::__handleLogoutSuccess(const std::string &message) const
+{
+    // Message format: "Logged out <user_name> (<user_uuid>)."
+    const std::string prefix = "Logged out ";
+    const std::string suffix = ".";
+
+    if (message.compare(0, prefix.size(), prefix) == 0 && message.size() > prefix.size() + suffix.size()) {
+        size_t open_pos = message.find(" (", prefix.size());
+        size_t close_pos = message.find(").", open_pos);
+        if (open_pos != std::string::npos && close_pos != std::string::npos && open_pos < close_pos) {
+            std::string user_name = message.substr(prefix.size(), open_pos - prefix.size());
+            std::string user_uuid = message.substr(open_pos + 2, close_pos - (open_pos + 2));
+            client_event_logged_out(user_uuid.c_str(), user_name.c_str());
+        }
+    }
+}
+
 void ResponseHandler::__dispatchLogging(const std::string &code,
     const std::string &message) const
 {
@@ -98,12 +148,20 @@ void ResponseHandler::__dispatchLogging(const std::string &code,
         client_error_unauthorized();
         return;
     }
+    if (code == "230") {
+        __handleLoginSuccess(message);
+        return;
+    }
     if (code == "540") {
         client_error_already_exist();
         return;
     }
     if (code == "405" || code == "406") {
         client_error_unknown_channel(context_uuid);
+        return;
+    }
+    if (code == "225") {
+        __handlePrivateMessageReceived(message);
         return;
     }
     if (code == "404") {
@@ -123,6 +181,10 @@ void ResponseHandler::__dispatchLogging(const std::string &code,
             client_print_users(user_uuid.c_str(), user_name.c_str(), user_status);
         else if (_last_command == "user")
             client_print_user(user_uuid.c_str(), user_name.c_str(), user_status);
+    }
+    if (code == "231") {
+        __handleLogoutSuccess(message);
+        return;
     }
 }
 
