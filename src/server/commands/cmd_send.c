@@ -13,7 +13,7 @@ static int resolve_identifier_to_uuid(server_t *server, char *token,
 {
     user_t *user = NULL;
 
-    if (uuid_parse(token, target) == 0)
+    if (string_to_uuid(token, target) == 0)
         return 0;
     user = find_user_by_name(server, token);
     if (!user)

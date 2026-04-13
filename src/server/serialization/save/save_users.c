@@ -5,7 +5,28 @@
 ** save_users.c
 */
 
-#include "serialization.h"
+#include "my_teams.h"
+
+static void save_single_subscription(FILE *file, team_subscription_t *sub)
+{
+    char team_uuid_str[UUID_STR_LEN];
+
+    uuid_to_string(sub->team_uuid, team_uuid_str);
+    fprintf(file, "\n\t\t\t{\n\t\t\t\t\"team_uuid\":\"%s\"\n\t\t\t}", team_uuid_str);
+}
+
+static void save_single_user_subscriptions(FILE *file, user_t *user)
+{
+    team_subscription_t *sub = NULL;
+
+    fprintf(file, ",\n\t\t\"subscribed_teams\":\n\t\t[");
+    TAILQ_FOREACH(sub, &user->subscribed_teams, entries) {
+        save_single_subscription(file, sub);
+        if (TAILQ_NEXT(sub, entries))
+            fprintf(file, ",\n");
+    }
+    fprintf(file, "\n\t\t]");
+}
 
 static void save_single_user(FILE *file, user_t *user)
 {
@@ -13,9 +34,10 @@ static void save_single_user(FILE *file, user_t *user)
 
     uuid_to_string(user->uuid, uuid_str);
     fprintf(file, "\t{\n\t\t\"uuid\":\"%s\","
-        "\n\t\t\"name\":\"%s\""
-        "\n\t}",
+        "\n\t\t\"name\":\"%s\"",
         uuid_str, user->name);
+    save_single_user_subscriptions(file, user);
+    fprintf(file, "\n\t}");
 }
 
 int save_users(struct user_queue_s *users)

@@ -77,11 +77,5 @@ typedef struct comment_init_s {
     char *body;
 } comment_init_t;
 
-typedef struct use_context_s {
-    server_t *server;
-    client_t *client;
-    team_t *team;
-} use_context_t;
-
 extern const command_t commands[];
 #endif

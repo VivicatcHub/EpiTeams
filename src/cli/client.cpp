@@ -24,40 +24,6 @@ bool Client::__isFinalResponseCode(const std::string &response)
     return false;
 }
 
-void Client::__handleUseResponse(const std::string &response)
-{
-    std::string first_line;
-    size_t pos = 0;
-
-    while (pos < response.size() && (response[pos] == '\r' || response[pos] == '\n'))
-        pos++;
-    size_t end = response.find_first_of("\r\n", pos);
-    if (end == std::string::npos)
-        first_line = response.substr(pos);
-    else
-        first_line = response.substr(pos, end - pos);
-
-    std::string code;
-    if (first_line.size() >= 3
-        && std::isdigit(static_cast<unsigned char>(first_line[0]))
-        && std::isdigit(static_cast<unsigned char>(first_line[1]))
-        && std::isdigit(static_cast<unsigned char>(first_line[2]))) {
-        code = first_line.substr(0, 3);
-    }
-
-    if (_response_handler.getLastCommand() == "use" && !code.empty() && code[0] == '2') {
-        std::vector<std::string> last_args = _response_handler.getLastArgs();
-        if (last_args.empty()) {
-            _context.reset();
-        } else {
-            _context.reset();
-            if (last_args.size() >= 1) _context.setTeamUuid(last_args[0]);
-            if (last_args.size() >= 2) _context.setChannelUuid(last_args[1]);
-            if (last_args.size() >= 3) _context.setThreadUuid(last_args[2]);
-        }
-    }
-}
-
 void Client::__displayPrompt() {
     std::cout << "\n╭─ \033[32mmyteams\033[0m\n╰─$ ";
     std::cout.flush();
@@ -98,7 +64,7 @@ void Client::__processQueuedCommands() {
             continue;
         }
 
-        if (cmd == "use" && args.size() == 0) continue;
+        if (cmd == "use") continue;
         _waiting_for_response = true;
         if (cmd == "logout") _disconnect_after_response = true;
     }
@@ -150,7 +116,6 @@ bool Client::__runEcho() {
             _response_handler.handleServerResponse(response);
 
             if (_waiting_for_response && __isFinalResponseCode(response)) {
-                __handleUseResponse(response);
                 _waiting_for_response = false;
                 if (_disconnect_after_response) _is_connected = false;
             }
@@ -216,7 +181,6 @@ bool Client::__runInteractive() {
             _response_handler.handleServerResponse(response);
 
             if (_waiting_for_response && __isFinalResponseCode(response)) {
-                __handleUseResponse(response);
                 _waiting_for_response = false;
                 if (_disconnect_after_response) _is_connected = false;
             }

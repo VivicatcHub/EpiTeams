@@ -27,7 +27,6 @@ private:
     bool __queueUserInput(const std::string &input);
     bool __runInteractive();
     bool __runEcho();
-    void __handleUseResponse(const std::string &response);
     static bool __isFinalResponseCode(const std::string &response);
 
 public:

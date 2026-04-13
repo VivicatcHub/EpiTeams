@@ -17,9 +17,9 @@ void uuid_to_string(uuid_t uuid, char *str)
     uuid_unparse(uuid, str);
 }
 
-void string_to_uuid(char const *str, uuid_t uuid)
+int string_to_uuid(char const *str, uuid_t uuid)
 {
-    uuid_parse(str, uuid);
+    return uuid_parse(str, uuid);
 }
 
 int save_dir_exists(void)

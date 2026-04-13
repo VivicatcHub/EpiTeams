@@ -22,6 +22,4 @@ public:
     void setCommandContext(const std::string &command,
         const std::vector<std::string> &args);
     void handleServerResponse(const std::string &raw_response) const;
-    std::string getLastCommand() const;
-    std::vector<std::string> getLastArgs() const;
 };

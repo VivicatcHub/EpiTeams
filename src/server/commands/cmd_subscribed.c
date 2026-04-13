@@ -25,7 +25,7 @@ static int resolve_team(server_t *server, client_t *client,
 {
     team_t *team = NULL;
 
-    if (uuid_parse(team_str, out) == 0) {
+    if (string_to_uuid(team_str, out) == 0) {
         team = find_team_by_uuid(server, out);
     } else {
         team = find_team_by_name(server, team_str);
