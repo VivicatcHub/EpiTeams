@@ -63,7 +63,7 @@ void ResponseHandler::__processResponseCode(const std::string &code, const std::
         __messageReceipted(message);
         return;
     }
-    if (code == "201") {
+    if (code == "201" || code == "203") {
         _waiting_for_202 = true;
     } else if (_waiting_for_202 && code == "202") {
         _waiting_for_202 = false;

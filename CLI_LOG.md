@@ -6,7 +6,7 @@
 - [x] int client_event_channel_created(char const \*channel_uuid, char const \*channel_name, char const \*channel_description);
 - [x] int client_event_thread_created(char const \*thread_uuid, char const \*user_uuid, time_t thread_timestamp, char const \*thread_title, char const \*thread_body);
 - [x] int client_print_users(char const \*user_uuid, char const \*user_name, int user_status);
-- [ ] int client_print_teams(char const \*team_uuid, char const \*team_name, char const \*team_description);
+- [x] int client_print_teams(char const \*team_uuid, char const \*team_name, char const \*team_description);
 - [ ] int client_team_print_channels(char const \*channel_uuid, char const \*channel_name, char const \*channel_description);
 - [ ] int client_channel_print_threads(char const \*thread_uuid, char const \*user_uuid, time_t thread_timestamp, char const \*thread_title, char const \*thread_body);
 - [ ] int client_thread_print_replies(char const \*thread_uuid, char const \*user_uuid, time_t reply_timestamp, char const \*reply_body);

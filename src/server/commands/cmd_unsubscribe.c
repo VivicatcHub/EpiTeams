@@ -18,8 +18,8 @@ static int check_arg(client_t *client, char *args)
     return 0;
 }
 
-static int resolve_team(server_t *server, client_t *client,
-    char *team_str, team_t **out)
+static int resolve_team(server_t *server, client_t *client, char *team_str,
+    team_t **out)
 {
     uuid_t team_uuid;
     team_t *team = NULL;

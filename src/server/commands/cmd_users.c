@@ -54,5 +54,5 @@ void cmd_users(server_t *server, client_t *client UNUSED, char *args UNUSED)
             connected_count);
         send_user_status(client, user, online);
     }
-    send_response(client, CODE_COMMAND_END, "End of users list");
+    send_response(client, CODE_COMMAND_END, "No more users.");
 }

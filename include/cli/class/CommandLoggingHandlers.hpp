@@ -114,12 +114,13 @@ private:
 */
 class SubscribeHandler : public LoggingHandler {
 public:
-    SubscribeHandler() = default;
+    SubscribeHandler(const std::vector<std::string> &args) : _args(args) {}
     virtual ~SubscribeHandler() = default;
 
     void handleResponse(const std::string &code, const std::string &message) const override;
 
 private:
+    std::vector<std::string> _args;
     void __handle200() const;
     void __handle404() const;
     void __handle530() const;
@@ -131,14 +132,15 @@ private:
 */
 class SubscribedHandler : public LoggingHandler {
 public:
-    SubscribedHandler() = default;
+    SubscribedHandler(const std::vector<std::string> &args) : _args(args) {}
     virtual ~SubscribedHandler() = default;
 
     void handleResponse(const std::string &code, const std::string &message) const override;
 
 private:
-    void __handle200(const std::string &message) const;
-    void __handle202(const std::string &message) const;
+    std::vector<std::string> _args;
+    void __handle201(const std::string &message) const;
+    void __handle203(const std::string &message) const;
     void __handle404() const;
     void __handle530() const;
 };
@@ -149,12 +151,13 @@ private:
 */
 class UnsubscribeHandler : public LoggingHandler {
 public:
-    UnsubscribeHandler() = default;
+    UnsubscribeHandler(const std::vector<std::string> &args) : _args(args) {}
     virtual ~UnsubscribeHandler() = default;
 
     void handleResponse(const std::string &code, const std::string &message) const override;
 
 private:
+    std::vector<std::string> _args;
     void __handle200() const;
     void __handle404() const;
     void __handle530() const;

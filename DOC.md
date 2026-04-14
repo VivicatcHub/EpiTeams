@@ -196,7 +196,7 @@ Return:
 - Args: `["team_uuid"]`
 - Server:
   - Send: `SUBSCRIBE <team_uuid>`
-  - Return: `200`/`404`/`530`
+  - Return: `200`/`404`/`501`/`530`
 
 Args:
 
@@ -210,6 +210,7 @@ Return:
 | ---- | ----------------------------------------- |
 | 200  | Subscription successful                   |
 | 404  | Team not found with the given `team_uuid` |
+| 501  | Request failed, team_uuid is incorrect    |
 | 530  | Request failed, user is not logged in     |
 
 #### Subscribed (`/subscribed`)
@@ -219,7 +220,7 @@ Return:
 - Args: `?["team_uuid"]`
 - Server:
   - Send: `SUBSCRIBED`/`SUBSCRIBED <team_uuid>`
-  - Return: `200`->`<subscribed-list>`/`200`->`<team-members>`/`404`/`530`
+  - Return: `201`->`<subscribed-list>`->`202`/`203`->`<team-members>`->`202`/`404`/`501`/`530`
 
 Args:
 
@@ -231,9 +232,10 @@ Return:
 
 | Code | Description                                       |
 | ---- | ------------------------------------------------- |
-| 200  | Success, followed by the list of subscribed teams |
-| 200  | Success, followed by the list of team subscribers |
+| 201  | Success, followed by the list of subscribed teams |
+| 203  | Success, followed by the list of team subscribers |
 | 404  | Team not found with the given `team_uuid`         |
+| 501  | Request failed, team_uuid is incorrect            |
 | 530  | Request failed, user is not logged in             |
 
 #### Unsubscribe (`/unsubscribe`)
@@ -243,7 +245,7 @@ Return:
 - Args: `["team_uuid"]`
 - Server:
   - Send: `UNSUBSCRIBE <team_uuid>`
-  - Return: `200`/`404`/`530`
+  - Return: `200`/`404`/`501`/`530`
 
 Args:
 
@@ -257,6 +259,7 @@ Return:
 | ---- | ----------------------------------------- |
 | 200  | Unsubscription successful                 |
 | 404  | Team not found with the given `team_uuid` |
+| 501  | Request failed, team_uuid is incorrect    |
 | 530  | Request failed, user is not logged in     |
 
 ### Context

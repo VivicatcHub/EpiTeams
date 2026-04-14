@@ -15,11 +15,11 @@ std::unique_ptr<LoggingHandler> LoggingHandlerFactory::createHandler(const std::
     } else if (command == "messages") {
         return std::make_unique<MessagesHandler>(args);
     } else if (command == "subscribe") {
-        return std::make_unique<SubscribeHandler>();
+        return std::make_unique<SubscribeHandler>(args);
     } else if (command == "subscribed") {
-        return std::make_unique<SubscribedHandler>();
+        return std::make_unique<SubscribedHandler>(args);
     } else if (command == "unsubscribe") {
-        return std::make_unique<UnsubscribeHandler>();
+        return std::make_unique<UnsubscribeHandler>(args);
     } else if (command == "create_team") {
         return std::make_unique<CreateTeamHandler>(args);
     } else if (command == "create_channel") {

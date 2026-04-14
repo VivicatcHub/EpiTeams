@@ -61,7 +61,7 @@ static void send_conversation_messages(server_t *server, client_t *client,
             send_matching_message(server, client, message);
         }
     }
-    send_response(client, CODE_COMMAND_END, "End of messages.");
+    send_response(client, CODE_COMMAND_END, "No more messages in this conv.");
 }
 
 void cmd_messages(server_t *server, client_t *client, char *args)
