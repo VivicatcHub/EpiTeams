@@ -1,0 +1,31 @@
+#include "class/CommandLoggingHandlers.hpp"
+#include "class/MessageParser.hpp"
+#include "logging_client.h"
+#include <iostream>
+
+void SendHandler::handleResponse(const std::string &code, const std::string &message) const
+{
+    MessageParser::printResponsePrompt(code);
+
+    if (code == "200") __handle200();
+    if (code == "404") return __handle404();
+    if (code == "501") return __handle501();
+    if (code == "530") return __handle530();
+    else std::cout << message << std::endl;
+}
+
+void SendHandler::__handle200() const {}
+
+void SendHandler::__handle404() const
+{
+    std::string target_uuid = _args.empty() ? "" : _args[0];
+    client_error_unknown_user(target_uuid.c_str());
+}
+
+void SendHandler::__handle501() const
+{
+    std::string target_uuid = _args.empty() ? "" : _args[0];
+    client_error_unknown_user(target_uuid.c_str());
+}
+
+void SendHandler::__handle530() const { client_error_unauthorized(); }

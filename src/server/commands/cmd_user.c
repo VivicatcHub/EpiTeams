@@ -36,9 +36,10 @@ static void send_user_info(client_t *client, user_t *user, int online)
     char buf[MAX_BUFFER];
 
     uuid_to_string(user->uuid, uuid_buf);
-    snprintf(buf, MAX_BUFFER, "%s (%s) -> %s",
-        user->name, uuid_buf, online ? "ONLINE" : "OFFLINE");
+    snprintf(buf, MAX_BUFFER, "%s (%s) -> %s", user->name, uuid_buf,
+        online ? "ONLINE" : "OFFLINE");
     send_response(client, CODE_COMMAND_OK, buf);
+    send_response(client, CODE_COMMAND_END, "End of user info.");
 }
 
 static int resolve_user_arg(server_t *server, char *args, uuid_t target)
@@ -54,6 +55,16 @@ static int resolve_user_arg(server_t *server, char *args, uuid_t target)
     return 0;
 }
 
+static void send_404(client_t *client, uuid_t uuid)
+{
+    char uuid_buf[UUID_STR_LEN];
+    uuid_to_string(uuid, uuid_buf);
+    char buf[MAX_BUFFER];
+
+    snprintf(buf, MAX_BUFFER, "User not found (%s).", uuid_buf);
+    send_response(client, CODE_NOT_FOUND, buf);
+}
+
 void cmd_user(server_t *server UNUSED, client_t *client, char *args)
 {
     user_t *user;
@@ -63,8 +74,7 @@ void cmd_user(server_t *server UNUSED, client_t *client, char *args)
     if (check_arg(client, args) == -1)
         return;
     if (resolve_user_arg(server, args, target) != 0) {
-        send_response(client, CODE_SYNTAX_ERROR_PARAM,
-            "Invalid UUID.");
+        send_response(client, CODE_SYNTAX_ERROR_PARAM, "Invalid UUID.");
         return;
     }
     TAILQ_FOREACH(user, &server->data.users, entries) {
@@ -74,5 +84,5 @@ void cmd_user(server_t *server UNUSED, client_t *client, char *args)
             return;
         }
     }
-    send_response(client, CODE_NOT_FOUND, "User not found.");
+    send_404(client, target);
 }

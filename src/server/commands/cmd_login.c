@@ -11,8 +11,7 @@
 static int check_arg(client_t *client, char *arg)
 {
     if (strlen(arg) > MAX_NAME_LENGTH) {
-        send_response(client, CODE_SYNTAX_ERROR_PARAM,
-            "Username too long.");
+        send_response(client, CODE_SYNTAX_ERROR_PARAM, "Username too long.");
         return -1;
     }
     if (strlen(arg) == 0) {
@@ -102,13 +101,11 @@ void cmd_login(server_t *server, client_t *client, char *args)
         return;
     }
     if (client->state == AUTHENTICATED) {
-        send_response(client, CODE_BAD_SEQUENCE,
-            "Already logged in.");
+        send_response(client, CODE_BAD_SEQUENCE, "Already logged in.");
         return;
     }
     if (check_arg(client, args) == -1)
         return;
     if (handle_user(client, server, args) == -1)
         return;
-    send_response(client, CODE_COMMAND_OK, "Username accepted.");
 }

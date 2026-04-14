@@ -4,21 +4,13 @@
 #include <poll.h>
 #include <unistd.h>
 
-Client::Client()
-    : _handler(_tcp_client, _context),
-    _is_connected(false),
-    _waiting_for_response(false),
-    _stdin_closed(false),
-    _interactive_mode(false) {
-}
+Client::Client() : _handler(_tcp_client, _context), _is_connected(false), _waiting_for_response(false), _stdin_closed(false), _interactive_mode(false) {}
 
 bool Client::__isFinalResponseCode(const std::string &response)
 {
-    if (response.size() < 3
-        || !std::isdigit(response[0])
-        || !std::isdigit(response[1])
-        || !std::isdigit(response[2])) return true;
+    if (response.size() < 3 || !std::isdigit(response[0]) || !std::isdigit(response[1]) || !std::isdigit(response[2])) return true;
     std::string code = response.substr(0, 3);
+    if (code == "200") return false;
     if (code[0] == '2' || code[0] == '4' || code[0] == '5') return true;
     return false;
 }
@@ -28,15 +20,17 @@ void Client::__displayPrompt() {
     std::cout.flush();
 }
 
+void Client::__displayErrorResponse(const std::string &code, const std::string &message) const { std::cerr << "  ╰─> Error: " << message << " (code: " << code << ")" << std::endl; }
+
 bool Client::__queueUserInput(const std::string &input) {
     if (!_parser.parse(input)) {
-        std::cerr << "Error: Invalid command format" << std::endl;
+        __displayErrorResponse("400", "Invalid command format");
         return true;
     }
 
     const std::string &cmd = _parser.getCommand();
     if (cmd == "help") {
-        if (!_handler.execute(cmd, _parser.getArgs())) std::cerr << "Error: Invalid command or arguments" << std::endl;
+        if (!_handler.execute(cmd, _parser.getArgs())) __displayErrorResponse("400", "Invalid command or arguments");
         return true;
     }
 
@@ -53,16 +47,16 @@ void Client::__processQueuedCommands() {
         _command_queue.pop();
 
         if (!_parser.parse(input)) {
-            std::cerr << "Error: Invalid command format" << std::endl;
+            __displayErrorResponse("400", "Invalid command format");
             continue;
         }
 
         const std::string &cmd = _parser.getCommand();
         const std::vector<std::string> &args = _parser.getArgs();
-        _response_handler.setCommandContext(cmd, args);
+        _response_handler.setCommandContext(cmd, args, _context);
 
         if (!_handler.execute(cmd, args)) {
-            std::cerr << "Error: Invalid command or arguments" << std::endl;
+            __displayErrorResponse("400", "Invalid command or arguments");
             continue;
         }
 
@@ -104,7 +98,7 @@ bool Client::__runEcho() {
         int poll_result = poll(fds, 2, -1);
 
         if (poll_result < 0) {
-            std::cerr << "Error: Poll failed" << std::endl;
+            __displayErrorResponse("500", "Poll failed");
             break;
         }
 
@@ -114,10 +108,16 @@ bool Client::__runEcho() {
                 _is_connected = false;
                 break;
             }
-            _response_handler.handleServerResponse(response);
-
-            if (_waiting_for_response && __isFinalResponseCode(response)) {
-                _waiting_for_response = false;
+            for (size_t i = 0; i <= response.size(); i++) {
+                if (i == response.size() || response[i] == '\n' || response[i] == '\r') {
+                    std::string line = response.substr(0, i);
+                    if (!line.empty()) {
+                        _response_handler.handleServerResponse(line);
+                        if (_waiting_for_response && __isFinalResponseCode(line)) _waiting_for_response = false;
+                    }
+                    response.erase(0, i + 1);
+                    i = -1;
+                }
             }
         }
         __processQueuedCommands();
@@ -141,7 +141,7 @@ bool Client::__runInteractive() {
         int poll_result = poll(fds, 2, -1);
 
         if (poll_result < 0) {
-            std::cerr << "Error: Poll failed" << std::endl;
+            __displayErrorResponse("500", "Poll failed");
             break;
         }
 
@@ -178,10 +178,16 @@ bool Client::__runInteractive() {
                 _is_connected = false;
                 break;
             }
-            _response_handler.handleServerResponse(response);
-
-            if (_waiting_for_response && __isFinalResponseCode(response)) {
-                _waiting_for_response = false;
+            for (size_t i = 0; i <= response.size(); i++) {
+                if (i == response.size() || response[i] == '\n' || response[i] == '\r') {
+                    std::string line = response.substr(0, i);
+                    if (!line.empty()) {
+                        _response_handler.handleServerResponse(line);
+                        if (_waiting_for_response && __isFinalResponseCode(line)) _waiting_for_response = false;
+                    } else break;
+                    response.erase(0, i + 1);
+                    i = -1;
+                }
             }
         }
         __processQueuedCommands();
@@ -194,7 +200,7 @@ bool Client::__runInteractive() {
 
 bool Client::run(const std::string &ip, int port) {
     if (!_tcp_client.connect(ip, port)) {
-        std::cerr << "Error: Failed to connect to server" << std::endl;
+        __displayErrorResponse("500", "Failed to connect to server");
         return false;
     }
 

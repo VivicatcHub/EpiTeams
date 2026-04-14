@@ -10,7 +10,7 @@
 void send_response(client_t *client, char const *code, char const *msg)
 {
     char buf[MAX_BUFFER];
-    int len = snprintf(buf, sizeof(buf), "%s %s", code, msg);
+    int len = snprintf(buf, sizeof(buf), "%s %s\n", code, msg);
 
     write(client->socket, buf, len);
     if (strcmp(code, CODE_SERVICE_READY) == 0 || strcmp(code, CODE_QUIT) == 0)

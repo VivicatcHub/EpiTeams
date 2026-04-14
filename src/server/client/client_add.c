@@ -24,6 +24,5 @@ int add_client(server_t *server, int fd, struct sockaddr_in *addr)
     server->clients[i] = client;
     printf("New client connected: %s:%d\n",
         get_ip_address(&addr->sin_addr), get_port(&addr->sin_port));
-    send_response(client, CODE_SERVICE_READY, "Service ready for new user.");
     return 0;
 }

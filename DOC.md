@@ -46,7 +46,7 @@
 - Args: `["user_name"]`
 - Server:
   - Send: `LOGIN <user_name>`
-  - Return: `230`/`530`/`540`
+  - Return: `230`/`501`/`503`/`540`
 
 Args:
 
@@ -56,10 +56,12 @@ Args:
 
 Return:
 
-| Code | Description                             |
-| ---- | --------------------------------------- |
-| 230  | Login successful, user is now logged in |
-| 530  | Login failed, user_name is missing      |
+| Code | Description                               |
+| ---- | ----------------------------------------- |
+| 230  | Login successful, user is now logged in   |
+| 501  | Login failed, user_name is incorect       |
+| 503  | Login failed, user is already logged in   |
+| 540  | Login failed, user_name is already in use |
 
 #### Logout (`/logout`)
 
@@ -86,13 +88,14 @@ Return:
 - Args: None
 - Server:
   - Send: `USERS`
-  - Return: `200`->`<users-list>`/`530`
+  - Return: `200`->`<users-list>`->`201`/`530`
 
 Return:
 
 | Code | Description                                        |
 | ---- | -------------------------------------------------- |
 | 200  | Success, followed by the users list (can be empty) |
+| 201  | End of users list                                  |
 | 530  | Request failed, user is not logged in              |
 
 #### User (`/user`)
@@ -102,7 +105,7 @@ Return:
 - Args: `["user_uuid"]`
 - Server:
   - Send: `USER <user_uuid>`
-  - Return: `200`->`<user-info>`/`404`/`530`
+  - Return: `200`->`<user-info>`->`201`/`404`/`501`/`530`
 
 Args:
 
@@ -116,6 +119,7 @@ Return:
 | ---- | ----------------------------------------- |
 | 200  | Success, followed by the user info        |
 | 404  | User not found with the given `user_uuid` |
+| 501  | Request failed, user_uuid is incorrect    |
 | 530  | Request failed, user is not logged in     |
 
 ### Message
@@ -127,7 +131,7 @@ Return:
 - Args: `["user_uuid"]` `["message_body"]`
 - Server:
   - Send: `SEND <user_uuid> "<message_body>"`
-  - Return: `200`/`404`/`530`
+  - Return: `200`/`201`/`404`/`501`/`530`
 
 Args:
 
@@ -141,8 +145,22 @@ Return:
 | Code | Description                               |
 | ---- | ----------------------------------------- |
 | 200  | Message sent successfully                 |
+| 201  | End of messages                           |
 | 404  | User not found with the given `user_uuid` |
+| 501  | Request failed, message body is incorrect |
 | 530  | Request failed, user is not logged in     |
+
+#### Receive Message (no command)
+
+> Receive a message from another user (sent by the `/send` command)
+
+- Server:
+  - Send: None
+  - Return: `225`
+
+| Code | Description                        |
+| ---- | ---------------------------------- |
+| 225  | Message received from another user |
 
 #### Messages (`/messages`)
 
@@ -151,7 +169,7 @@ Return:
 - Args: `["user_uuid"]`
 - Server:
   - Send: `MESSAGES <user_uuid>`
-  - Return: `200`->`<messages-list>`/`404`/`530`
+  - Return: `200`->`<messages-list>`->`201`/`404`/`501`/`530`
 
 Args:
 
@@ -164,7 +182,9 @@ Return:
 | Code | Description                               |
 | ---- | ----------------------------------------- |
 | 200  | Success, followed by the messages list    |
+| 201  | End of messages                           |
 | 404  | User not found with the given `user_uuid` |
+| 501  | Request failed, user_uuid is incorrect    |
 | 530  | Request failed, user is not logged in     |
 
 ### Subscription
@@ -199,7 +219,7 @@ Return:
 - Args: `?["team_uuid"]`
 - Server:
   - Send: `SUBSCRIBED`/`SUBSCRIBED <team_uuid>`
-  - Return: `200`->`<subscribed-list>`/`201`->`<team-members>`/`404`/`530`
+  - Return: `200`->`<subscribed-list>`/`200`->`<team-members>`/`404`/`530`
 
 Args:
 
@@ -212,7 +232,7 @@ Return:
 | Code | Description                                       |
 | ---- | ------------------------------------------------- |
 | 200  | Success, followed by the list of subscribed teams |
-| 201  | Success, followed by the list of team subscribers |
+| 200  | Success, followed by the list of team subscribers |
 | 404  | Team not found with the given `team_uuid`         |
 | 530  | Request failed, user is not logged in             |
 

@@ -87,14 +87,15 @@ static void notify_and_respond(server_t *server, client_t *client,
     save_messages(&server->data.messages);
     uuid_to_string(sender->uuid, sender_uuid_str);
     uuid_to_string(msg->receiver_uuid, receiver_uuid_str);
-    server_event_private_message_sended(
-        sender_uuid_str, receiver_uuid_str, msg->body);
+    server_event_private_message_sended(sender_uuid_str, receiver_uuid_str,
+        msg->body);
     notify_connected_receiver(server, receiver, sender, msg->body);
     send_response(client, CODE_COMMAND_OK, "Message sent.");
+    send_response(client, CODE_COMMAND_END, "End of message.");
 }
 
-static user_t *get_receiver_or_respond(server_t *server,
-    client_t *client, uuid_t target)
+static user_t *get_receiver_or_respond(server_t *server, client_t *client,
+    uuid_t target)
 {
     user_t *receiver = find_user_by_uuid(server, target);
 
