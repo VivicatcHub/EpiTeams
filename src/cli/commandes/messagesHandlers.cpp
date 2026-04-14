@@ -7,14 +7,14 @@ void MessagesHandler::handleResponse(const std::string &code, const std::string 
 {
 	MessageParser::printResponsePrompt(code);
 
-	if (code == "200") return __handle200(message);
+	if (code == "201") return __handle201(message);
 	if (code == "404") return __handle404();
 	if (code == "501") return __handle501();
 	if (code == "530") return __handle530();
 	std::cout << message << std::endl;
 }
 
-void MessagesHandler::__handle200(const std::string &message) const
+void MessagesHandler::__handle201(const std::string &message) const
 {
 	std::string sender_uuid;
 	long timestamp = 0;

@@ -88,14 +88,14 @@ Return:
 - Args: None
 - Server:
   - Send: `USERS`
-  - Return: `200`->`<users-list>`->`201`/`530`
+  - Return: `201`->`<users-list>`->`202`/`530`
 
 Return:
 
 | Code | Description                                        |
 | ---- | -------------------------------------------------- |
-| 200  | Success, followed by the users list (can be empty) |
-| 201  | End of users list                                  |
+| 201  | Success, followed by the users list (can be empty) |
+| 202  | End of users list                                  |
 | 530  | Request failed, user is not logged in              |
 
 #### User (`/user`)
@@ -105,7 +105,7 @@ Return:
 - Args: `["user_uuid"]`
 - Server:
   - Send: `USER <user_uuid>`
-  - Return: `200`->`<user-info>`->`201`/`404`/`501`/`530`
+  - Return: `201`->`<user-info>`->`202`/`404`/`501`/`530`
 
 Args:
 
@@ -117,7 +117,8 @@ Return:
 
 | Code | Description                               |
 | ---- | ----------------------------------------- |
-| 200  | Success, followed by the user info        |
+| 201  | Success, followed by the user info        |
+| 202  | End of user info                          |
 | 404  | User not found with the given `user_uuid` |
 | 501  | Request failed, user_uuid is incorrect    |
 | 530  | Request failed, user is not logged in     |
@@ -131,7 +132,7 @@ Return:
 - Args: `["user_uuid"]` `["message_body"]`
 - Server:
   - Send: `SEND <user_uuid> "<message_body>"`
-  - Return: `200`/`201`/`404`/`501`/`530`
+  - Return: `200`/`404`/`501`/`530`
 
 Args:
 
@@ -145,7 +146,6 @@ Return:
 | Code | Description                               |
 | ---- | ----------------------------------------- |
 | 200  | Message sent successfully                 |
-| 201  | End of messages                           |
 | 404  | User not found with the given `user_uuid` |
 | 501  | Request failed, message body is incorrect |
 | 530  | Request failed, user is not logged in     |
@@ -169,7 +169,7 @@ Return:
 - Args: `["user_uuid"]`
 - Server:
   - Send: `MESSAGES <user_uuid>`
-  - Return: `200`->`<messages-list>`->`201`/`404`/`501`/`530`
+  - Return: `201`->`<messages-list>`->`202`/`404`/`501`/`530`
 
 Args:
 
@@ -181,8 +181,8 @@ Return:
 
 | Code | Description                               |
 | ---- | ----------------------------------------- |
-| 200  | Success, followed by the messages list    |
-| 201  | End of messages                           |
+| 201  | Success, followed by the messages list    |
+| 202  | End of messages                           |
 | 404  | User not found with the given `user_uuid` |
 | 501  | Request failed, user_uuid is incorrect    |
 | 530  | Request failed, user is not logged in     |

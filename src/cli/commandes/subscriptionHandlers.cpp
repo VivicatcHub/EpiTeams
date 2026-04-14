@@ -47,7 +47,7 @@ void SubscribedHandler::handleResponse(const std::string &code,
 	MessageParser::printResponsePrompt(code);
 
 	if (code == "200") __handle200(message);
-	else if (code == "201") __handle201(message);
+	else if (code == "202") __handle202(message);
 	else if (code == "404") __handle404();
 	else if (code == "530") __handle530();
 	else std::cout << message << std::endl;
@@ -63,7 +63,7 @@ void SubscribedHandler::__handle200(const std::string &message) const
 	}
 }
 
-void SubscribedHandler::__handle201(const std::string &message) const
+void SubscribedHandler::__handle202(const std::string &message) const
 {
 	// List of team subscribers (users)
 	std::string user_name, user_uuid;

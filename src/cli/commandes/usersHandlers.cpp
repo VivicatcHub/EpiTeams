@@ -7,12 +7,12 @@ void UsersHandler::handleResponse(const std::string &code, const std::string &me
 {
 	MessageParser::printResponsePrompt(code);
 
-	if (code == "200") return __handle200(message);
+	if (code == "201") return __handle201(message);
 	if (code == "530") return __handle530();
 	std::cout << message << std::endl;
 }
 
-void UsersHandler::__handle200(const std::string &message) const
+void UsersHandler::__handle201(const std::string &message) const
 {
 	std::string user_name, user_uuid;
 	int user_status = 0;

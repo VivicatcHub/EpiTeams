@@ -12,7 +12,8 @@
 
     #define CODE_FILE_STATUS_OK "150"
     #define CODE_COMMAND_OK "200"
-    #define CODE_COMMAND_END "201"
+    #define CODE_COMMAND_BEGIN "201"
+    #define CODE_COMMAND_END "202"
     #define CODE_COMMAND_OK_WITH_INFO "202"
     #define CODE_SYSTEM_STATUS "211"
     #define CODE_HELP_MESSAGE "214"

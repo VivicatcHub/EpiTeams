@@ -20,8 +20,6 @@ std::unique_ptr<LoggingHandler> LoggingHandlerFactory::createHandler(const std::
         return std::make_unique<SubscribedHandler>();
     } else if (command == "unsubscribe") {
         return std::make_unique<UnsubscribeHandler>();
-    } else if (command == "use") {
-        return std::make_unique<UseHandler>();
     } else if (command == "create_team") {
         return std::make_unique<CreateTeamHandler>(args);
     } else if (command == "create_channel") {

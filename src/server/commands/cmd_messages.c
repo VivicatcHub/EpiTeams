@@ -45,7 +45,7 @@ static void send_matching_message(server_t *server, client_t *client,
     if (strftime(timebuf, sizeof(timebuf), "%d/%m/%y %I:%M %p", &tm) == 0)
         strncpy(timebuf, "1/1/70, 00:00 AM", sizeof(timebuf));
     snprintf(buf, MAX_BUFFER, "%s: %s (%s)", sender_name, m->body, timebuf);
-    send_response(client, CODE_COMMAND_OK, buf);
+    send_response(client, CODE_COMMAND_BEGIN, buf);
 }
 
 static void send_conversation_messages(server_t *server, client_t *client,

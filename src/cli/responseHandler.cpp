@@ -6,7 +6,7 @@
 #include <cctype>
 #include <iostream>
 
-ResponseHandler::ResponseHandler() : _waiting_for_201(false) {}
+ResponseHandler::ResponseHandler() : _waiting_for_202(false) {}
 
 void ResponseHandler::setCommandContext(const std::string &command, const std::vector<std::string> &args, const Context &context)
 {
@@ -63,10 +63,10 @@ void ResponseHandler::__processResponseCode(const std::string &code, const std::
         __messageReceipted(message);
         return;
     }
-    if (code == "200") {
-        _waiting_for_201 = true;
-    } else if (_waiting_for_201 && code == "201") {
-        _waiting_for_201 = false;
+    if (code == "201") {
+        _waiting_for_202 = true;
+    } else if (_waiting_for_202 && code == "202") {
+        _waiting_for_202 = false;
         return;
     }
     auto handler = LoggingHandlerFactory::createHandler(_last_command, _last_args);

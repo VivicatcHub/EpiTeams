@@ -91,7 +91,6 @@ static void notify_and_respond(server_t *server, client_t *client,
         msg->body);
     notify_connected_receiver(server, receiver, sender, msg->body);
     send_response(client, CODE_COMMAND_OK, "Message sent.");
-    send_response(client, CODE_COMMAND_END, "End of message.");
 }
 
 static user_t *get_receiver_or_respond(server_t *server, client_t *client,

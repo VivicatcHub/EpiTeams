@@ -9,7 +9,7 @@ private:
     std::string _last_command;
     std::vector<std::string> _last_args;
     Context _context;
-    bool _waiting_for_201;
+    bool _waiting_for_202;
 
     static std::string __cleanString(const std::string &value);
     static bool __extractCodeAndMessage(const std::string &line, std::string &code, std::string &message);

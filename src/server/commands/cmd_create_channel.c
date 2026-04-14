@@ -61,7 +61,6 @@ static void notify_channel_created(channel_t *channel, uuid_t team_uuid,
     server_event_channel_created(team_uuid_str, channel_uuid_str,
         channel->name);
     send_response(client, CODE_COMMAND_OK, "Channel created.");
-    send_response(client, CODE_COMMAND_END, "End of channel creation.");
 }
 
 static int process_create_channel_tokens(server_t *server,

@@ -10,7 +10,7 @@ bool Client::__isFinalResponseCode(const std::string &response)
 {
     if (response.size() < 3 || !std::isdigit(response[0]) || !std::isdigit(response[1]) || !std::isdigit(response[2])) return true;
     std::string code = response.substr(0, 3);
-    if (code == "200") return false;
+    if (code == "201") return false;
     if (code[0] == '2' || code[0] == '4' || code[0] == '5') return true;
     return false;
 }

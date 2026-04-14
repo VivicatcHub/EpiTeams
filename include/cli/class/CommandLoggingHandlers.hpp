@@ -49,7 +49,7 @@ public:
     void handleResponse(const std::string &code, const std::string &message) const override;
 
 private:
-    void __handle200(const std::string &message) const;
+    void __handle201(const std::string &message) const;
     void __handle530() const;
 };
 
@@ -65,7 +65,7 @@ public:
     void handleResponse(const std::string &code, const std::string &message) const override;
 
 private:
-    void __handle200(const std::string &message) const;
+    void __handle201(const std::string &message) const;
     void __handle404(const std::string &message) const;
     void __handle530() const;
 };
@@ -102,7 +102,7 @@ public:
 
 private:
     std::vector<std::string> _args;
-    void __handle200(const std::string &message) const;
+    void __handle201(const std::string &message) const;
     void __handle404() const;
     void __handle501() const;
     void __handle530() const;
@@ -127,7 +127,7 @@ private:
 
 /*
 ** SUBSCRIBED HANDLER (list subscriptions)
-** Codes: 200 (subscribed teams), 201 (team subscribers), 404 (team not found), 530 (not logged in)
+** Codes: 200 (subscribed teams), 202 (team subscribers), 404 (team not found), 530 (not logged in)
 */
 class SubscribedHandler : public LoggingHandler {
 public:
@@ -138,7 +138,7 @@ public:
 
 private:
     void __handle200(const std::string &message) const;
-    void __handle201(const std::string &message) const;
+    void __handle202(const std::string &message) const;
     void __handle404() const;
     void __handle530() const;
 };
@@ -157,25 +157,6 @@ public:
 private:
     void __handle200() const;
     void __handle404() const;
-    void __handle530() const;
-};
-
-/*
-** USE HANDLER (set context)
-** Codes: 200 (success), 404 (team not found), 405 (channel not found), 406 (thread not found), 530 (not logged in)
-*/
-class UseHandler : public LoggingHandler {
-public:
-    UseHandler() = default;
-    virtual ~UseHandler() = default;
-
-    void handleResponse(const std::string &code, const std::string &message) const override;
-
-private:
-    void __handle200() const;
-    void __handle404() const;
-    void __handle405() const;
-    void __handle406() const;
     void __handle530() const;
 };
 

@@ -38,7 +38,7 @@ static void send_user_info(client_t *client, user_t *user, int online)
     uuid_to_string(user->uuid, uuid_buf);
     snprintf(buf, MAX_BUFFER, "%s (%s) -> %s", user->name, uuid_buf,
         online ? "ONLINE" : "OFFLINE");
-    send_response(client, CODE_COMMAND_OK, buf);
+    send_response(client, CODE_COMMAND_BEGIN, buf);
     send_response(client, CODE_COMMAND_END, "End of user info.");
 }
 

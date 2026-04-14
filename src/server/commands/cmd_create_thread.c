@@ -56,7 +56,6 @@ static void notify_thread_created(thread_t *thread, uuid_t channel_uuid,
     server_event_thread_created(channel_uuid_str, thread_uuid_str,
         user_uuid_str, thread->title, thread->message);
     send_response(client, CODE_COMMAND_OK, "Thread created.");
-    send_response(client, CODE_COMMAND_END, "End of thread creation.");
 }
 
 static user_t *get_author_or_respond_thread(server_t *server,

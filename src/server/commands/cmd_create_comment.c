@@ -49,7 +49,6 @@ static void notify_comment_created(comment_t *comment, uuid_t thread_uuid,
     uuid_to_string(author->uuid, user_uuid_str);
     server_event_reply_created(thread_uuid_str, user_uuid_str, comment->body);
     send_response(client, CODE_COMMAND_OK, "Comment created.");
-    send_response(client, CODE_COMMAND_END, "End of comment creation.");
 }
 
 static user_t *get_author_or_respond(server_t *server, client_t *client)
