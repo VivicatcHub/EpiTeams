@@ -61,6 +61,7 @@ static void notify_channel_created(channel_t *channel, uuid_t team_uuid,
     server_event_channel_created(team_uuid_str, channel_uuid_str,
         channel->name);
     send_response(client, CODE_COMMAND_OK, "Channel created.");
+    send_response(client, CODE_COMMAND_END, "End of channel creation.");
 }
 
 static int process_create_channel_tokens(server_t *server,
@@ -70,12 +71,10 @@ static int process_create_channel_tokens(server_t *server,
     team_t *team = NULL;
     channel_t *channel = NULL;
 
-    if (string_to_uuid(p->team_str, team_uuid) != 0) {
-        send_response(client, CODE_SYNTAX_ERROR_PARAM,
-            "Invalid team uuid.");
-        return -1;
-    }
-    team = find_team_by_uuid(server, team_uuid);
+    if (string_to_uuid(p->team_str, team_uuid) != 0)
+        team = find_team_by_name(server, p->team_str);
+    else
+        team = find_team_by_uuid(server, team_uuid);
     if (!team) {
         send_response(client, CODE_NOT_FOUND, "Team not found.");
         return -1;

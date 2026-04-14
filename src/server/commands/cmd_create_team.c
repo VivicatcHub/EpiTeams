@@ -54,6 +54,7 @@ static void notify_team_created(team_t *team, user_t *creator,
     uuid_to_string(creator->uuid, user_uuid_str);
     server_event_team_created(team_uuid_str, team->name, user_uuid_str);
     send_response(client, CODE_COMMAND_OK, "Team created.");
+    send_response(client, CODE_COMMAND_END, "End of team creation.");
 }
 
 void cmd_create_team(server_t *server, client_t *client, char *args)

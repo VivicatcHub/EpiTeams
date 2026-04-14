@@ -87,9 +87,9 @@ bool CommandHandler::handleUse(const std::vector<std::string> &args) {
 
     if (args.size() > 3) return false;
 
-    if (args.size() >= 1) { context.setTeamUuid(args[0]); }
-    if (args.size() >= 2) { context.setChannelUuid(args[1]); }
-    if (args.size() >= 3) { context.setThreadUuid(args[2]); }
+    if (args.size() >= 1) { context.setTeamUuid(args[0]); } else { context.setTeamUuid(""); }
+    if (args.size() >= 2) { context.setChannelUuid(args[1]); } else { context.setChannelUuid(""); }
+    if (args.size() >= 3) { context.setThreadUuid(args[2]); } else { context.setThreadUuid(""); }
     return args.size() <= 3;
 }
 
@@ -109,12 +109,12 @@ bool CommandHandler::handleCreate(const std::vector<std::string> &args) {
 
     if (!context.isThreadContext()) {
         if (args.size() != 2) { return false; }
-        std::string cmd = "CREATE_THREAD " + context.getChannelUuid() + " " + args[0] + " " + args[1];
+        std::string cmd = "CREATE_THREAD " + context.getTeamUuid() + " " + context.getChannelUuid() + " " + args[0] + " " + args[1];
         return sendCommand(cmd);
     }
 
     if (args.size() != 1) { return false; }
-    std::string cmd = "CREATE_COMMENT " + context.getThreadUuid() + " " + args[0];
+    std::string cmd = "CREATE_COMMENT " + context.getTeamUuid() + " " + context.getChannelUuid() + " " + context.getThreadUuid() + " " + args[0];
     return sendCommand(cmd);
 }
 

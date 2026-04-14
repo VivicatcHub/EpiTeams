@@ -21,9 +21,9 @@
 - [ ] int client_print_team(char const \*team_uuid, char const \*team_name, char const \*team_description);
 - [ ] int client_print_channel(char const \*channel_uuid, char const \*channel_name, char const \*channel_description);
 - [ ] int client_print_thread(char const \*thread_uuid, char const \*user_uuid, time_t thread_timestamp, char const \*thread_title, char const \*thread_body);
-- [ ] int client_print_team_created(char const \*team_uuid, char const \*team_name, char const \*team_description);
-- [ ] int client_print_channel_created(char const \*channel_uuid, char const \*channel_name, char const \*channel_description);
-- [ ] int client_print_thread_created(char const \*thread_uuid, char const \*user_uuid, time_t thread_timestamp, char const \*thread_title, char const \*thread_body);
+- [x] int client_print_team_created(char const \*team_uuid, char const \*team_name, char const \*team_description);
+- [x] int client_print_channel_created(char const \*channel_uuid, char const \*channel_name, char const \*channel_description);
+- [x] int client_print_thread_created(char const \*thread_uuid, char const \*user_uuid, time_t thread_timestamp, char const \*thread_title, char const \*thread_body);
 - [ ] int client_print_reply_created(char const \*thread_uuid, char const \*user_uuid, time_t reply_timestamp, char const \*reply_body);
 - [ ] int client_print_subscribed(char const \*user_uuid, char const \*team_uuid);
 - [ ] int client_print_unsubscribed(char const \*user_uuid, char const \*team_uuid)

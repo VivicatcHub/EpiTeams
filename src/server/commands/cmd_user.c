@@ -58,9 +58,9 @@ static int resolve_user_arg(server_t *server, char *args, uuid_t target)
 static void send_404(client_t *client, uuid_t uuid)
 {
     char uuid_buf[UUID_STR_LEN];
-    uuid_to_string(uuid, uuid_buf);
     char buf[MAX_BUFFER];
 
+    uuid_to_string(uuid, uuid_buf);
     snprintf(buf, MAX_BUFFER, "User not found (%s).", uuid_buf);
     send_response(client, CODE_NOT_FOUND, buf);
 }

@@ -24,12 +24,13 @@ static int has_next_comma(FILE *file)
 static int parse_subscribed_teams(FILE *file, user_t *user)
 {
     char team_uuid_str[UUID_STR_LEN];
+    team_subscription_t *sub;
 
     fscanf(file, ",\n\t\t\"subscribed_teams\":\n\t\t[");
-    while (fscanf(file, "\n\t\t\t{\n\t\t\t\t\"team_uuid\":\"%36[^\"]\"\n\t\t\t}",
-            team_uuid_str) == 1) {
-        team_subscription_t *sub = malloc(sizeof(team_subscription_t));
-
+    while (fscanf(file, "\n\t\t\t{\n\t\t\t\t\"team_uuid"
+        "\":\"%36[^\"]\"\n\t\t\t}",
+        team_uuid_str) == 1) {
+        sub = malloc(sizeof(team_subscription_t));
         if (!sub)
             return -1;
         string_to_uuid(team_uuid_str, sub->team_uuid);

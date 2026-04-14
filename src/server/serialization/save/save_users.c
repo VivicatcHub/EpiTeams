@@ -12,7 +12,8 @@ static void save_single_subscription(FILE *file, team_subscription_t *sub)
     char team_uuid_str[UUID_STR_LEN];
 
     uuid_to_string(sub->team_uuid, team_uuid_str);
-    fprintf(file, "\n\t\t\t{\n\t\t\t\t\"team_uuid\":\"%s\"\n\t\t\t}", team_uuid_str);
+    fprintf(file, "\n\t\t\t{\n\t\t\t\t\"team_uuid\":\"%s\"\n\t\t\t}",
+        team_uuid_str);
 }
 
 static void save_single_user_subscriptions(FILE *file, user_t *user)
@@ -36,9 +37,8 @@ static void save_single_user(FILE *file, user_t *user)
     fprintf(file, "\t{\n\t\t\"uuid\":\"%s\","
         "\n\t\t\"name\":\"%s\"",
         uuid_str, user->name);
-    if (!TAILQ_EMPTY(&user->subscribed_teams)) {
+    if (!TAILQ_EMPTY(&user->subscribed_teams))
         save_single_user_subscriptions(file, user);
-    }
     fprintf(file, "\n\t}");
 }
 

@@ -16,7 +16,11 @@ bool Client::__isFinalResponseCode(const std::string &response)
 }
 
 void Client::__displayPrompt() {
-    std::cout << "\n╭─ \033[32mmyteams\033[0m\n╰─$ ";
+    std::cout << "\n╭─ \033[32mmyteams\033[0m" <<
+        (_context.isTeamContext() ? " ─ " + _context.getTeamUuid() : "") <<
+        (_context.isChannelContext() ? " ─ " + _context.getChannelUuid() : "") <<
+        (_context.isThreadContext() ? " ─ " + _context.getThreadUuid() : "") <<
+        "\n╰─$ ";
     std::cout.flush();
 }
 

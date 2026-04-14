@@ -267,8 +267,8 @@ Return:
 
 - Args: `?["team_uuid"]` `?["channel_uuid"]` `?["thread_uuid"]`
 - Server:
-  - Send: `TRY`/`TRY <team_uuid>`/`TRY <team_uuid> <channel_uuid>`/`TRY <team_uuid> <channel_uuid> <thread_uuid>`
-  - Return: `200`/`404`/`405`/`406`/`530`
+  - Send: None
+  - Return: None
 
 Args:
 
@@ -277,16 +277,6 @@ Args:
 | `team_uuid`    | string | No           | The UUID of the team to set as context (if not provided, context is reset)         |
 | `channel_uuid` | string | No           | The UUID of the channel to set as context (requires `team_uuid`)                   |
 | `thread_uuid`  | string | No           | The UUID of the thread to set as context (requires `team_uuid` and `channel_uuid`) |
-
-Return:
-
-| Code | Description                           |
-| ---- | ------------------------------------- |
-| 200  | Context successfully updated          |
-| 404  | Team not found with the given UUID    |
-| 405  | Channel not found with the given UUID |
-| 406  | Thread not found with the given UUID  |
-| 530  | Request failed, user is not logged in |
 
 #### Create (`/create`)
 
@@ -297,7 +287,7 @@ Return:
 - Args: `["team_name"]` `["team_description"]`
 - Server:
   - Send: `CREATE_TEAM <team_name> "<team_description>"`
-  - Return: `200`/`530`
+  - Return: `200`/`501`/`530`
 
 Args:
 
@@ -308,10 +298,11 @@ Args:
 
 Return:
 
-| Code | Description                           |
-| ---- | ------------------------------------- |
-| 200  | Team created successfully             |
-| 530  | Request failed, user is not logged in |
+| Code | Description                            |
+| ---- | -------------------------------------- |
+| 200  | Team created successfully              |
+| 501  | Request failed, team_name is incorrect |
+| 530  | Request failed, user is not logged in  |
 
 ##### Team Context
 
@@ -320,7 +311,7 @@ Return:
 - Args: `["channel_name"]` `["channel_description"]`
 - Server:
   - Send: `CREATE_CHANNEL <team_uuid> <channel_name> "<channel_description>"`
-  - Return: `200`/`404`/`530`
+  - Return: `200`/`404`/`501`/`530`
 
 Args:
 
@@ -335,6 +326,7 @@ Return:
 | ---- | ----------------------------------------- |
 | 200  | Channel created successfully              |
 | 404  | Team not found with the given `team_uuid` |
+| 501  | Request failed, channel_name is incorrect |
 | 530  | Request failed, user is not logged in     |
 
 ##### Channel Context
