@@ -22,6 +22,15 @@ const command_t commands[] = {
     {"UNSUBSCRIBE", cmd_unsubscribe},
     {"SUBSCRIBED", cmd_subscribed},
     {"LAUGH", cmd_laugh},
+    {"LIST", cmd_list},
+    {"LIST_TEAM", cmd_list_team},
+    {"LIST_CHANNEL", cmd_list_channel},
+    {"LIST_THREAD", cmd_list_thread},
+    {"LIST_COMMENT", cmd_list_comment},
+    {"INFO_USER", cmd_info},
+    {"INFO_TEAM", cmd_info_team},
+    {"INFO_CHANNEL", cmd_info_channel},
+    {"INFO_THREAD", cmd_info_thread},
     {NULL, NULL}
 };
 
