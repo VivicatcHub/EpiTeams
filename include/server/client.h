@@ -48,5 +48,4 @@ void handle_client_data(server_t *server, client_t *client);
 client_t *create_client(int socket, struct sockaddr_in *address);
 void destroy_client(client_t *client);
 void send_response(client_t *client, char const *code, char const *msg);
-
 #endif

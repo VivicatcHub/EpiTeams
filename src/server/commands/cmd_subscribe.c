@@ -68,8 +68,7 @@ static user_t *get_authenticated_user(server_t *server, client_t *client)
     return user;
 }
 
-static int do_subscribe(server_t *server, client_t *client,
-    user_t *user, team_t *team)
+static int do_subscribe(client_t *client, user_t *user, team_t *team)
 {
     char team_uuid_buf[UUID_STR_LEN];
     char user_uuid_buf[UUID_STR_LEN];
@@ -80,7 +79,6 @@ static int do_subscribe(server_t *server, client_t *client,
     }
     if (add_subscription(user, team) == -1)
         return -1;
-    save_users(&server->data.users);
     uuid_to_string(team->uuid, team_uuid_buf);
     uuid_to_string(user->uuid, user_uuid_buf);
     server_event_user_subscribed(team_uuid_buf, user_uuid_buf);
@@ -102,5 +100,5 @@ void cmd_subscribe(server_t *server, client_t *client, char *args)
         return;
     if (resolve_team(server, client, team_str, &team) != 0)
         return;
-    do_subscribe(server, client, user, team);
+    do_subscribe(client, user, team);
 }

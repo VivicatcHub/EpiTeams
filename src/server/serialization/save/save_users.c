@@ -23,7 +23,7 @@ static void save_single_user_subscriptions(FILE *file, user_t *user)
     TAILQ_FOREACH(sub, &user->subscribed_teams, entries) {
         save_single_subscription(file, sub);
         if (TAILQ_NEXT(sub, entries))
-            fprintf(file, ",\n");
+            fprintf(file, ",");
     }
     fprintf(file, "\n\t\t]");
 }
@@ -36,7 +36,9 @@ static void save_single_user(FILE *file, user_t *user)
     fprintf(file, "\t{\n\t\t\"uuid\":\"%s\","
         "\n\t\t\"name\":\"%s\"",
         uuid_str, user->name);
-    save_single_user_subscriptions(file, user);
+    if (!TAILQ_EMPTY(&user->subscribed_teams)) {
+        save_single_user_subscriptions(file, user);
+    }
     fprintf(file, "\n\t}");
 }
 
