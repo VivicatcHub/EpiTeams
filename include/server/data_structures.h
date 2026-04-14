@@ -110,5 +110,4 @@ typedef struct server_data_s {
     struct comment_queue_s comments;
     struct message_queue_s messages;
 } server_data_t;
-
 #endif
