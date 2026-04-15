@@ -73,6 +73,7 @@ void Client::__processQueuedCommands() {
 
 bool Client::__runEcho() {
     struct pollfd fds[2];
+    bool stop_input = false;
 
     fds[0].fd = -1;
     fds[0].events = POLLIN;
@@ -90,19 +91,25 @@ bool Client::__runEcho() {
 
             if (command.empty()) continue;
             if (!__queueUserInput(command)) {
-                _is_connected = false;
+                stop_input = true;
                 break;
             }
         }
-        if (!_is_connected) break;
+        if (stop_input) break;
     }
     _stdin_closed = true;
+    __processQueuedCommands();
 
     while (_is_connected) {
+        if (!_waiting_for_response) {
+            __processQueuedCommands();
+            if (!_is_connected || !_waiting_for_response) continue;
+        }
+
         int poll_result = poll(fds, 2, -1);
 
         if (poll_result < 0) {
-            __displayErrorResponse("500", "Poll failed");
+            std::cerr << "Error: Poll failed" << std::endl;
             break;
         }
 
@@ -118,7 +125,7 @@ bool Client::__runEcho() {
                     if (!line.empty()) {
                         _response_handler.handleServerResponse(line);
                         if (_waiting_for_response && __isFinalResponseCode(line)) _waiting_for_response = false;
-                    }
+                    } else break;
                     response.erase(0, i + 1);
                     i = -1;
                 }

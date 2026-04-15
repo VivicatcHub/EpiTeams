@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <cstdlib>
+#include <unistd.h>
 
 std::string MessageParser::cleanString(const std::string &value)
 {
@@ -183,15 +184,19 @@ void MessageParser::printResponsePrompt(const std::string &code)
 {
     const char *env = std::getenv("ENV");
     bool is_dev = (env && std::string(env) == "dev");
+    bool interactive_mode = isatty(STDIN_FILENO);
 
-    std::cout << "  ╰─> ";
+    if (interactive_mode) std::cout << "  ╰─> ";
     if (is_dev) std::cout << "[" << code << "]: ";
     std::cout.flush();
 }
 
 void MessageParser::printResponseFailure(const std::string &message)
 {
+    bool interactive_mode = isatty(STDIN_FILENO);
+
     std::cout << "Fail to parse response ─> ";
+    if (interactive_mode) std::cout << "  ╰─> ";
     if (std::getenv("ENV") && std::string(std::getenv("ENV")) == "dev") std::cout << "[500]: ";
     std::cout << message << std::endl;
 }
