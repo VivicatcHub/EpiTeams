@@ -20,8 +20,8 @@ static int is_name_connected(server_t *server, char const *name)
     return 0;
 }
 
-static int resolve_team(server_t *server, client_t *client,
-    char *team_str, uuid_t out)
+static int resolve_team(server_t *server, client_t *client, char *team_str,
+    uuid_t out)
 {
     team_t *team = NULL;
 
@@ -45,9 +45,9 @@ static void send_team_info(client_t *client, team_t *team)
     char uuid_buf[UUID_STR_LEN];
 
     uuid_to_string(team->uuid, uuid_buf);
-    snprintf(buf, MAX_BUFFER,
-        "%s (%s) -> %s", team->name, uuid_buf, team->description);
-    send_response(client, CODE_COMMAND_OK, buf);
+    snprintf(buf, MAX_BUFFER, "%s (%s) - %s", team->name, uuid_buf,
+        team->description);
+    send_response(client, CODE_COMMAND_BEGIN, buf);
 }
 
 static void send_user_sub_info(server_t *server, client_t *client,
@@ -60,8 +60,7 @@ static void send_user_sub_info(server_t *server, client_t *client,
     uuid_to_string(user->uuid, uuid_buf);
     if (is_name_connected(server, user->name) == 1)
         status = "ONLINE";
-    snprintf(buf, MAX_BUFFER,
-        "%s (%s) -> %s", user->name, uuid_buf, status);
+    snprintf(buf, MAX_BUFFER, "%s (%s) -> %s", user->name, uuid_buf, status);
     send_response(client, CODE_COMMAND_OK_WITH_INFO, buf);
 }
 
@@ -77,6 +76,7 @@ static void list_subscribed_teams(server_t *server, client_t *client,
             continue;
         send_team_info(client, team);
     }
+    send_response(client, CODE_COMMAND_END, "No more subscribed teams.");
 }
 
 static void list_team_subscribers(server_t *server, client_t *client,
@@ -93,6 +93,7 @@ static void list_team_subscribers(server_t *server, client_t *client,
             }
         }
     }
+    send_response(client, CODE_COMMAND_END, "No more team subscribers.");
 }
 
 void cmd_subscribed(server_t *server, client_t *client, char *args)

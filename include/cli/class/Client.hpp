@@ -27,6 +27,7 @@ private:
     bool __runInteractive();
     bool __runEcho();
     static bool __isFinalResponseCode(const std::string &response);
+    void __displayErrorResponse(const std::string &code, const std::string &message) const;
 
 public:
     Client();

@@ -6,9 +6,9 @@
 */
 
 #ifndef LIB_MYTEAMS_LOGGING_CLIENT_H
-    #define LIB_MYTEAMS_LOGGING_CLIENT_H
+#define LIB_MYTEAMS_LOGGING_CLIENT_H
 
-    #include <time.h>
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -251,7 +251,7 @@ extern "C" {
     /**
     ** @brief Must be called when you requested a list of private messages
     ** ex: asking the private messages with a user
-    ** This function should be called one per private  message in the list
+    ** This function should be called one per private message in the list
     ** This function should be called even if the list only has one entry
     ** @param sender_uuid The id of the user who sent a private message
     ** @param message_timestamp The unix timestamp of

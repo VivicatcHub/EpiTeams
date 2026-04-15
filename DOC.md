@@ -46,7 +46,7 @@
 - Args: `["user_name"]`
 - Server:
   - Send: `LOGIN <user_name>`
-  - Return: `230`/`530`/`540`
+  - Return: `230`/`501`/`503`/`540`
 
 Args:
 
@@ -56,10 +56,12 @@ Args:
 
 Return:
 
-| Code | Description                             |
-| ---- | --------------------------------------- |
-| 230  | Login successful, user is now logged in |
-| 530  | Login failed, user_name is missing      |
+| Code | Description                               |
+| ---- | ----------------------------------------- |
+| 230  | Login successful, user is now logged in   |
+| 501  | Login failed, user_name is incorect       |
+| 503  | Login failed, user is already logged in   |
+| 540  | Login failed, user_name is already in use |
 
 #### Logout (`/logout`)
 
@@ -86,13 +88,14 @@ Return:
 - Args: None
 - Server:
   - Send: `USERS`
-  - Return: `200`->`<users-list>`/`530`
+  - Return: `201`->`<users-list>`->`202`/`530`
 
 Return:
 
 | Code | Description                                        |
 | ---- | -------------------------------------------------- |
-| 200  | Success, followed by the users list (can be empty) |
+| 201  | Success, followed by the users list (can be empty) |
+| 202  | End of users list                                  |
 | 530  | Request failed, user is not logged in              |
 
 #### User (`/user`)
@@ -102,7 +105,7 @@ Return:
 - Args: `["user_uuid"]`
 - Server:
   - Send: `USER <user_uuid>`
-  - Return: `200`->`<user-info>`/`404`/`530`
+  - Return: `201`->`<user-info>`->`202`/`404`/`501`/`530`
 
 Args:
 
@@ -114,8 +117,10 @@ Return:
 
 | Code | Description                               |
 | ---- | ----------------------------------------- |
-| 200  | Success, followed by the user info        |
+| 201  | Success, followed by the user info        |
+| 202  | End of user info                          |
 | 404  | User not found with the given `user_uuid` |
+| 501  | Request failed, user_uuid is incorrect    |
 | 530  | Request failed, user is not logged in     |
 
 ### Message
@@ -127,7 +132,7 @@ Return:
 - Args: `["user_uuid"]` `["message_body"]`
 - Server:
   - Send: `SEND <user_uuid> "<message_body>"`
-  - Return: `200`/`404`/`530`
+  - Return: `200`/`404`/`501`/`530`
 
 Args:
 
@@ -142,7 +147,20 @@ Return:
 | ---- | ----------------------------------------- |
 | 200  | Message sent successfully                 |
 | 404  | User not found with the given `user_uuid` |
+| 501  | Request failed, message body is incorrect |
 | 530  | Request failed, user is not logged in     |
+
+#### Receive Message (no command)
+
+> Receive a message from another user (sent by the `/send` command)
+
+- Server:
+  - Send: None
+  - Return: `225`
+
+| Code | Description                        |
+| ---- | ---------------------------------- |
+| 225  | Message received from another user |
 
 #### Messages (`/messages`)
 
@@ -151,7 +169,7 @@ Return:
 - Args: `["user_uuid"]`
 - Server:
   - Send: `MESSAGES <user_uuid>`
-  - Return: `200`->`<messages-list>`/`404`/`530`
+  - Return: `201`->`<messages-list>`->`202`/`404`/`501`/`530`
 
 Args:
 
@@ -163,8 +181,10 @@ Return:
 
 | Code | Description                               |
 | ---- | ----------------------------------------- |
-| 200  | Success, followed by the messages list    |
+| 201  | Success, followed by the messages list    |
+| 202  | End of messages                           |
 | 404  | User not found with the given `user_uuid` |
+| 501  | Request failed, user_uuid is incorrect    |
 | 530  | Request failed, user is not logged in     |
 
 ### Subscription
@@ -176,7 +196,7 @@ Return:
 - Args: `["team_uuid"]`
 - Server:
   - Send: `SUBSCRIBE <team_uuid>`
-  - Return: `200`/`404`/`530`
+  - Return: `200`/`404`/`501`/`530`
 
 Args:
 
@@ -190,6 +210,7 @@ Return:
 | ---- | ----------------------------------------- |
 | 200  | Subscription successful                   |
 | 404  | Team not found with the given `team_uuid` |
+| 501  | Request failed, team_uuid is incorrect    |
 | 530  | Request failed, user is not logged in     |
 
 #### Subscribed (`/subscribed`)
@@ -199,7 +220,7 @@ Return:
 - Args: `?["team_uuid"]`
 - Server:
   - Send: `SUBSCRIBED`/`SUBSCRIBED <team_uuid>`
-  - Return: `200`->`<subscribed-list>`/`201`->`<team-members>`/`404`/`530`
+  - Return: `201`->`<subscribed-list>`->`202`/`203`->`<team-members>`->`202`/`404`/`501`/`530`
 
 Args:
 
@@ -211,9 +232,10 @@ Return:
 
 | Code | Description                                       |
 | ---- | ------------------------------------------------- |
-| 200  | Success, followed by the list of subscribed teams |
-| 201  | Success, followed by the list of team subscribers |
+| 201  | Success, followed by the list of subscribed teams |
+| 203  | Success, followed by the list of team subscribers |
 | 404  | Team not found with the given `team_uuid`         |
+| 501  | Request failed, team_uuid is incorrect            |
 | 530  | Request failed, user is not logged in             |
 
 #### Unsubscribe (`/unsubscribe`)
@@ -223,7 +245,7 @@ Return:
 - Args: `["team_uuid"]`
 - Server:
   - Send: `UNSUBSCRIBE <team_uuid>`
-  - Return: `200`/`404`/`530`
+  - Return: `200`/`404`/`501`/`530`
 
 Args:
 
@@ -237,6 +259,7 @@ Return:
 | ---- | ----------------------------------------- |
 | 200  | Unsubscription successful                 |
 | 404  | Team not found with the given `team_uuid` |
+| 501  | Request failed, team_uuid is incorrect    |
 | 530  | Request failed, user is not logged in     |
 
 ### Context
@@ -247,8 +270,8 @@ Return:
 
 - Args: `?["team_uuid"]` `?["channel_uuid"]` `?["thread_uuid"]`
 - Server:
-  - Send: `TRY`/`TRY <team_uuid>`/`TRY <team_uuid> <channel_uuid>`/`TRY <team_uuid> <channel_uuid> <thread_uuid>`
-  - Return: `200`/`404`/`405`/`406`/`530`
+  - Send: None
+  - Return: None
 
 Args:
 
@@ -257,16 +280,6 @@ Args:
 | `team_uuid`    | string | No           | The UUID of the team to set as context (if not provided, context is reset)         |
 | `channel_uuid` | string | No           | The UUID of the channel to set as context (requires `team_uuid`)                   |
 | `thread_uuid`  | string | No           | The UUID of the thread to set as context (requires `team_uuid` and `channel_uuid`) |
-
-Return:
-
-| Code | Description                           |
-| ---- | ------------------------------------- |
-| 200  | Context successfully updated          |
-| 404  | Team not found with the given UUID    |
-| 405  | Channel not found with the given UUID |
-| 406  | Thread not found with the given UUID  |
-| 530  | Request failed, user is not logged in |
 
 #### Create (`/create`)
 
@@ -277,7 +290,7 @@ Return:
 - Args: `["team_name"]` `["team_description"]`
 - Server:
   - Send: `CREATE_TEAM <team_name> "<team_description>"`
-  - Return: `200`/`530`
+  - Return: `200`/`501`/`530`
 
 Args:
 
@@ -288,10 +301,11 @@ Args:
 
 Return:
 
-| Code | Description                           |
-| ---- | ------------------------------------- |
-| 200  | Team created successfully             |
-| 530  | Request failed, user is not logged in |
+| Code | Description                            |
+| ---- | -------------------------------------- |
+| 200  | Team created successfully              |
+| 501  | Request failed, team_name is incorrect |
+| 530  | Request failed, user is not logged in  |
 
 ##### Team Context
 
@@ -300,7 +314,7 @@ Return:
 - Args: `["channel_name"]` `["channel_description"]`
 - Server:
   - Send: `CREATE_CHANNEL <team_uuid> <channel_name> "<channel_description>"`
-  - Return: `200`/`404`/`530`
+  - Return: `200`/`404`/`501`/`530`
 
 Args:
 
@@ -315,6 +329,7 @@ Return:
 | ---- | ----------------------------------------- |
 | 200  | Channel created successfully              |
 | 404  | Team not found with the given `team_uuid` |
+| 501  | Request failed, channel_name is incorrect |
 | 530  | Request failed, user is not logged in     |
 
 ##### Channel Context

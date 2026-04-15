@@ -54,6 +54,13 @@ team_t *find_team_by_name(server_t *server, char const *name);
 channel_t *find_channel_by_name(server_t *server, char const *name);
 thread_t *find_thread_by_title(server_t *server, char const *title);
 
+int parse_and_verify_team(server_t *server, client_t *client,
+    char *team_str, team_t **out_team);
+int parse_and_get_channel(server_t *server, client_t *client,
+    char *channel_str, channel_t **out_channel);
+int parse_and_get_thread(server_t *server, client_t *client, char *thread_str,
+    thread_t **out_thread);
+
 void dispatch_command(server_t *server, client_t *client, char *line);
 
 typedef struct channel_create_params_s {
@@ -63,10 +70,18 @@ typedef struct channel_create_params_s {
 } channel_create_params_t;
 
 typedef struct thread_parse_params_s {
+    char *team_str;
     char *channel_str;
     char *title;
     char *msg;
 } thread_create_params_t;
+
+typedef struct comment_parse_params_s {
+    char *team_str;
+    char *channel_str;
+    char *thread_str;
+    char *body;
+} comment_create_params_t;
 
 typedef struct thread_init_s {
     uuid_t channel_uuid;

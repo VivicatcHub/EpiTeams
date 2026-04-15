@@ -38,7 +38,7 @@ static void send_user_status(client_t *client, user_t *user, int online)
     uuid_to_string(user->uuid, uuid_buf);
     snprintf(buf, MAX_BUFFER, "%s (%s) -> %s",
         user->name, uuid_buf, online ? "ONLINE" : "OFFLINE");
-    send_response(client, CODE_COMMAND_OK, buf);
+    send_response(client, CODE_COMMAND_BEGIN, buf);
 }
 
 void cmd_users(server_t *server, client_t *client UNUSED, char *args UNUSED)
@@ -54,4 +54,5 @@ void cmd_users(server_t *server, client_t *client UNUSED, char *args UNUSED)
             connected_count);
         send_user_status(client, user, online);
     }
+    send_response(client, CODE_COMMAND_END, "No more users.");
 }

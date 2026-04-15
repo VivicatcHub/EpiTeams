@@ -8,25 +8,16 @@
 #include "my_teams.h"
 #include "logging_server.h"
 
-static int parse_create_thread_args(char *args, char **out_channel,
-    char **out_title, char **out_msg)
+static int parse_create_thread_args(char *args,
+    thread_create_params_t **out_params)
 {
-    char *s1 = NULL;
-    char *s2 = NULL;
-
-    if (!args || args[0] == '\0')
+    (*out_params)->team_str = strtok(args, " ");
+    (*out_params)->channel_str = strtok(NULL, " ");
+    (*out_params)->title = strtok(NULL, " ");
+    (*out_params)->msg = strtok(NULL, "");
+    if (!(*out_params)->team_str || !(*out_params)->channel_str ||
+        !(*out_params)->title || !(*out_params)->msg)
         return -1;
-    s1 = strchr(args, ' ');
-    if (!s1)
-        return -1;
-    *s1 = '\0';
-    s2 = strchr(s1 + 1, ' ');
-    if (!s2)
-        return -1;
-    *s2 = '\0';
-    *out_channel = args;
-    *out_title = s1 + 1;
-    *out_msg = s2 + 1;
     return 0;
 }
 
@@ -67,35 +58,6 @@ static void notify_thread_created(thread_t *thread, uuid_t channel_uuid,
     send_response(client, CODE_COMMAND_OK, "Thread created.");
 }
 
-static channel_t *get_channel_or_respond(server_t *server,
-    client_t *client, uuid_t chan_uuid)
-{
-    channel_t *channel = find_channel_by_uuid(server, chan_uuid);
-
-    if (!channel) {
-        send_response(client, CODE_CHANNEL_NOT_FOUND,
-            "Channel not found.");
-        return NULL;
-    }
-    return channel;
-}
-
-static int parse_and_get_channel(server_t *server, client_t *client,
-    char *channel_str, channel_t **out_channel)
-{
-    uuid_t chan_uuid;
-
-    if (string_to_uuid(channel_str, chan_uuid) != 0) {
-        send_response(client, CODE_SYNTAX_ERROR_PARAM,
-            "Invalid channel uuid.");
-        return -1;
-    }
-    *out_channel = get_channel_or_respond(server, client, chan_uuid);
-    if (!*out_channel)
-        return -1;
-    return 0;
-}
-
 static user_t *get_author_or_respond_thread(server_t *server,
     client_t *client)
 {
@@ -129,10 +91,13 @@ static int store_and_notify_thread(server_t *server, client_t *client,
 static int process_create_thread_tokens(server_t *server,
     client_t *client, thread_create_params_t *p)
 {
+    team_t *team = NULL;
     channel_t *channel = NULL;
     user_t *author = NULL;
     thread_init_t init;
 
+    if (parse_and_verify_team(server, client, p->team_str, &team) != 0)
+        return -1;
     if (parse_and_get_channel(server, client, p->channel_str, &channel) != 0)
         return -1;
     author = get_author_or_respond_thread(server, client);
@@ -148,18 +113,18 @@ static int process_create_thread_tokens(server_t *server,
 
 void cmd_create_thread(server_t *server, client_t *client, char *args)
 {
-    char *channel_str = NULL;
-    char *title = NULL;
-    char *msg = NULL;
-    thread_create_params_t tcp;
+    thread_create_params_t *tcp = malloc(sizeof(thread_create_params_t));
 
-    if (parse_create_thread_args(args, &channel_str, &title, &msg) == -1) {
-        send_response(client, CODE_SYNTAX_ERROR_PARAM,
-            "Syntax error in parameters.");
+    if (!tcp) {
+        send_response(client, CODE_SYNTAX_ERROR_PARAM, "Internal error.");
         return;
     }
-    tcp.channel_str = channel_str;
-    tcp.title = title;
-    tcp.msg = msg;
-    process_create_thread_tokens(server, client, &tcp);
+    if (parse_create_thread_args(args, &tcp) == -1) {
+        send_response(client, CODE_SYNTAX_ERROR_PARAM,
+            "Syntax error in parameters.");
+        free(tcp);
+        return;
+    }
+    process_create_thread_tokens(server, client, tcp);
+    free(tcp);
 }

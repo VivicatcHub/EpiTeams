@@ -70,12 +70,10 @@ static int process_create_channel_tokens(server_t *server,
     team_t *team = NULL;
     channel_t *channel = NULL;
 
-    if (string_to_uuid(p->team_str, team_uuid) != 0) {
-        send_response(client, CODE_SYNTAX_ERROR_PARAM,
-            "Invalid team uuid.");
-        return -1;
-    }
-    team = find_team_by_uuid(server, team_uuid);
+    if (string_to_uuid(p->team_str, team_uuid) != 0)
+        team = find_team_by_name(server, p->team_str);
+    else
+        team = find_team_by_uuid(server, team_uuid);
     if (!team) {
         send_response(client, CODE_NOT_FOUND, "Team not found.");
         return -1;

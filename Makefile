@@ -107,9 +107,19 @@ test_client: $(NAME_CLI)
 	@$(ECHO) -e "[$(CYAN_)✔$(DEF_)] Running client tests..." \
 	&& LD_LIBRARY_PATH=libs/myteams ./myteams_cli 127.0.0.1 4242
 
+val_test_client: $(NAME_CLI)
+	@$(ECHO) -e "[$(CYAN_)✔$(DEF_)] Running client tests with valgrind..." \
+	&& LD_LIBRARY_PATH=libs/myteams valgrind --leak-check=full \
+	--track-origins=yes ./myteams_cli 127.0.0.1 4242
+
 test_server: $(NAME_SERVER)
 	@$(ECHO) -e "[$(CYAN_)✔$(DEF_)] Running server tests..." \
 	&& LD_LIBRARY_PATH=libs/myteams ./myteams_server 4242
+
+val_test_server: $(NAME_SERVER)
+	@$(ECHO) -e "[$(CYAN_)✔$(DEF_)] Running server tests with valgrind..." \
+	&& LD_LIBRARY_PATH=libs/myteams valgrind --leak-check=full \
+	--track-origins=yes ./myteams_server 4242
 
 .PHONY: all clean fclean re
 
