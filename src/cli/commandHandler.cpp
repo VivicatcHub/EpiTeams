@@ -142,7 +142,6 @@ bool CommandHandler::handleInfo() {
         std::string cmd = "INFO_TEAM " + context.getTeamUuid();
         return sendCommand(cmd);
     }
-
     if (!context.isThreadContext()) {
         std::string cmd = "INFO_CHANNEL " + context.getChannelUuid();
         return sendCommand(cmd);

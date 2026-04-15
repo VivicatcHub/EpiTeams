@@ -40,10 +40,10 @@ void cmd_list(server_t *server, client_t *client, char *args);
 void cmd_info_thread(server_t *server, client_t *client, char *args);
 void cmd_info_team(server_t *server, client_t *client, char *args);
 void cmd_info_channel(server_t *server, client_t *client, char *args);
-void cmd_list_channel(server_t *server, client_t *client, char *args);
-void cmd_list_comment(server_t *server, client_t *client, char *args);
-void cmd_list_team(server_t *server, client_t *client, char *args);
-void cmd_list_thread(server_t *server, client_t *client, char *args);
+void cmd_list_channels(server_t *server, client_t *client, char *args);
+void cmd_list_comments(server_t *server, client_t *client, char *args);
+void cmd_list_teams(server_t *server, client_t *client, char *args);
+void cmd_list_threads(server_t *server, client_t *client, char *args);
 // Helpers
 user_t *find_user_by_name(server_t *server, char const *username);
 user_t *find_user_by_uuid(server_t *server, uuid_t uuid);

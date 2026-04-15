@@ -13,6 +13,8 @@ void cmd_info(server_t *server, client_t *client, char *args)
     // send_response(client, CODE_COMMAND_OK, client->username);
 
     user_t *user = find_user_by_name(server, client->username);
+    if (user == NULL)
+        ;//
     user->uuid;
     char uuid_buf[UUID_STR_LEN];
     uuid_to_string(user->uuid, uuid_buf);
@@ -23,9 +25,11 @@ void cmd_info(server_t *server, client_t *client, char *args)
         send_response(client, CODE_COMMAND_OK, result);
     } else {
         snprintf(result, sizeof(result), "User %s with uuid %s is not connected", client->username, uuid_buf);
-        send_response(client, CODE_COMMAND_OK, result);
+        send_response(client, CODE_NOT_LOGGED_IN, result);
     }
 }
+
+// Ok, là je dois juste, hmh. Parcourrir et voir si cet uuid existe parmi tous les logs. our le info_team?
 
 // fuser -k 4242/tcp
 // make test_server
@@ -38,7 +42,7 @@ void cmd_info(server_t *server, client_t *client, char *args)
 // Et les strings qu'il renvoie, ne sont âs forcément les mêmes que ceux que je demande à récupérer.. attention.
 
 
-// command handler : 
+// command handler :
 // bool CommandHandler::handleInfo() {
 //     if (!context.isTeamContext()) { return sendCommand("INFO_USER"); }  <========== like this
 

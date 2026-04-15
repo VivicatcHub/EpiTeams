@@ -495,7 +495,7 @@ Return:
 
 - Args: None
 - Server:
-  - Send: `INFO_CHANNEL <team_uuid> <channel_uuid>`
+  - Send: `INFO_CHANNEL <team_uuid> <channel_uuid>`(need team uuid, and channel uuid inputed)
   - Return: `200`->`<channel-info>`/`404`/`405`/`530`
 
 Return:
