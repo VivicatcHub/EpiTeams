@@ -12,13 +12,15 @@ void cmd_info_team(server_t *server, client_t *client, char *args)
     int exist = 0;
     char result[MAX_BUFFER];
     char uuid_buf[UUID_STR_LEN];
+    int64_t time_;
 
     for (team_t *team = server->data.teams.tqh_first; team != NULL;
         team = team->entries.tqe_next) {
+        time_ = (int64_t)team->created_at;
         if (strcmp(args, team->name) == 0) {
             uuid_to_string(team->uuid, uuid_buf);
-            snprintf(result, sizeof(result), "Team name : %s | Uuid : %s\n",
-                team->name, uuid_buf);
+            snprintf(result, sizeof(result), "Team name : %s | Uuid : %s\n | Created at %i | Description : %s",
+                team->name, uuid_buf, time_, team->description);
             send_response(client, CODE_COMMAND_OK, result);
             exist = 1;
         }

@@ -26,16 +26,18 @@ void cmd_info_channel(server_t *server, client_t *client, char *args)
     int exist = 0;
     char result[MAX_BUFFER];
     char uuid_buf[UUID_STR_LEN];
+    int64_t time_;
 
     send_response(client, CODE_COMMAND_OK, args);
     if (is_team_exist(server, client, args) == 0)
         return;
     for (channel_t *channel = server->data.channels.tqh_first; channel != NULL;
         channel = channel->entries.tqe_next) {
+        time_ = (int64_t)channel->created_at;
         if (strcmp(args, channel->name) == 0) {
             uuid_to_string(channel->uuid, uuid_buf);
-            snprintf(result, sizeof(result), "Channel name : %s | Uuid : %s\n",
-                channel->name, uuid_buf);
+            snprintf(result, sizeof(result), "Channel name : %s | Uuid : %s | Created at %i | Description : %s\n",
+                channel->name, uuid_buf, time_, channel->description);
             send_response(client, CODE_COMMAND_OK, result);
             exist = 1;
         }
