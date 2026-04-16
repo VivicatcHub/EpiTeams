@@ -19,7 +19,7 @@ void cmd_info_team(server_t *server, client_t *client, char *args)
         time_ = (int64_t)team->created_at;
         if (strcmp(args, team->name) == 0) {
             uuid_to_string(team->uuid, uuid_buf);
-            snprintf(result, sizeof(result), "Team name : %s | Uuid : %s\n | Created at %i | Description : %s",
+            snprintf(result, sizeof(result), "Team name : %s | Uuid : %s\n Created at %i | Description : %s",
                 team->name, uuid_buf, time_, team->description);
             send_response(client, CODE_COMMAND_OK, result);
             exist = 1;

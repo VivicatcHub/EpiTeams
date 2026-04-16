@@ -10,11 +10,16 @@
 int is_team_exist(server_t *server, client_t *client, char *args)
 {
     uuid_t team_uuid;
-    char team_buff[MAX_BUFFER];
-    string_to_uuid(team_buff, team_uuid);
-    team_t *team = find_team_by_uuid(server, team_uuid);
+    team_t *team = NULL;
+    channel_t *channel = NULL;
 
-    if (!team) {
+    channel = find_channel_by_name(server, args);
+    if (channel == NULL) {
+        send_response(client, CODE_CHANNEL_NOT_FOUND, "Channel not found.");
+        return 0;
+    }
+    team = find_team_by_uuid(server, channel->team_uuid);
+    if (team == NULL) {
         send_response(client, CODE_NOT_FOUND, "Team not found.");
         return 0;
     }
@@ -27,16 +32,17 @@ void cmd_info_channel(server_t *server, client_t *client, char *args)
     char result[MAX_BUFFER];
     char uuid_buf[UUID_STR_LEN];
     int64_t time_;
+    uuid_t channel_uuid;
 
-    send_response(client, CODE_COMMAND_OK, args);
     if (is_team_exist(server, client, args) == 0)
         return;
     for (channel_t *channel = server->data.channels.tqh_first; channel != NULL;
         channel = channel->entries.tqe_next) {
         time_ = (int64_t)channel->created_at;
+
         if (strcmp(args, channel->name) == 0) {
             uuid_to_string(channel->uuid, uuid_buf);
-            snprintf(result, sizeof(result), "Channel name : %s | Uuid : %s | Created at %i | Description : %s\n",
+            snprintf(result, sizeof(result), "Channel name : %s | Uuid : %s\nCreated at %i | Description : %s\n",
                 channel->name, uuid_buf, time_, channel->description);
             send_response(client, CODE_COMMAND_OK, result);
             exist = 1;
