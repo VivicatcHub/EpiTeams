@@ -17,7 +17,7 @@ int is_channel_exist(server_t *server, client_t *client, char *args)
 
     string_to_uuid(args, uuid);
     thread = find_thread_by_uuid(server, uuid);
-    thread_n = find_thread_by_name(server, args);
+    thread_n = find_thread_by_title(server, args);
     if (!thread && !thread_n) {
         send_response(client, CODE_THREAD_NOT_FOUND, "Thread not found.");
         return 0;
@@ -56,7 +56,7 @@ void cmd_info_thread(server_t *server, client_t *client, char *args)
         return;
     string_to_uuid(args, uuid);
     thread = find_thread_by_uuid(server, uuid);
-    thread_n = find_thread_by_name(server, args);
+    thread_n = find_thread_by_title(server, args);
     if (!thread && !thread_n) {
         send_response(client, CODE_NOT_FOUND, "thread not found.");
         return;
