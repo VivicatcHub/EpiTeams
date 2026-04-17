@@ -31,9 +31,9 @@ int is_channel_exist(server_t *server, client_t *client, char *args)
     return 1;
 }
 
-void cmd_info_thread_2(client_t *client, thread_t *thread_ok
-    , uuid_t uuid_buf)
+void cmd_info_thread_2(client_t *client, thread_t *thread_ok)
 {
+    char uuid_buf[UUID_STR_LEN];
     char result[MAX_BUFFER];
     int64_t time_;
 
@@ -47,7 +47,6 @@ void cmd_info_thread_2(client_t *client, thread_t *thread_ok
 
 void cmd_info_thread(server_t *server, client_t *client, char *args)
 {
-    char uuid_buf[UUID_STR_LEN];
     thread_t *thread;
     thread_t *thread_n;
     thread_t *thread_ok;
@@ -63,5 +62,5 @@ void cmd_info_thread(server_t *server, client_t *client, char *args)
         return;
     }
     thread_ok = (!thread) ? thread_n : thread;
-    cmd_info_thread_2(client, thread_ok, uuid_buf);
+    cmd_info_thread_2(client, thread_ok);
 }

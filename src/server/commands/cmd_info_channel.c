@@ -31,11 +31,21 @@ int is_team_exist(server_t *server, client_t *client, char *args)
     return 1;
 }
 
+void cmd_info_channel_2(client_t *client, channel_t *channel_ok)
+{
+    char uuid_buf[UUID_STR_LEN];
+    char result[MAX_BUFFER];
+    int64_t time_;
+
+    time_ = (int64_t)channel_ok->created_at;
+    uuid_to_string(channel_ok->uuid, uuid_buf);
+    snprintf(result, sizeof(result), "Channel Name : %s | Uuid : %s\n Created at %i | Description : %s",
+        channel_ok->name, uuid_buf, time_, channel_ok->description);
+    send_response(client, CODE_COMMAND_OK, result);
+}
+
 void cmd_info_channel(server_t *server, client_t *client, char *args)
 {
-    char result[MAX_BUFFER];
-    char uuid_buf[UUID_STR_LEN];
-    int64_t time_;
     channel_t *channel;
     channel_t *channel_n;
     channel_t *channel_ok;
@@ -51,9 +61,5 @@ void cmd_info_channel(server_t *server, client_t *client, char *args)
         return;
     }
     channel_ok = (!channel) ? channel_n : channel;
-    time_ = (int64_t)channel_ok->created_at;
-    uuid_to_string(channel_ok->uuid, uuid_buf);
-    snprintf(result, sizeof(result), "Channel Name : %s | Uuid : %s\n Created at %i | Description : %s",
-        channel_ok->name, uuid_buf, time_, channel_ok->description);
-    send_response(client, CODE_COMMAND_OK, result);
+    cmd_info_channel_2(client, channel_ok);
 }
