@@ -19,8 +19,7 @@ int is_team_exist(server_t *server, client_t *client, char *args)
     channel = find_channel_by_uuid(server, uuid);
     channel_n = find_channel_by_name(server, args);
     if (!channel && !channel_n) {
-        send_response(client, CODE_CHANNEL_NOT_FOUND,
-            "Channel not found. Maybe bcs it doesn't exist or Team doesn't");
+        send_response(client, CODE_CHANNEL_NOT_FOUND, "Channel not found.");
         return 0;
     }
     channel_ok = (!channel) ? channel_n : channel;

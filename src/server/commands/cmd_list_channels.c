@@ -44,7 +44,8 @@ void cmd_list_channels2(int *len, char **result,
     *max_buffer += *len;
 }
 
-void cmd_list_channels_for(server_t *server, team_t *team_ok, char **result, int *len)
+void cmd_list_channels_for(server_t *server, team_t *team_ok,
+    char **result, int *len)
 {
     int max_buffer = MAX_BUFFER;
 

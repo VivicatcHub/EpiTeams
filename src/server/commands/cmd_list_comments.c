@@ -42,7 +42,8 @@ void cmd_list_comment2(int *len, char **result, comment_t *comment,
     *max_buffer += *len;
 }
 
-void cmd_list_comments_for(server_t *server, thread_t *thread_ok, char **result, int *len)
+void cmd_list_comments_for(server_t *server,
+    thread_t *thread_ok, char **result, int *len)
 {
     int max_buffer = MAX_BUFFER;
 

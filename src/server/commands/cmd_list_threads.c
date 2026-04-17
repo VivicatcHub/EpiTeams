@@ -44,7 +44,8 @@ void cmd_list_thread2(int *len, char **result, thread_t *thread,
     *max_buffer += *len;
 }
 
-void cmd_list_threads_for(server_t *server, channel_t *channel_ok, char **result, int *len)
+void cmd_list_threads_for(server_t *server, channel_t *channel_ok,
+    char **result, int *len)
 {
     int max_buffer = MAX_BUFFER;
 
