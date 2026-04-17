@@ -42,26 +42,37 @@ void cmd_list_comment2(int *len, char **result, comment_t *comment,
     *max_buffer += *len;
 }
 
-void cmd_list_comments(server_t *server, client_t *client, char *args)
+void cmd_list_comments_for(server_t *server, thread_t *thread_ok, char **result, int *len)
 {
     int max_buffer = MAX_BUFFER;
-    char *result = malloc(sizeof(char) * (max_buffer + 1));
-    int len = 0;
-    user_t *author;
 
+    for (comment_t *comment = server->data.comments.tqh_first;
+        comment != NULL; comment = comment->entries.tqe_next) {
+        if (uuid_compare(comment->thread_uuid, thread_ok->uuid) == 0) {
+            cmd_list_comment2(len, result, comment, &max_buffer);
+            *result = realloc(*result, max_buffer);
+        }
+    }
+}
+
+void cmd_list_comments(server_t *server, client_t *client, char *args)
+{
+    int len = 0;
+    char *result = malloc(sizeof(char) * (MAX_BUFFER + 1));
+    uuid_t uuid_args;
+    thread_t *thread = find_thread_by_title(server, args);
+    thread_t *thread_;
+    thread_t *thread_ok;
+
+    string_to_uuid(args, uuid_args);
+    thread_ = find_thread_by_uuid(server, uuid_args);
+    thread_ok = (!thread) ? thread_ : thread;
+    memset(result, 0, MAX_BUFFER + 1);
     if (thread_exist(server, client, args) == 0) {
         free(result);
         return;
     }
-    memset(result, 0, max_buffer + 1);
-    for (comment_t *comment = server->data.comments.tqh_first;
-        comment != NULL; comment = comment->entries.tqe_next) {
-        author = find_user_by_uuid(server, comment->author_uuid);
-        len = strlen(author->name);
-        strcat(result, author->name);
-        cmd_list_comment2(&len, &result, comment, &max_buffer);
-        result = realloc(result, max_buffer);
-    }
+    cmd_list_comments_for(server, thread_ok, &result, &len);
     send_response(client, CODE_COMMAND_OK, result);
     free(result);
 }
