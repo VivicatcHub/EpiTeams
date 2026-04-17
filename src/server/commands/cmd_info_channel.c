@@ -39,7 +39,8 @@ void cmd_info_channel_2(client_t *client, channel_t *channel_ok)
 
     time_ = (int64_t)channel_ok->created_at;
     uuid_to_string(channel_ok->uuid, uuid_buf);
-    snprintf(result, sizeof(result), "Channel Name : %s | Uuid : %s\n Created at %i | Description : %s",
+    snprintf(result, sizeof(result),
+        "Channel Name : %s | Uuid : %s\n Created at %i | Description : %s",
         channel_ok->name, uuid_buf, time_, channel_ok->description);
     send_response(client, CODE_COMMAND_OK, result);
 }
