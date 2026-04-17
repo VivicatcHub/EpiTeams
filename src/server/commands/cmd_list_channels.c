@@ -48,18 +48,60 @@ void cmd_list_channels(server_t *server, client_t *client, char *args)
 {
     int max_buffer = MAX_BUFFER;
     char *result = malloc(sizeof(char) * (max_buffer + 1));
+
+    char string[MAX_BUFFER];
+    uuid_t uuid_args;
     int len = 0;
 
-    memset(result, 0, max_buffer + 1);
+    string_to_uuid(args, uuid_args);
+    team_t *team = find_team_by_name(server, args);
+    team_t *team_ = find_team_by_uuid(server, uuid_args);
+    team_t *team_ok = (!team) ? team_ : team;
     if (team_exist(server, client, args) == 0) {
         free(result);
         return;
     }
     for (channel_t *channel = server->data.channels.tqh_first;
         channel != NULL; channel = channel->entries.tqe_next) {
-        cmd_list_channels2(&len, &result, channel, &max_buffer);
-        result = realloc(result, max_buffer);
+        if (uuid_compare(channel->team_uuid, team_ok->uuid) == 0) {
+            send_response(client, CODE_COMMAND_OK, channel->name);
+            cmd_list_channels2(&len, &result, channel, &max_buffer);
+            result = realloc(result, max_buffer);
+        }
     }
     send_response(client, CODE_COMMAND_OK, result);
     free(result);
 }
+
+
+    // memset(result, 0, max_buffer + 1);
+    // uuid_t uuid;
+    // string_to_uuid(args, uuid);
+    // channel_t *chan = find_channel_by_name(server, args);
+    // channel_t *chann = find_channel_by_uuid(server, uuid);
+    // channel_t *chan_ok = (!chan) ? chann : chan;
+    // uuid_t curr_chan;
+    
+    // if (team_exist(server, client, args) == 0) {
+    //     free(result);
+    //     return;
+    // }
+
+    // uuid_copy(curr_chan, chan_ok->uuid);
+    for (channel_t *channel = server->data.channels.tqh_first;
+        channel != NULL; channel = channel->entries.tqe_next) {
+        uuid_to_string(channel->team_uuid, team_uuid);
+        send_response(client, CODE_COMMAND_OK, team_uuid);
+        send_response(client, CODE_COMMAND_OK, channel->name);
+        if (uuid_compare(channel->team_uuid, curr_chan) == 0) {
+            send_response(client, CODE_COMMAND_OK, "SAMEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+        }
+
+        snprintf(result, sizeof(result), "Name : %s | Uuid : %s", channel->name, team_uuid);
+        send_response(client, CODE_COMMAND_OK, result);
+        if (uuid_compare(channel->team_uuid, uuid_) == 0)
+            continue;
+        cmd_list_channels2(&len, &result, channel, &max_buffer);
+        result = realloc(result, max_buffer);
+    }
+    send_response(client, CODE_COMMAND_OK, result);

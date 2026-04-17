@@ -33,6 +33,7 @@ void cmd_list_teams(server_t *server, client_t *client, char *args)
     char *result = malloc(sizeof(char) * (max_buffer + 1));
     int len = 0;
 
+    (void)args;
     memset(result, 0, max_buffer + 1);
     for (team_t *team = server->data.teams.tqh_first;
         team != NULL; team = team->entries.tqe_next) {

@@ -17,7 +17,7 @@ int channel_exist(server_t *server, client_t *client, char *args)
     channel = find_channel_by_uuid(server, uuid);
     channel_ = find_channel_by_name(server, args);
     if (!channel && !channel_) {
-        send_response(client, CODE_NOT_FOUND, "channel not found.");
+        send_response(client, CODE_CHANNEL_NOT_FOUND, "channel not found.");
         return 0;
     }
     return 1;
