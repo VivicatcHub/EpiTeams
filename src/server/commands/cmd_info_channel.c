@@ -9,14 +9,11 @@
 
 int is_team_exist(server_t *server, client_t *client, char *args)
 {
-    uuid_t team_uuid;
     team_t *team = NULL;
-    team_t *team_n = NULL;
     channel_t *channel = NULL;
     channel_t *channel_n = NULL;
     channel_t *channel_ok = NULL;
     uuid_t uuid;
-    uuid_t uuid_team;
 
     string_to_uuid(args, uuid);
     channel = find_channel_by_uuid(server, uuid);
@@ -26,16 +23,13 @@ int is_team_exist(server_t *server, client_t *client, char *args)
         return 0;
     }
     channel_ok = (!channel) ? channel_n : channel;
-    string_to_uuid(args, uuid_team);
-    team = find_channel_by_uuid(server, uuid);
-    team_n = find_team_by_uuid(server, channel_ok->team_uuid);
-    if (!team_n && !team) {
+    team = find_team_by_uuid(server, channel_ok->team_uuid);
+    if (!team) {
         send_response(client, CODE_NOT_FOUND, "Team not found.");
         return 0;
     }
     return 1;
 }
-
 
 void cmd_info_channel(server_t *server, client_t *client, char *args)
 {
