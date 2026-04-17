@@ -22,10 +22,10 @@ const command_t commands[] = {
     {"UNSUBSCRIBE", cmd_unsubscribe},
     {"SUBSCRIBED", cmd_subscribed},
     {"LAUGH", cmd_laugh},
-    {"LIST_TEAM", cmd_list_teams},
-    {"LIST_CHANNEL", cmd_list_channels},
-    {"LIST_THREAD", cmd_list_threads},
-    {"LIST_COMMENT", cmd_list_comments},
+    {"LIST_TEAMS", cmd_list_teams},
+    {"LIST_CHANNELS", cmd_list_channels},
+    {"LIST_THREADS", cmd_list_threads},
+    {"LIST_COMMENTS", cmd_list_comments},
     {"INFO_USER", cmd_info},
     {"INFO_TEAM", cmd_info_team},
     {"INFO_CHANNEL", cmd_info_channel},
@@ -61,19 +61,16 @@ void dispatch_command(server_t *server, client_t *client, char *line)
     char *args;
 
     parse_command(line, name, &args);
-    send_response(client, CODE_COMMAND_OK, args);
-        for (int i = 0; commands[i].name != NULL; i++) {
-            if (strcasecmp(commands[i].name, name) != 0) {
-                send_response(client, CODE_COMMAND_OK, "1");
-                continue;
-            }
-            if (!no_auth_required(name) && client->state != AUTHENTICATED) {
-                send_response(client, CODE_NOT_LOGGED_IN, "Not logged in.");
-                return;
-            }
-            commands[i].handler(server, client, args);
-            // return;
-            send_response(client, CODE_COMMAND_OK, "0");
+    for (int i = 0; commands[i].name != NULL; i++) {
+        if (strcasecmp(commands[i].name, name) != 0) {
+            continue;
         }
-    // send_response(client, CODE_SYNTAX_ERROR, "Unknown command.");
+        if (!no_auth_required(name) && client->state != AUTHENTICATED) {
+            send_response(client, CODE_NOT_LOGGED_IN, "Not logged in.");
+            return;
+        }
+        commands[i].handler(server, client, args);
+        return;
+    }
+    send_response(client, CODE_SYNTAX_ERROR, "Unknown command.");
 }
