@@ -23,37 +23,45 @@ static int thread_exist(server_t *server, client_t *client, char *args)
     return 1;
 }
 
+void cmd_list_comment2(int *len, char **result, comment_t *comment,
+    int *max_buffer)
+{
+    char uuid[MAX_BUFFER];
+
+    uuid_to_string(comment->uuid, uuid);
+    *len += 3;
+    strcat(*result, " | ");
+    *len += strlen(uuid);
+    strcat(*result, uuid);
+    *len += 3;
+    strcat(*result, " | ");
+    *len += strlen(comment->body);
+    strcat(*result, comment->body);
+    *len += 1;
+    strcat(*result, "\n");
+    *max_buffer += *len;
+}
+
 void cmd_list_comments(server_t *server, client_t *client, char *args)
 {
     int max_buffer = MAX_BUFFER;
     char *result = malloc(sizeof(char) * (max_buffer + 1));
     int len = 0;
-    char *uuid = malloc(sizeof(char) * (max_buffer + 1));
     user_t *author;
 
-    if (thread_exist(server, client, args) == 0)
+    if (thread_exist(server, client, args) == 0) {
+        free(result);
         return;
+    }
     memset(result, 0, max_buffer + 1);
-    for (comment_t *comment = server->data.comments.tqh_first; comment != NULL; comment = comment->entries.tqe_next) {
-        uuid_to_string(comment->uuid, uuid);
+    for (comment_t *comment = server->data.comments.tqh_first;
+        comment != NULL; comment = comment->entries.tqe_next) {
         author = find_user_by_uuid(server, comment->author_uuid);
         len = strlen(author->name);
         strcat(result, author->name);
-        len += 3;
-        strcat(result, " | ");
-        len += strlen(uuid);
-        strcat(result, uuid);
-        len += 3;
-        strcat(result, " | ");
-        len += strlen(comment->body);
-        strcat(result, comment->body);
-        len += 1;
-        strcat(result, "\n");
-        max_buffer += len;
+        cmd_list_comment2(&len, &result, comment, &max_buffer);
         result = realloc(result, max_buffer);
-        uuid = realloc(uuid, max_buffer);
     }
     send_response(client, CODE_COMMAND_OK, result);
     free(result);
-    free(uuid);
 }
