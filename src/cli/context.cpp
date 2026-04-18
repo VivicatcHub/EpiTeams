@@ -2,26 +2,26 @@
 
 Context::Context() {}
 
-void Context::setTeamUuid(const std::string &uuid) { team_uuid = uuid; }
+void Context::setTeamUuid(const std::string &uuid) { _team_uuid = uuid; }
 
-void Context::setChannelUuid(const std::string &uuid) { channel_uuid = uuid; }
+void Context::setChannelUuid(const std::string &uuid) { _channel_uuid = uuid; }
 
-void Context::setThreadUuid(const std::string &uuid) { thread_uuid = uuid; }
+void Context::setThreadUuid(const std::string &uuid) { _thread_uuid = uuid; }
 
-const std::string &Context::getTeamUuid() const { return team_uuid; }
+const std::string &Context::getTeamUuid() const { return _team_uuid; }
 
-const std::string &Context::getChannelUuid() const { return channel_uuid; }
+const std::string &Context::getChannelUuid() const { return _channel_uuid; }
 
-const std::string &Context::getThreadUuid() const { return thread_uuid; }
+const std::string &Context::getThreadUuid() const { return _thread_uuid; }
 
 void Context::reset() {
-    team_uuid.clear();
-    channel_uuid.clear();
-    thread_uuid.clear();
+    _team_uuid.clear();
+    _channel_uuid.clear();
+    _thread_uuid.clear();
 }
 
-bool Context::isTeamContext() const { return !team_uuid.empty(); }
+bool Context::isTeamContext() const { return !_team_uuid.empty(); }
 
-bool Context::isChannelContext() const { return !team_uuid.empty() && !channel_uuid.empty(); }
+bool Context::isChannelContext() const { return !_team_uuid.empty() && !_channel_uuid.empty(); }
 
-bool Context::isThreadContext() const { return !team_uuid.empty() && !channel_uuid.empty() && !thread_uuid.empty(); }
+bool Context::isThreadContext() const { return !_team_uuid.empty() && !_channel_uuid.empty() && !_thread_uuid.empty(); }

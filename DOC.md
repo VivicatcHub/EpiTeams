@@ -162,6 +162,86 @@ Return:
 | ---- | ---------------------------------- |
 | 225  | Message received from another user |
 
+#### Receive Thread Created Event (no command)
+
+> Receive a thread creation event when a thread is created in a team you are subscribed to
+
+- Server:
+  - Send: None
+  - Return: `232`
+
+Recipients:
+
+- Connected users subscribed to the team containing the created thread
+
+Payload format (`232` message):
+
+- `<thread_uuid> <user_uuid> <thread_timestamp> "<thread_title>" "<thread_body>"`
+
+| Code | Description                             |
+| ---- | --------------------------------------- |
+| 232  | New thread created in a subscribed team |
+
+#### Receive Thread Reply Created Event (no command)
+
+> Receive a reply creation event when a reply/comment is created in a thread of a team you are subscribed to
+
+- Server:
+  - Send: None
+  - Return: `233`
+
+Recipients:
+
+- Connected users subscribed to the team containing the replied thread
+
+Payload format (`233` message):
+
+- `<team_uuid> <thread_uuid> <user_uuid> "<reply_body>"`
+
+| Code | Description                                   |
+| ---- | --------------------------------------------- |
+| 233  | New thread reply created in a subscribed team |
+
+#### Receive Team Created Event (no command)
+
+> Receive a team creation event when a new team is created
+
+- Server:
+  - Send: None
+  - Return: `234`
+
+Recipients:
+
+- Connected users (logged in), including the team creator
+
+Payload format (`234` message):
+
+- `<team_uuid> "<team_name>" "<team_description>"`
+
+| Code | Description            |
+| ---- | ---------------------- |
+| 234  | New team created event |
+
+#### Receive Channel Created Event (no command)
+
+> Receive a channel creation event when a channel is created in a team you are subscribed to
+
+- Server:
+  - Send: None
+  - Return: `235`
+
+Recipients:
+
+- Connected users subscribed to the team containing the created channel
+
+Payload format (`235` message):
+
+- `<channel_uuid> "<channel_name>" "<channel_description>"`
+
+| Code | Description                              |
+| ---- | ---------------------------------------- |
+| 235  | New channel created in a subscribed team |
+
 #### Messages (`/messages`)
 
 > List all messages exchanged with the specified user
@@ -196,7 +276,7 @@ Return:
 - Args: `["team_uuid"]`
 - Server:
   - Send: `SUBSCRIBE <team_uuid>`
-  - Return: `200`/`404`/`501`/`530`
+  - Return: `200`/`404`/`501`/`504`/`530`
 
 Args:
 
@@ -206,12 +286,13 @@ Args:
 
 Return:
 
-| Code | Description                               |
-| ---- | ----------------------------------------- |
-| 200  | Subscription successful                   |
-| 404  | Team not found with the given `team_uuid` |
-| 501  | Request failed, team_uuid is incorrect    |
-| 530  | Request failed, user is not logged in     |
+| Code | Description                                |
+| ---- | ------------------------------------------ |
+| 200  | Subscription successful                    |
+| 404  | Team not found with the given `team_uuid`  |
+| 501  | Request failed, team_uuid is incorrect     |
+| 504  | Request failed, team is already subscribed |
+| 530  | Request failed, user is not logged in      |
 
 #### Subscribed (`/subscribed`)
 
@@ -290,7 +371,7 @@ Args:
 - Args: `["team_name"]` `["team_description"]`
 - Server:
   - Send: `CREATE_TEAM <team_name> "<team_description>"`
-  - Return: `200`/`501`/`530`
+  - Return: `200`/`501`/`530` (+ async `234` for connected logged users)
 
 Args:
 
@@ -307,6 +388,12 @@ Return:
 | 501  | Request failed, team_name is incorrect |
 | 530  | Request failed, user is not logged in  |
 
+Async event for connected logged users:
+
+| Code | Description            |
+| ---- | ---------------------- |
+| 234  | New team created event |
+
 ##### Team Context
 
 > Create a new channel
@@ -314,7 +401,7 @@ Return:
 - Args: `["channel_name"]` `["channel_description"]`
 - Server:
   - Send: `CREATE_CHANNEL <team_uuid> <channel_name> "<channel_description>"`
-  - Return: `200`/`404`/`501`/`530`
+  - Return: `200`/`404`/`501`/`530` (+ async `235` for subscribed users)
 
 Args:
 
@@ -332,6 +419,12 @@ Return:
 | 501  | Request failed, channel_name is incorrect |
 | 530  | Request failed, user is not logged in     |
 
+Async event for subscribers:
+
+| Code | Description                              |
+| ---- | ---------------------------------------- |
+| 235  | New channel created in a subscribed team |
+
 ##### Channel Context
 
 > Create a new thread
@@ -339,7 +432,7 @@ Return:
 - Args: `["thread_title"]` `["thread_message"]`
 - Server:
   - Send: `CREATE_THREAD <team_uuid> <channel_uuid> <thread_title> "<thread_message>"`
-  - Return: `200`/`404`/`405`/`530`
+  - Return: `200`/`404`/`405`/`530` (+ async `232` for subscribed users)
 
 Args:
 
@@ -357,6 +450,12 @@ Return:
 | 405  | Channel not found with the given `channel_uuid` |
 | 530  | Request failed, user is not logged in           |
 
+Async event for subscribers:
+
+| Code | Description                             |
+| ---- | --------------------------------------- |
+| 232  | New thread created in a subscribed team |
+
 ##### Thread Context
 
 > Create a new comment/reply in the thread
@@ -364,7 +463,7 @@ Return:
 - Args: `["comment_body"]`
 - Server:
   - Send: `CREATE_COMMENT <team_uuid> <channel_uuid> <thread_uuid> "<comment_body>"`
-  - Return: `200`/`404`/`405`/`406`/`530`
+  - Return: `200`/`404`/`405`/`406`/`530` (+ async `233` for subscribed users)
 
 Args:
 
@@ -382,6 +481,12 @@ Return:
 | 406  | Thread not found with the given `thread_uuid`          |
 | 530  | Request failed, user is not logged in                  |
 
+Async event for subscribers:
+
+| Code | Description                                   |
+| ---- | --------------------------------------------- |
+| 233  | New thread reply created in a subscribed team |
+
 #### List (`/list`)
 
 ##### Root
@@ -391,13 +496,14 @@ Return:
 - Args: None
 - Server:
   - Send: `LIST_TEAMS`
-  - Return: `200`->`<teams-list>`/`530`
+  - Return: `201`->`<teams-list>`->`202`/`530`
 
 Return:
 
 | Code | Description                                        |
 | ---- | -------------------------------------------------- |
-| 200  | Success, followed by the teams list (can be empty) |
+| 201  | Success, followed by the teams list (can be empty) |
+| 202  | End of teams list                                  |
 | 530  | Request failed, user is not logged in              |
 
 ##### Team Context
@@ -407,13 +513,14 @@ Return:
 - Args: None
 - Server:
   - Send: `LIST_CHANNELS <team_uuid>`
-  - Return: `200`->`<channels-list>`/`404`/`530`
+  - Return: `201`->`<channels-list>`->`202`/`404`/`530`
 
 Return:
 
 | Code | Description                               |
 | ---- | ----------------------------------------- |
-| 200  | Success, followed by the channels list    |
+| 201  | Success, followed by the channels list    |
+| 202  | End of channels list                      |
 | 404  | Team not found with the given `team_uuid` |
 | 530  | Request failed, user is not logged in     |
 
@@ -424,13 +531,14 @@ Return:
 - Args: None
 - Server:
   - Send: `LIST_THREADS <team_uuid> <channel_uuid>`
-  - Return: `200`->`<threads-list>`/`404`/`405`/`530`
+  - Return: `201`->`<threads-list>`->`202`/`404`/`405`/`530`
 
 Return:
 
 | Code | Description                                     |
 | ---- | ----------------------------------------------- |
-| 200  | Success, followed by the threads list           |
+| 201  | Success, followed by the threads list           |
+| 202  | End of threads list                             |
 | 404  | Team or channel not found with the given UUIDs  |
 | 405  | Channel not found with the given `channel_uuid` |
 | 530  | Request failed, user is not logged in           |
@@ -442,13 +550,14 @@ Return:
 - Args: None
 - Server:
   - Send: `LIST_COMMENTS <team_uuid> <channel_uuid> <thread_uuid>`
-  - Return: `200`->`<comments-list>`/`404`/`405`/`406`/`530`
+  - Return: `201`->`<comments-list>`->`202`/`404`/`405`/`406`/`530`
 
 Return:
 
 | Code | Description                                            |
 | ---- | ------------------------------------------------------ |
-| 200  | Success, followed by the comments list                 |
+| 201  | Success, followed by the comments list                 |
+| 202  | End of comments list                                   |
 | 404  | Team, channel or thread not found with the given UUIDs |
 | 405  | Channel not found with the given `channel_uuid`        |
 | 406  | Thread not found with the given `thread_uuid`          |
@@ -463,13 +572,14 @@ Return:
 - Args: None
 - Server:
   - Send: `INFO_USER`
-  - Return: `200`->`<user-info>`/`530`
+  - Return: `201`->`<user-info>`->`202`/`530`
 
 Return:
 
 | Code | Description                           |
 | ---- | ------------------------------------- |
-| 200  | Success, followed by the user info    |
+| 201  | Success, followed by the user info    |
+| 202  | End of user info                      |
 | 530  | Request failed, user is not logged in |
 
 ##### Team Context
@@ -479,13 +589,14 @@ Return:
 - Args: None
 - Server:
   - Send: `INFO_TEAM <team_uuid>`
-  - Return: `200`->`<team-info>`/`404`/`530`
+  - Return: `201`->`<team-info>`->`202`/`404`/`530`
 
 Return:
 
 | Code | Description                               |
 | ---- | ----------------------------------------- |
-| 200  | Success, followed by the team info        |
+| 201  | Success, followed by the team info        |
+| 202  | End of team info                          |
 | 404  | Team not found with the given `team_uuid` |
 | 530  | Request failed, user is not logged in     |
 
@@ -495,14 +606,15 @@ Return:
 
 - Args: None
 - Server:
-  - Send: `INFO_CHANNEL <team_uuid> <channel_uuid>`(need team uuid, and channel uuid inputed)
-  - Return: `200`->`<channel-info>`/`404`/`405`/`530`
+  - Send: `INFO_CHANNEL <team_uuid> <channel_uuid>`
+  - Return: `201`->`<channel-info>`->`202`/`404`/`405`/`530`
 
 Return:
 
 | Code | Description                                     |
 | ---- | ----------------------------------------------- |
-| 200  | Success, followed by the channel info           |
+| 201  | Success, followed by the channel info           |
+| 202  | End of channel info                             |
 | 404  | Team not found with the given `team_uuid`       |
 | 405  | Channel not found with the given `channel_uuid` |
 | 530  | Request failed, user is not logged in           |
@@ -514,13 +626,14 @@ Return:
 - Args: None
 - Server:
   - Send: `INFO_THREAD <team_uuid> <channel_uuid> <thread_uuid>`
-  - Return: `200`->`<thread-info>`/`404`/`405`/`406`/`530`
+  - Return: `201`->`<thread-info>`->`202`/`404`/`405`/`406`/`530`
 
 Return:
 
 | Code | Description                                            |
 | ---- | ------------------------------------------------------ |
-| 200  | Success, followed by the thread info                   |
+| 201  | Success, followed by the thread info                   |
+| 202  | End of thread info                                     |
 | 404  | Team, channel or thread not found with the given UUIDs |
 | 405  | Channel not found with the given `channel_uuid`        |
 | 406  | Thread not found with the given `thread_uuid`          |

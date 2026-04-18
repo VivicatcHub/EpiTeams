@@ -7,73 +7,109 @@
 
 #include "my_teams.h"
 
-static int thread_exist(server_t *server, client_t *client, char *args)
+static int parse_thread_only_args(char *args, char **out_team,
+    char **out_channel, char **out_thread)
 {
-    uuid_t uuid;
-    thread_t *thread;
-    thread_t *thread_;
-
-    string_to_uuid(args, uuid);
-    thread = find_thread_by_uuid(server, uuid);
-    thread_ = find_thread_by_title(server, args);
-    if (!thread && !thread_) {
-        send_response(client, CODE_THREAD_NOT_FOUND, "Thread not found.");
-        return 0;
-    }
-    return 1;
+    *out_team = NULL;
+    *out_channel = NULL;
+    *out_thread = args;
+    return 0;
 }
 
-void cmd_list_comment2(int *len, char **result, comment_t *comment,
-    int *max_buffer)
+static int validate_list_comments_tokens(char *channel_str, char *thread_str)
 {
-    char uuid[MAX_BUFFER];
-
-    uuid_to_string(comment->uuid, uuid);
-    *len += 3;
-    strcat(*result, " | ");
-    *len += strlen(uuid);
-    strcat(*result, uuid);
-    *len += 3;
-    strcat(*result, " | ");
-    *len += strlen(comment->body);
-    strcat(*result, comment->body);
-    *len += 1;
-    strcat(*result, "\n");
-    *max_buffer += *len;
+    if (!channel_str || channel_str[0] == '\0')
+        return -1;
+    if (!thread_str || thread_str[0] == '\0')
+        return -1;
+    return 0;
 }
 
-void cmd_list_comments_for(server_t *server,
-    thread_t *thread_ok, char **result, int *len)
+static int parse_list_comments_args(char *args, char **out_team,
+    char **out_channel, char **out_thread)
 {
-    int max_buffer = MAX_BUFFER;
+    char *sep1 = NULL;
+    char *sep2 = NULL;
 
+    if (!args || args[0] == '\0')
+        return -1;
+    sep1 = strchr(args, ' ');
+    if (!sep1)
+        return parse_thread_only_args(args, out_team, out_channel,
+            out_thread);
+    *sep1 = '\0';
+    sep2 = strchr(sep1 + 1, ' ');
+    if (!sep2)
+        return -1;
+    *sep2 = '\0';
+    *out_team = args;
+    *out_channel = sep1 + 1;
+    *out_thread = sep2 + 1;
+    return validate_list_comments_tokens(*out_channel, *out_thread);
+}
+
+void cmd_list_comment2(client_t *client, comment_t *comment)
+{
+    char thread_uuid_str[UUID_STR_LEN];
+    char user_uuid_str[UUID_STR_LEN];
+    char buf[MAX_BUFFER];
+
+    uuid_to_string(comment->thread_uuid, thread_uuid_str);
+    uuid_to_string(comment->author_uuid, user_uuid_str);
+    snprintf(buf, sizeof(buf), "%s %s %ld \"%s\"", thread_uuid_str,
+        user_uuid_str, (long)comment->created_at, comment->body);
+    send_response(client, CODE_COMMAND_BEGIN, buf);
+}
+
+void cmd_list_comments_for(server_t *server, client_t *client,
+    thread_t *thread_ok)
+{
     for (comment_t *comment = server->data.comments.tqh_first;
         comment != NULL; comment = comment->entries.tqe_next) {
-        if (uuid_compare(comment->thread_uuid, thread_ok->uuid) == 0) {
-            cmd_list_comment2(len, result, comment, &max_buffer);
-            *result = realloc(*result, max_buffer);
-        }
+        if (uuid_compare(comment->thread_uuid, thread_ok->uuid) == 0)
+            cmd_list_comment2(client, comment);
     }
+}
+
+static int parse_list_comment_target(server_t *server, client_t *client,
+    thread_in_channel_params_t *params)
+{
+    return parse_and_verify_thread_in_channel(server, client, params);
+}
+
+static int resolve_list_comments(server_t *server, client_t *client,
+    char *args, thread_t **out_thread)
+{
+    char *team_str = NULL;
+    char *channel_str = NULL;
+    char *thread_str = NULL;
+    team_t *team = NULL;
+    channel_t *channel = NULL;
+    thread_in_channel_params_t params;
+
+    if (parse_list_comments_args(args, &team_str, &channel_str,
+        &thread_str) != 0)
+        return -2;
+    params = (thread_in_channel_params_t){team_str, channel_str,
+        thread_str, &team, &channel, out_thread};
+    return parse_list_comment_target(server, client, &params);
 }
 
 void cmd_list_comments(server_t *server, client_t *client, char *args)
 {
-    int len = 0;
-    char *result = malloc(sizeof(char) * (MAX_BUFFER + 1));
-    uuid_t uuid_args;
-    thread_t *thread = find_thread_by_title(server, args);
-    thread_t *thread_;
-    thread_t *thread_ok;
+    thread_t *thread = NULL;
+    int status = 0;
 
-    string_to_uuid(args, uuid_args);
-    thread_ = find_thread_by_uuid(server, uuid_args);
-    thread_ok = (!thread) ? thread_ : thread;
-    memset(result, 0, MAX_BUFFER + 1);
-    if (thread_exist(server, client, args) == 0) {
-        free(result);
+    if (is_user_logged_in(server, client) == 0)
+        return;
+    status = resolve_list_comments(server, client, args, &thread);
+    if (status == -2) {
+        send_response(client, CODE_SYNTAX_ERROR_PARAM,
+            "Syntax error in parameters.");
         return;
     }
-    cmd_list_comments_for(server, thread_ok, &result, &len);
-    send_response(client, CODE_COMMAND_OK, result);
-    free(result);
+    if (status != 0)
+        return;
+    cmd_list_comments_for(server, client, thread);
+    send_response(client, CODE_COMMAND_END, "No more comments.");
 }

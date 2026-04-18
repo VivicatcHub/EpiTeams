@@ -60,6 +60,37 @@ int parse_and_get_channel(server_t *server, client_t *client,
     char *channel_str, channel_t **out_channel);
 int parse_and_get_thread(server_t *server, client_t *client, char *thread_str,
     thread_t **out_thread);
+typedef struct thread_context_params_s {
+    char *thread_str;
+    team_t *team;
+    channel_t *channel;
+    thread_t **out_thread;
+} thread_context_params_t;
+
+typedef struct channel_in_team_params_s {
+    char *team_str;
+    char *channel_str;
+    team_t **out_team;
+    channel_t **out_channel;
+} channel_in_team_params_t;
+
+typedef struct thread_in_channel_params_s {
+    char *team_str;
+    char *channel_str;
+    char *thread_str;
+    team_t **out_team;
+    channel_t **out_channel;
+    thread_t **out_thread;
+} thread_in_channel_params_t;
+
+int parse_and_get_thread_in_context(server_t *server, client_t *client,
+    thread_context_params_t *params);
+int is_user_logged_in(server_t *server, client_t *client);
+int is_user_subscribed_to_team(user_t *user, uuid_t team_uuid);
+int parse_and_verify_channel_in_team(server_t *server, client_t *client,
+    channel_in_team_params_t *params);
+int parse_and_verify_thread_in_channel(server_t *server, client_t *client,
+    thread_in_channel_params_t *params);
 
 void dispatch_command(server_t *server, client_t *client, char *line);
 
@@ -83,6 +114,34 @@ typedef struct comment_parse_params_s {
     char *body;
 } comment_create_params_t;
 
+typedef struct team_create_exec_s {
+    user_t *creator;
+    char *name;
+    char *desc;
+} team_create_exec_t;
+
+typedef struct thread_notify_context_s {
+    uuid_t channel_uuid;
+    user_t *author;
+    client_t *client;
+} thread_notify_context_t;
+
+typedef struct thread_targets_s {
+    channel_t *channel;
+    user_t *author;
+} thread_targets_t;
+
+typedef struct comment_notify_context_s {
+    thread_t *thread;
+    user_t *author;
+    client_t *client;
+} comment_notify_context_t;
+
+typedef struct comment_targets_s {
+    thread_t *thread;
+    user_t *author;
+} comment_targets_t;
+
 typedef struct thread_init_s {
     uuid_t channel_uuid;
     uuid_t team_uuid;
@@ -98,4 +157,5 @@ typedef struct comment_init_s {
 } comment_init_t;
 
 extern const command_t commands[];
+
 #endif

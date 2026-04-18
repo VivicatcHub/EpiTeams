@@ -16,6 +16,11 @@ private:
     void __processResponseCode(const std::string &code, const std::string &message);
     void __splitAndProcessLine(const std::string &line);
     void __messageReceipted(const std::string &message);
+    void __threadCreationReceipted(const std::string &message);
+    void __threadReplyCreationReceipted(const std::string &message);
+    void __teamCreationReceipted(const std::string &message);
+    void __channelCreationReceipted(const std::string &message);
+    bool __async_gestion(const std::string &code, const std::string &message);
 
 public:
     ResponseHandler();

@@ -19,12 +19,14 @@ void SendHandler::__handle200() const {}
 void SendHandler::__handle404() const
 {
     std::string target_uuid = _args.empty() ? "" : _args[0];
+
     client_error_unknown_user(target_uuid.c_str());
 }
 
 void SendHandler::__handle501() const
 {
     std::string target_uuid = _args.empty() ? "" : _args[0];
+
     client_error_unknown_user(target_uuid.c_str());
 }
 

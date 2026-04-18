@@ -7,25 +7,24 @@
 
 class CommandHandler {
 private:
-    TCPClient &tcp_client;
-    Context &context;
+    TCPClient &_tcp_client;
+    Context &_context;
 
-    bool handleHelp();
-    bool handleLogin(const std::vector<std::string> &args);
-    bool handleLogout();
-    bool handleUsers();
-    bool handleUser(const std::vector<std::string> &args);
-    bool handleSend(const std::vector<std::string> &args);
-    bool handleMessages(const std::vector<std::string> &args);
-    bool handleSubscribe(const std::vector<std::string> &args);
-    bool handleUnsubscribe(const std::vector<std::string> &args);
-    bool handleSubscribed(const std::vector<std::string> &args);
-    bool handleUse(const std::vector<std::string> &args);
-    bool handleCreate(const std::vector<std::string> &args);
-    bool handleList();
-    bool handleInfo();
-
-    bool sendCommand(const std::string &command);
+    bool __handleHelp();
+    bool __handleLogin(const std::vector<std::string> &args);
+    bool __handleLogout();
+    bool __handleUsers();
+    bool __handleUser(const std::vector<std::string> &args);
+    bool __handleSend(const std::vector<std::string> &args);
+    bool __handleMessages(const std::vector<std::string> &args);
+    bool __handleSubscribe(const std::vector<std::string> &args);
+    bool __handleUnsubscribe(const std::vector<std::string> &args);
+    bool __handleSubscribed(const std::vector<std::string> &args);
+    bool __handleUse(const std::vector<std::string> &args);
+    bool __handleCreate(const std::vector<std::string> &args);
+    bool __handleList();
+    bool __handleInfo();
+    bool __sendCommand(const std::string &command);
 
 public:
     CommandHandler(TCPClient &client, Context &ctx);

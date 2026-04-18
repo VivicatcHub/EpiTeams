@@ -31,4 +31,5 @@ int init_server(server_t *server);
 void run_server(server_t *server);
 void cleanup_server(server_t *server);
 void handle_server_events(server_t *server);
+
 #endif

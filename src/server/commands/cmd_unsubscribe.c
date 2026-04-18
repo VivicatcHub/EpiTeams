@@ -66,6 +66,7 @@ static user_t *get_authenticated_user(server_t *server, client_t *client)
 static int do_unsubscribe(client_t *client, user_t *user, team_t *team)
 {
     team_subscription_t *sub = find_subscription(user, team);
+    char response[MAX_BODY_LENGTH];
     char team_uuid_buf[UUID_STR_LEN];
     char user_uuid_buf[UUID_STR_LEN];
 
@@ -77,7 +78,10 @@ static int do_unsubscribe(client_t *client, user_t *user, team_t *team)
     uuid_to_string(team->uuid, team_uuid_buf);
     uuid_to_string(user->uuid, user_uuid_buf);
     server_event_user_unsubscribed(team_uuid_buf, user_uuid_buf);
-    send_response(client, CODE_COMMAND_OK, "Unsubscribed.");
+    snprintf(response, sizeof(response),
+        "user (%s) unsubscribed from team (%s)", user_uuid_buf,
+        team_uuid_buf);
+    send_response(client, CODE_COMMAND_OK, response);
     return 0;
 }
 

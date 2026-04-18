@@ -16,21 +16,24 @@ void MessagesHandler::handleResponse(const std::string &code, const std::string 
 
 void MessagesHandler::__handle201(const std::string &message) const
 {
-	std::string sender_uuid;
+	std::string sender_uuid, message_body;
 	long timestamp = 0;
-	std::string message_body;
 
 	if (MessageParser::parsePrivateMessage(message, sender_uuid, timestamp, message_body)) client_private_message_print_messages(sender_uuid.c_str(), static_cast<time_t>(timestamp), message_body.c_str());
 	else MessageParser::printResponseFailure(message);
 }
 
-void MessagesHandler::__handle404() const {
+void MessagesHandler::__handle404() const
+{
 	std::string target_uuid = _args.empty() ? "" : _args[0];
+
 	client_error_unknown_user(target_uuid.c_str());
 }
 
-void MessagesHandler::__handle501() const {
+void MessagesHandler::__handle501() const
+{
 	std::string target_uuid = _args.empty() ? "" : _args[0];
+
 	client_error_unknown_user(target_uuid.c_str());
 }
 

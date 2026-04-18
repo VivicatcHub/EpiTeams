@@ -14,8 +14,7 @@ void handle_server_events(server_t *server)
     int ret;
 
     ret = getline(&line, &len, stdin);
-    if (ret == -1 ||
-        strcasecmp(line, "QUIT\n") == 0 ||
+    if (ret == -1 || strcasecmp(line, "QUIT\n") == 0 ||
         strcasecmp(line, "EXIT\n") == 0 ||
         strcasecmp(line, "SHUTDOWN\n") == 0) {
         server->state = STOPPING;

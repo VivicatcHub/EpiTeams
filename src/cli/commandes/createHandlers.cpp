@@ -10,6 +10,7 @@ void CreateTeamHandler::handleResponse(const std::string &code, const std::strin
 	MessageParser::printResponsePrompt(code);
 
 	if (code == "200") return __handle200(message);
+	if (code == "504") return __handle504();
 	if (code == "530") return __handle530();
 	std::cout << message << std::endl;
 }
@@ -24,6 +25,8 @@ void CreateTeamHandler::__handle200(const std::string &message) const
 
 void CreateTeamHandler::__handle530() const { client_error_unauthorized(); }
 
+void CreateTeamHandler::__handle504() const { client_error_already_exist(); }
+
 // ----- CHANNEL ----- //
 
 void CreateChannelHandler::handleResponse(const std::string &code, const std::string &message) const
@@ -32,6 +35,7 @@ void CreateChannelHandler::handleResponse(const std::string &code, const std::st
 
 	if (code == "200") return __handle200(message);
 	if (code == "404") return __handle404();
+	if (code == "504") return __handle504();
 	if (code == "530") return __handle530();
 	std::cout << message << std::endl;
 }
@@ -46,11 +50,14 @@ void CreateChannelHandler::__handle200(const std::string &message) const
 
 void CreateChannelHandler::__handle404() const
 {
-	std::string target_uuid = _args.empty() ? "" : _args[0];
+	std::string target_uuid = _context.getTeamUuid();
+
 	client_error_unknown_team(target_uuid.c_str());
 }
 
 void CreateChannelHandler::__handle530() const { client_error_unauthorized(); }
+
+void CreateChannelHandler::__handle504() const { client_error_already_exist(); }
 
 // ----- THREAD ----- //
 
@@ -61,15 +68,15 @@ void CreateThreadHandler::handleResponse(const std::string &code, const std::str
 	if (code == "200") return __handle200(message);
 	if (code == "404") return __handle404();
 	if (code == "405") return __handle405();
+	if (code == "504") return __handle504();
 	if (code == "530") return __handle530();
 	std::cout << message << std::endl;
 }
 
 void CreateThreadHandler::__handle200(const std::string &message) const
 {
-	std::string thread_uuid, user_uuid;
+	std::string thread_uuid, user_uuid, thread_title, thread_body;
 	long timestamp = 0;
-	std::string thread_title, thread_body;
 
 	if (MessageParser::parseThreadInfo(message, thread_uuid, user_uuid, timestamp, thread_title, thread_body)) client_print_thread_created(thread_uuid.c_str(), user_uuid.c_str(), static_cast<time_t>(timestamp), thread_title.c_str(), thread_body.c_str());
 	else MessageParser::printResponseFailure(message);
@@ -77,17 +84,21 @@ void CreateThreadHandler::__handle200(const std::string &message) const
 
 void CreateThreadHandler::__handle404() const
 {
-	std::string target_uuid = _args.empty() ? "" : _args[0];
+	std::string target_uuid = _context.getTeamUuid();
+
 	client_error_unknown_team(target_uuid.c_str());
 }
 
 void CreateThreadHandler::__handle405() const
 {
-	std::string target_uuid = _args.size() > 1 ? _args[1] : "";
+	std::string target_uuid = _context.getChannelUuid();
+
 	client_error_unknown_channel(target_uuid.c_str());
 }
 
 void CreateThreadHandler::__handle530() const { client_error_unauthorized(); }
+
+void CreateThreadHandler::__handle504() const { client_error_already_exist(); }
 
 // ----- COMMENT ----- //
 
@@ -95,32 +106,45 @@ void CreateCommentHandler::handleResponse(const std::string &code, const std::st
 {
 	MessageParser::printResponsePrompt(code);
 
-	if (code == "200") __handle200();
+	if (code == "200") __handle200(message);
 	if (code == "404") return __handle404();
 	if (code == "405") return __handle405();
 	if (code == "406") return __handle406();
+	if (code == "504") return __handle504();
 	if (code == "530") return __handle530();
 	std::cout << message << std::endl;
 }
 
-void CreateCommentHandler::__handle200() const {}
+void CreateCommentHandler::__handle200(const std::string &message) const
+{
+	std::string thread_uuid, user_uuid, reply_body;
+	long timestamp = 0;
+
+	if (MessageParser::parseThreadReplyInfo(message, thread_uuid, user_uuid, timestamp, reply_body)) client_print_reply_created(thread_uuid.c_str(), user_uuid.c_str(), static_cast<time_t>(timestamp), reply_body.c_str());
+	else MessageParser::printResponseFailure(message);
+}
 
 void CreateCommentHandler::__handle404() const
 {
-	std::string target_uuid = _args.empty() ? "" : _args[0];
+	std::string target_uuid = _context.getTeamUuid();
+
 	client_error_unknown_team(target_uuid.c_str());
 }
 
 void CreateCommentHandler::__handle405() const
 {
-	std::string target_uuid = _args.size() > 1 ? _args[1] : "";
+	std::string target_uuid = _context.getChannelUuid();
+
 	client_error_unknown_channel(target_uuid.c_str());
 }
 
 void CreateCommentHandler::__handle406() const
 {
-	std::string target_uuid = _args.size() > 2 ? _args[2] : "";
+	std::string target_uuid = _context.getThreadUuid();
+
 	client_error_unknown_thread(target_uuid.c_str());
 }
 
 void CreateCommentHandler::__handle530() const { client_error_unauthorized(); }
+
+void CreateCommentHandler::__handle504() const { client_error_already_exist(); }

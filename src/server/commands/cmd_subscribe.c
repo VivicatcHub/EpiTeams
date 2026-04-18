@@ -68,13 +68,23 @@ static user_t *get_authenticated_user(server_t *server, client_t *client)
     return user;
 }
 
+static void send_response_200(client_t *client, char const *team_uuid,
+    char const *user_uuid)
+{
+    char response[MAX_BODY_LENGTH];
+
+    snprintf(response, sizeof(response), "user (%s) subscribed to team (%s)",
+        user_uuid, team_uuid);
+    send_response(client, CODE_COMMAND_OK, response);
+}
+
 static int do_subscribe(client_t *client, user_t *user, team_t *team)
 {
     char team_uuid_buf[UUID_STR_LEN];
     char user_uuid_buf[UUID_STR_LEN];
 
     if (is_already_subscribed(user, team)) {
-        send_response(client, CODE_COMMAND_OK, "Already subscribed.");
+        send_response(client, CODE_ALREADY_SUBSCRIBED, "Already subscribed.");
         return 0;
     }
     if (add_subscription(user, team) == -1)
@@ -82,7 +92,7 @@ static int do_subscribe(client_t *client, user_t *user, team_t *team)
     uuid_to_string(team->uuid, team_uuid_buf);
     uuid_to_string(user->uuid, user_uuid_buf);
     server_event_user_subscribed(team_uuid_buf, user_uuid_buf);
-    send_response(client, CODE_COMMAND_OK, "Subscribed.");
+    send_response_200(client, team_uuid_buf, user_uuid_buf);
     return 0;
 }
 

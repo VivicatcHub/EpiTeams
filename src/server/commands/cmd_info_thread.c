@@ -7,55 +7,79 @@
 
 #include "my_teams.h"
 
-int is_channel_exist(server_t *server, client_t *client, char *args)
+static int parse_info_thread_args(char *args, char **out_team,
+    char **out_channel, char **out_thread)
 {
-    channel_t *channel = NULL;
-    thread_t *thread = NULL;
-    thread_t *thread_n = NULL;
-    thread_t *thread_ok = NULL;
-    uuid_t uuid;
+    char *sep1 = NULL;
+    char *sep2 = NULL;
 
-    string_to_uuid(args, uuid);
-    thread = find_thread_by_uuid(server, uuid);
-    thread_n = find_thread_by_title(server, args);
-    if (!thread && !thread_n) {
-        send_response(client, CODE_THREAD_NOT_FOUND,
-            "Thread not found.");
-        return 0;
-    }
-    return 1;
+    if (!args || args[0] == '\0')
+        return -1;
+    sep1 = strchr(args, ' ');
+    if (!sep1)
+        return -1;
+    *sep1 = '\0';
+    sep2 = strchr(sep1 + 1, ' ');
+    if (!sep2)
+        return -1;
+    *sep2 = '\0';
+    *out_team = args;
+    *out_channel = sep1 + 1;
+    *out_thread = sep2 + 1;
+    return 0;
+}
+
+static int verify_team_channel_thread(server_t *server, client_t *client,
+    thread_in_channel_params_t *params)
+{
+    return parse_and_verify_thread_in_channel(server, client, params);
 }
 
 void cmd_info_thread_2(client_t *client, thread_t *thread_ok)
 {
-    char uuid_buf[UUID_STR_LEN];
+    char thread_uuid_buf[UUID_STR_LEN];
+    char author_uuid_buf[UUID_STR_LEN];
     char result[MAX_BUFFER];
-    int64_t time_;
 
-    time_ = (int64_t)thread_ok->created_at;
-    uuid_to_string(thread_ok->uuid, uuid_buf);
-    snprintf(result, sizeof(result),
-        "thread Name : %s | Uuid : %s\n Created at %i | Description : %s",
-        thread_ok->title, uuid_buf, time_, thread_ok->message);
-    send_response(client, CODE_COMMAND_OK, result);
+    uuid_to_string(thread_ok->uuid, thread_uuid_buf);
+    uuid_to_string(thread_ok->author_uuid, author_uuid_buf);
+    snprintf(result, sizeof(result), "%s %s %ld \"%s\" \"%s\"",
+        thread_uuid_buf, author_uuid_buf, (long)thread_ok->created_at,
+        thread_ok->title, thread_ok->message);
+    send_response(client, CODE_COMMAND_BEGIN, result);
+    send_response(client, CODE_COMMAND_END, "No more thread info.");
+}
+
+static int resolve_info_thread(server_t *server, client_t *client,
+    char *args, thread_t **out_thread)
+{
+    char *team_str = NULL;
+    char *channel_str = NULL;
+    char *thread_str = NULL;
+    team_t *team = NULL;
+    channel_t *channel = NULL;
+    thread_in_channel_params_t params;
+
+    if (parse_info_thread_args(args, &team_str, &channel_str,
+        &thread_str) != 0)
+        return -2;
+    params = (thread_in_channel_params_t){team_str, channel_str,
+        thread_str, &team, &channel, out_thread};
+    return verify_team_channel_thread(server, client, &params);
 }
 
 void cmd_info_thread(server_t *server, client_t *client, char *args)
 {
-    thread_t *thread;
-    thread_t *thread_n;
-    thread_t *thread_ok;
-    uuid_t uuid;
+    thread_t *thread = NULL;
+    int status = 0;
 
-    if (is_channel_exist(server, client, args) == 0)
-        return;
-    string_to_uuid(args, uuid);
-    thread = find_thread_by_uuid(server, uuid);
-    thread_n = find_thread_by_title(server, args);
-    if (!thread && !thread_n) {
-        send_response(client, CODE_NOT_FOUND, "thread not found.");
+    status = resolve_info_thread(server, client, args, &thread);
+    if (status == -2) {
+        send_response(client, CODE_SYNTAX_ERROR_PARAM,
+            "Syntax error in parameters.");
         return;
     }
-    thread_ok = (!thread) ? thread_n : thread;
-    cmd_info_thread_2(client, thread_ok);
+    if (status != 0)
+        return;
+    cmd_info_thread_2(client, thread);
 }

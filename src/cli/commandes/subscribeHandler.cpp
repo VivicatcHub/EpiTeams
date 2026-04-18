@@ -8,17 +8,24 @@ void SubscribeHandler::handleResponse(const std::string &code, const std::string
 {
     MessageParser::printResponsePrompt(code);
 
-    if (code == "200") __handle200();
+    if (code == "200") return __handle200(message);
     if (code == "404") return __handle404();
     if (code == "530") return __handle530();
     std::cout << message << std::endl;
 }
 
-void SubscribeHandler::__handle200() const {}
+void SubscribeHandler::__handle200(const std::string &message) const
+{
+    std::string user_uuid, team_uuid;
+
+    if (MessageParser::parseSubscribeResponse(message, team_uuid, user_uuid)) client_print_subscribed(user_uuid.c_str(), team_uuid.c_str());
+    else MessageParser::printResponseFailure(message);
+}
 
 void SubscribeHandler::__handle404() const
 {
     std::string target_uuid = _args.empty() ? "" : _args[0];
+
     client_error_unknown_team(target_uuid.c_str());
 }
 

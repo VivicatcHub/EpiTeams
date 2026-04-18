@@ -4,9 +4,9 @@
 
 class Flags {
 private:
-    std::string ip;
-    int port;
-    bool isHelp;
+    std::string _ip;
+    int _port;
+    bool _isHelp;
 
 public:
     Flags();
