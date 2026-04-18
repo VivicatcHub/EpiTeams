@@ -6,13 +6,13 @@
 */
 
 #ifndef LIB_MYTEAMS_LOGGING_CLIENT_H
-#define LIB_MYTEAMS_LOGGING_CLIENT_H
+    #define LIB_MYTEAMS_LOGGING_CLIENT_H
 
-#include <time.h>
+    #include <time.h>
 
-#ifdef __cplusplus
+    #ifdef __cplusplus
 extern "C" {
-#endif
+    #endif
 
     /*
     ** The functions that have event in their name are called when you receive

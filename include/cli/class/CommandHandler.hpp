@@ -23,7 +23,7 @@ private:
     bool __handleUse(const std::vector<std::string> &args);
     bool __handleCreate(const std::vector<std::string> &args);
     bool __handleList();
-    bool __handleInfo();
+    bool __handleInfo(const std::vector<std::string> &args);
     bool __sendCommand(const std::string &command);
 
 public:

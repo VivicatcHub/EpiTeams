@@ -79,19 +79,28 @@ static void list_subscribed_teams(server_t *server, client_t *client,
     send_response(client, CODE_COMMAND_END, "No more subscribed teams.");
 }
 
+static int send_if_user_subscribed(server_t *server, client_t *client,
+    user_t *user, uuid_t target)
+{
+    team_subscription_t *sub = NULL;
+
+    TAILQ_FOREACH(sub, &user->subscribed_teams, entries) {
+        if (uuid_compare(sub->team_uuid, target) == 0) {
+            send_user_sub_info(server, client, user);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 static void list_team_subscribers(server_t *server, client_t *client,
     uuid_t target)
 {
     user_t *u = NULL;
-    team_subscription_t *sub = NULL;
 
     TAILQ_FOREACH(u, &server->data.users, entries) {
-        TAILQ_FOREACH(sub, &u->subscribed_teams, entries) {
-            if (uuid_compare(sub->team_uuid, target) == 0) {
-                send_user_sub_info(server, client, u);
-                break;
-            }
-        }
+        if (send_if_user_subscribed(server, client, u, target))
+            continue;
     }
     send_response(client, CODE_COMMAND_END, "No more team subscribers.");
 }

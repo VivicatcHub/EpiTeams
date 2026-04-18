@@ -6,11 +6,11 @@
 */
 
 #ifndef LIB_MYTEAMS_LOGGING_SERVER_H
-#define LIB_MYTEAMS_LOGGING_SERVER_H
+    #define LIB_MYTEAMS_LOGGING_SERVER_H
 
-#ifdef __cplusplus
+    #ifdef __cplusplus
 extern "C" {
-#endif
+    #endif
 
     /*
     ** As the server never initialize an action
@@ -160,8 +160,8 @@ extern "C" {
         char const *receiver_uuid,
         char const *message_body);
 
-#ifdef __cplusplus
+    #ifdef __cplusplus
 }
-#endif
+    #endif
 
 #endif /* LIB_MYTEAMS_LOGGING_SERVER_H */

@@ -8,40 +8,6 @@
 #include "my_teams.h"
 #include "logging_server.h"
 
-static int channel_name_exists_in_team(server_t *server, uuid_t team_uuid,
-    char const *name)
-{
-    channel_t *channel = NULL;
-
-    TAILQ_FOREACH(channel, &server->data.channels, entries) {
-        if (uuid_compare(channel->team_uuid, team_uuid) != 0)
-            continue;
-        if (strcmp(channel->name, name) == 0)
-            return 1;
-    }
-    return 0;
-}
-
-static void notify_channel_created_subscribers(server_t *server,
-    channel_t *channel)
-{
-    char buf[MAX_BUFFER];
-    char channel_uuid_str[UUID_STR_LEN];
-    user_t *receiver = NULL;
-
-    uuid_to_string(channel->uuid, channel_uuid_str);
-    snprintf(buf, sizeof(buf), "%s \"%s\" \"%s\"", channel_uuid_str,
-        channel->name, channel->description);
-    for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (!server->clients[i] || !server->clients[i]->username)
-            continue;
-        receiver = find_user_by_name(server, server->clients[i]->username);
-        if (!is_user_subscribed_to_team(receiver, channel->team_uuid))
-            continue;
-        send_response(server->clients[i], CODE_CHANNEL_CREATED_EVENT, buf);
-    }
-}
-
 static int parse_create_channel_args(char *args, char **out_team,
     char **out_name, char **out_desc)
 {
@@ -84,61 +50,39 @@ static channel_t *create_and_store_channel(server_t *server, uuid_t team_uuid,
     return channel;
 }
 
-static team_t *find_channel_team(server_t *server, char const *team_str)
-{
-    uuid_t team_uuid;
-
-    if (string_to_uuid(team_str, team_uuid) != 0)
-        return find_team_by_name(server, team_str);
-    return find_team_by_uuid(server, team_uuid);
-}
-
-static void notify_channel_created(server_t *server, channel_t *channel,
-    uuid_t team_uuid, client_t *client)
+static void notify_channel_created(channel_t *channel, uuid_t team_uuid,
+    client_t *client)
 {
     char team_uuid_str[UUID_STR_LEN];
     char channel_uuid_str[UUID_STR_LEN];
-    char buf[MAX_BUFFER];
 
     uuid_to_string(team_uuid, team_uuid_str);
     uuid_to_string(channel->uuid, channel_uuid_str);
     server_event_channel_created(team_uuid_str, channel_uuid_str,
         channel->name);
-    notify_channel_created_subscribers(server, channel);
-    snprintf(buf, sizeof(buf), "%s (%s) - %s", channel->name,
-        channel_uuid_str, channel->description);
-    send_response(client, CODE_COMMAND_OK, buf);
-}
-
-static void save_and_notify_channel_creation(server_t *server,
-    client_t *client, team_t *team, channel_t *channel)
-{
-    save_channels(&server->data.channels);
-    notify_channel_created(server, channel, team->uuid, client);
+    send_response(client, CODE_COMMAND_OK, "Channel created.");
 }
 
 static int process_create_channel_tokens(server_t *server,
     client_t *client, channel_create_params_t *p)
 {
+    uuid_t team_uuid;
     team_t *team = NULL;
     channel_t *channel = NULL;
 
-    if (is_user_logged_in(server, client) == 0)
-        return -1;
-    team = find_channel_team(server, p->team_str);
+    if (string_to_uuid(p->team_str, team_uuid) != 0)
+        team = find_team_by_name(server, p->team_str);
+    else
+        team = find_team_by_uuid(server, team_uuid);
     if (!team) {
         send_response(client, CODE_NOT_FOUND, "Team not found.");
-        return -1;
-    }
-    if (channel_name_exists_in_team(server, team->uuid, p->name)) {
-        send_response(client, CODE_ALREADY_SUBSCRIBED,
-            "Channel already exists.");
         return -1;
     }
     channel = create_and_store_channel(server, team->uuid, p->name, p->desc);
     if (!channel)
         return -1;
-    save_and_notify_channel_creation(server, client, team, channel);
+    save_channels(&server->data.channels);
+    notify_channel_created(channel, team->uuid, client);
     return 0;
 }
 

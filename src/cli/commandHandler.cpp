@@ -135,8 +135,15 @@ bool CommandHandler::__handleList() {
     return __sendCommand(cmd);
 }
 
-bool CommandHandler::__handleInfo() {
-    if (!_context.isTeamContext()) { return __sendCommand("INFO_USER"); }
+bool CommandHandler::__handleInfo(const std::vector<std::string> &args) {
+    if (!_context.isTeamContext()) {
+        if (args.size() == 0) return __sendCommand("INFO_USER");
+        if (args.size() == 1) {
+            std::string cmd = "INFO_USER " + args[0];
+            return __sendCommand(cmd);
+        }
+        return false;
+    }
 
     if (!_context.isChannelContext()) {
         std::string cmd = "INFO_TEAM " + _context.getTeamUuid();
@@ -166,7 +173,7 @@ bool CommandHandler::execute(const std::string &command, const std::vector<std::
     if (command == "use") { return __handleUse(args); }
     if (command == "create") { return __handleCreate(args); }
     if (command == "list") { return __handleList(); }
-    if (command == "info") { return __handleInfo(); }
+    if (command == "info") { return __handleInfo(args); }
     if (command == "laugh") { return __sendCommand("LAUGH"); }
 
     return false;

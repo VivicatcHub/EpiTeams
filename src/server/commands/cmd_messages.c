@@ -55,7 +55,7 @@ static void send_conversation_messages(server_t *server, client_t *client,
 
     TAILQ_FOREACH(message, &server->data.messages, entries) {
         if ((uuid_compare(message->sender_uuid, sender->uuid) == 0 &&
-            uuid_compare(message->receiver_uuid, receiver->uuid) == 0) ||
+                uuid_compare(message->receiver_uuid, receiver->uuid) == 0) ||
             (uuid_compare(message->sender_uuid, receiver->uuid) == 0 &&
                 uuid_compare(message->receiver_uuid, sender->uuid) == 0)) {
             send_matching_message(server, client, message);
@@ -70,13 +70,13 @@ void cmd_messages(server_t *server, client_t *client, char *args)
     user_t *current_user = NULL;
 
     switch (find_receiver_by_args(server, args, &receiver)) {
-    case -1:
-        send_response(client, CODE_SYNTAX_ERROR_PARAM,
-            "Syntax error in parameters.");
-        return;
-    case 1:
-        send_response(client, CODE_NOT_FOUND, "User not found.");
-        return;
+        case -1:
+            send_response(client, CODE_SYNTAX_ERROR_PARAM,
+                "Syntax error in parameters.");
+            return;
+        case 1:
+            send_response(client, CODE_NOT_FOUND, "User not found.");
+            return;
     }
     if (find_current_user(server, client, &current_user) != 0) {
         send_response(client, CODE_NOT_LOGGED_IN, "Not logged in.");

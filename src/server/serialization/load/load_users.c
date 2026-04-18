@@ -28,8 +28,8 @@ static int parse_subscribed_teams(FILE *file, user_t *user)
 
     fscanf(file, ",\n\t\t\"subscribed_teams\":\n\t\t[");
     while (fscanf(file, "\n\t\t\t{\n\t\t\t\t\"team_uuid"
-        "\":\"%36[^\"]\"\n\t\t\t}",
-        team_uuid_str) == 1) {
+            "\":\"%36[^\"]\"\n\t\t\t}",
+            team_uuid_str) == 1) {
         sub = malloc(sizeof(team_subscription_t));
         if (!sub)
             return -1;
