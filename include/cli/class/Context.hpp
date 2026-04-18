@@ -4,9 +4,9 @@
 
 class Context {
 private:
-    std::string team_uuid;
-    std::string channel_uuid;
-    std::string thread_uuid;
+    std::string _team_uuid;
+    std::string _channel_uuid;
+    std::string _thread_uuid;
 
 public:
     Context();

@@ -49,4 +49,5 @@ typedef struct args_parser_s {
 
 char *get_ip_address(struct in_addr *addr);
 int get_port(in_port_t *port);
+
 #endif

@@ -4,9 +4,9 @@
 
 class TCPClient {
 private:
-    int socket_fd;
-    std::string ip;
-    int port;
+    int _socket_fd;
+    std::string _ip;
+    int _port;
 
 public:
     TCPClient();

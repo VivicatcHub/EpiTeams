@@ -22,6 +22,14 @@ const command_t commands[] = {
     {"UNSUBSCRIBE", cmd_unsubscribe},
     {"SUBSCRIBED", cmd_subscribed},
     {"LAUGH", cmd_laugh},
+    {"LIST_TEAMS", cmd_list_teams},
+    {"LIST_CHANNELS", cmd_list_channels},
+    {"LIST_THREADS", cmd_list_threads},
+    {"LIST_COMMENTS", cmd_list_comments},
+    {"INFO_USER", cmd_info},
+    {"INFO_TEAM", cmd_info_team},
+    {"INFO_CHANNEL", cmd_info_channel},
+    {"INFO_THREAD", cmd_info_thread},
     {NULL, NULL}
 };
 
@@ -54,8 +62,9 @@ void dispatch_command(server_t *server, client_t *client, char *line)
 
     parse_command(line, name, &args);
     for (int i = 0; commands[i].name != NULL; i++) {
-        if (strcasecmp(commands[i].name, name) != 0)
+        if (strcasecmp(commands[i].name, name) != 0) {
             continue;
+        }
         if (!no_auth_required(name) && client->state != AUTHENTICATED) {
             send_response(client, CODE_NOT_LOGGED_IN, "Not logged in.");
             return;

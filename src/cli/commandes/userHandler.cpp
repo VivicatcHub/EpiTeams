@@ -8,7 +8,7 @@ void UserHandler::handleResponse(const std::string &code, const std::string &mes
     MessageParser::printResponsePrompt(code);
 
     if (code == "201") return __handle201(message);
-    if (code == "404") return __handle404(message);
+    if (code == "404") return __handle404();
     if (code == "530") return __handle530();
     std::cout << message << std::endl;
 }
@@ -22,11 +22,11 @@ void UserHandler::__handle201(const std::string &message) const
     else MessageParser::printResponseFailure(message);
 }
 
-void UserHandler::__handle404(const std::string &message) const {
-    std::string user_uuid;
+void UserHandler::__handle404() const
+{
+    std::string target_uuid = _args.empty() ? "" : _args[0];
 
-    if (!MessageParser::extractUuid(message).empty()) client_error_unknown_user(user_uuid.c_str());
-    else MessageParser::printResponseFailure(message);
+    client_error_unknown_user(target_uuid.c_str());
 }
 
 void UserHandler::__handle530() const { client_error_unauthorized(); }

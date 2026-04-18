@@ -124,10 +124,8 @@ bool MessageParser::parseThreadInfo(const std::string &message, std::string &thr
     std::string token, title_start;
     size_t first_quote, second_quote, third_quote, fourth_quote;
 
-    // Extract first three tokens (thread_uuid, user_uuid, timestamp)
     if (!(iss >> thread_uuid >> user_uuid >> timestamp)) return false;
 
-    // Find the quoted strings for title and body
     first_quote = message.find('"');
     if (first_quote == std::string::npos) return false;
 
@@ -148,7 +146,6 @@ bool MessageParser::parseThreadInfo(const std::string &message, std::string &thr
 
 bool MessageParser::parsePrivateMessage(const std::string &message, std::string &sender_uuid, long &timestamp, std::string &message_body)
 {
-    // <send_uuid>: <message_body> (<timestamp>)
     size_t colon_pos = message.find(':');
     size_t open_pos = message.find('(', colon_pos);
     size_t close_pos = message.find(')', open_pos);
@@ -164,9 +161,23 @@ bool MessageParser::parsePrivateMessage(const std::string &message, std::string 
     return !sender_uuid.empty() && !message_body.empty();
 }
 
+bool MessageParser::parseThreadReplyInfo(const std::string &message, std::string &thread_uuid, std::string &user_uuid, long &timestamp, std::string &reply_body)
+{
+    std::istringstream iss(message);
+    size_t first_quote = std::string::npos;
+    size_t second_quote = std::string::npos;
+
+    if (!(iss >> thread_uuid >> user_uuid >> timestamp)) return false;
+    first_quote = message.find('"');
+    if (first_quote == std::string::npos) return false;
+    second_quote = message.find('"', first_quote + 1);
+    if (second_quote == std::string::npos) return false;
+    reply_body = message.substr(first_quote + 1, second_quote - (first_quote + 1));
+    return !thread_uuid.empty() && !user_uuid.empty() && !reply_body.empty();
+}
+
 bool MessageParser::parseMessageReceipt(const std::string &message, std::string &msg, std::string &from)
 {
-    // New message from <from> : <message>"
     const std::string prefix = "New message from ";
     const std::string middle = " : ";
     size_t prefix_pos = message.find(prefix);
@@ -178,6 +189,47 @@ bool MessageParser::parseMessageReceipt(const std::string &message, std::string 
     from = message.substr(prefix_pos + prefix.size(), middle_pos - (prefix_pos + prefix.size()));
     msg = message.substr(middle_pos + middle.size());
     return !from.empty() && !msg.empty();
+}
+
+bool MessageParser::parseSubscribeResponse(const std::string &message, std::string &team_uuid, std::string &user_uuid)
+{
+    const std::string user_prefix = "user (";
+    const std::string user_suffix = ") subscribed to team (";
+    const std::string team_suffix = ")";
+    size_t user_prefix_pos = message.find(user_prefix);
+    size_t user_suffix_pos = message.find(user_suffix, user_prefix_pos);
+    size_t team_suffix_pos = message.find(team_suffix, user_suffix_pos);
+
+    if (user_prefix_pos == std::string::npos || user_suffix_pos == std::string::npos || team_suffix_pos == std::string::npos)
+        return false;
+
+    user_uuid = message.substr(user_prefix_pos + user_prefix.size(), user_suffix_pos - (user_prefix_pos + user_prefix.size()));
+    team_uuid = message.substr(user_suffix_pos + user_suffix.size(), team_suffix_pos - (user_suffix_pos + user_suffix.size()));
+
+    return !user_uuid.empty() && !team_uuid.empty();
+}
+
+bool MessageParser::parseUnsubscribeResponse(const std::string &message,
+    std::string &team_uuid, std::string &user_uuid)
+{
+    const std::string user_prefix = "user (";
+    const std::string user_suffix = ") unsubscribed from team (";
+    const std::string team_suffix = ")";
+    size_t user_prefix_pos = message.find(user_prefix);
+    size_t user_suffix_pos = message.find(user_suffix, user_prefix_pos);
+    size_t team_suffix_pos = message.find(team_suffix, user_suffix_pos);
+
+    if (user_prefix_pos == std::string::npos ||
+        user_suffix_pos == std::string::npos ||
+        team_suffix_pos == std::string::npos)
+        return false;
+
+    user_uuid = message.substr(user_prefix_pos + user_prefix.size(),
+        user_suffix_pos - (user_prefix_pos + user_prefix.size()));
+    team_uuid = message.substr(user_suffix_pos + user_suffix.size(),
+        team_suffix_pos - (user_suffix_pos + user_suffix.size()));
+
+    return !user_uuid.empty() && !team_uuid.empty();
 }
 
 void MessageParser::printResponsePrompt(const std::string &code)
@@ -199,4 +251,102 @@ void MessageParser::printResponseFailure(const std::string &message)
     if (interactive_mode) std::cout << "  ╰─> ";
     if (std::getenv("ENV") && std::string(std::getenv("ENV")) == "dev") std::cout << "[500]: ";
     std::cout << message << std::endl;
+}
+
+bool MessageParser::parseThreadCreationReceipt(const std::string &message, std::string &thread_uuid, std::string &user_uuid, time_t &thread_timestamp, std::string &thread_title, std::string &thread_body)
+{
+    std::istringstream iss(message);
+    std::string token, title_start;
+    size_t first_quote, second_quote, third_quote, fourth_quote;
+
+    if (!(iss >> thread_uuid >> user_uuid >> thread_timestamp)) return false;
+
+    first_quote = message.find('"');
+    if (first_quote == std::string::npos) return false;
+    second_quote = message.find('"', first_quote + 1);
+    if (second_quote == std::string::npos) return false;
+    third_quote = message.find('"', second_quote + 1);
+    if (third_quote == std::string::npos) return false;
+    fourth_quote = message.find('"', third_quote + 1);
+    if (fourth_quote == std::string::npos) return false;
+
+    thread_title = message.substr(first_quote + 1, second_quote - (first_quote + 1));
+    thread_body = message.substr(third_quote + 1, fourth_quote - (third_quote + 1));
+    return !thread_uuid.empty() && !user_uuid.empty() && !thread_title.empty() && !thread_body.empty();
+}
+
+bool MessageParser::parseThreadReplyCreationReceipt(const std::string &message, std::string &team_uuid, std::string &thread_uuid, std::string &user_uuid, std::string &reply_body)
+{
+    std::istringstream iss(message);
+    size_t first_quote = std::string::npos;
+    size_t second_quote = std::string::npos;
+
+    if (!(iss >> team_uuid >> thread_uuid >> user_uuid))
+        return false;
+    first_quote = message.find('"');
+    if (first_quote == std::string::npos)
+        return false;
+    second_quote = message.find('"', first_quote + 1);
+    if (second_quote == std::string::npos)
+        return false;
+    reply_body = message.substr(first_quote + 1, second_quote - (first_quote + 1));
+    return !team_uuid.empty() && !thread_uuid.empty() && !user_uuid.empty() && !reply_body.empty();
+}
+
+bool MessageParser::parseTeamCreationReceipt(const std::string &message, std::string &team_uuid, std::string &team_name, std::string &team_description)
+{
+    size_t first_quote = std::string::npos;
+    size_t second_quote = std::string::npos;
+    size_t third_quote = std::string::npos;
+    size_t fourth_quote = std::string::npos;
+    std::istringstream iss(message);
+
+    if (!(iss >> team_uuid))
+        return false;
+    first_quote = message.find('"');
+    if (first_quote == std::string::npos)
+        return false;
+    second_quote = message.find('"', first_quote + 1);
+    if (second_quote == std::string::npos)
+        return false;
+    third_quote = message.find('"', second_quote + 1);
+    if (third_quote == std::string::npos)
+        return false;
+    fourth_quote = message.find('"', third_quote + 1);
+    if (fourth_quote == std::string::npos)
+        return false;
+    team_name = message.substr(first_quote + 1, second_quote - (first_quote + 1));
+    team_description = message.substr(third_quote + 1, fourth_quote - (third_quote + 1));
+    return !team_uuid.empty() && !team_name.empty();
+}
+
+bool MessageParser::parseChannelCreationReceipt(const std::string &message,
+    std::string &channel_uuid, std::string &channel_name,
+    std::string &channel_description)
+{
+    size_t first_quote = std::string::npos;
+    size_t second_quote = std::string::npos;
+    size_t third_quote = std::string::npos;
+    size_t fourth_quote = std::string::npos;
+    std::istringstream iss(message);
+
+    if (!(iss >> channel_uuid))
+        return false;
+    first_quote = message.find('"');
+    if (first_quote == std::string::npos)
+        return false;
+    second_quote = message.find('"', first_quote + 1);
+    if (second_quote == std::string::npos)
+        return false;
+    third_quote = message.find('"', second_quote + 1);
+    if (third_quote == std::string::npos)
+        return false;
+    fourth_quote = message.find('"', third_quote + 1);
+    if (fourth_quote == std::string::npos)
+        return false;
+    channel_name = message.substr(first_quote + 1,
+        second_quote - (first_quote + 1));
+    channel_description = message.substr(third_quote + 1,
+        fourth_quote - (third_quote + 1));
+    return !channel_uuid.empty() && !channel_name.empty();
 }

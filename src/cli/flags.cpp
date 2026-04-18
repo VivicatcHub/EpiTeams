@@ -1,7 +1,7 @@
 #include "client.hpp"
 #include "class/Flags.hpp"
 
-Flags::Flags() : ip(""), port(-1), isHelp(false) {}
+Flags::Flags() : _ip(""), _port(-1), _isHelp(false) {}
 
 Flags::~Flags() {}
 
@@ -13,7 +13,7 @@ void Flags::getFlags(int ac, char **av) {
 
     std::string arg(av[1]);
     if (arg == "-h" || arg == "--help") {
-        isHelp = true;
+        _isHelp = true;
         return;
     }
 
@@ -22,8 +22,8 @@ void Flags::getFlags(int ac, char **av) {
 
     if (ac == 3) {
         try {
-            ip = arg;
-            port = std::stoi(av[2]);
+            _ip = arg;
+            _port = std::stoi(av[2]);
         }
         catch (...) {
             printHelp(av[0]);
@@ -36,14 +36,14 @@ void Flags::getFlags(int ac, char **av) {
     }
 }
 
-bool Flags::isHelpFlag() const { return isHelp; }
+bool Flags::isHelpFlag() const { return _isHelp; }
 
 void Flags::printHelp(const char *progName) const { std::cout << "Usage: " << progName << " <ip> <port>" << std::endl; }
 
-const std::string &Flags::getIp() const { return ip; }
+const std::string &Flags::getIp() const { return _ip; }
 
-int Flags::getPort() const { return port; }
+int Flags::getPort() const { return _port; }
 
-void Flags::setIp(const std::string &ip) { this->ip = ip; }
+void Flags::setIp(const std::string &ip) { this->_ip = ip; }
 
-void Flags::setPort(int port) { this->port = port; }
+void Flags::setPort(int port) { this->_port = port; }

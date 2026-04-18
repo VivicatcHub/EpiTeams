@@ -5,13 +5,13 @@
 #include <cstring>
 #include <iostream>
 
-TCPClient::TCPClient() : socket_fd(-1), port(-1) {}
+TCPClient::TCPClient() : _socket_fd(-1), _port(-1) {}
 
 TCPClient::~TCPClient() { disconnect(); }
 
 bool TCPClient::connect(const std::string &ip, int port) {
-    socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (socket_fd < 0) { return false; }
+    _socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (_socket_fd < 0) { return false; }
 
     struct sockaddr_in addr;
     std::memset(&addr, 0, sizeof(addr));
@@ -19,42 +19,42 @@ bool TCPClient::connect(const std::string &ip, int port) {
     addr.sin_port = htons(port);
 
     if (inet_pton(AF_INET, ip.c_str(), &addr.sin_addr) <= 0) {
-        close(socket_fd);
+        close(_socket_fd);
         return false;
     }
 
-    if (::connect(socket_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-        close(socket_fd);
-        socket_fd = -1;
+    if (::connect(_socket_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        close(_socket_fd);
+        _socket_fd = -1;
         return false;
     }
 
-    this->ip = ip;
-    this->port = port;
+    this->_ip = ip;
+    this->_port = port;
     return true;
 }
 
 bool TCPClient::send(const std::string &message) {
-    if (socket_fd < 0) { return false; }
-    ssize_t bytes_sent = ::send(socket_fd, message.c_str(), message.length(), 0);
+    if (_socket_fd < 0) { return false; }
+    ssize_t bytes_sent = ::send(_socket_fd, message.c_str(), message.length(), 0);
     return bytes_sent > 0;
 }
 
 std::string TCPClient::receive() {
-    if (socket_fd < 0) { return ""; }
+    if (_socket_fd < 0) { return ""; }
     char buffer[1024] = { 0 };
-    ssize_t bytes_received = recv(socket_fd, buffer, sizeof(buffer) - 1, 0);
+    ssize_t bytes_received = recv(_socket_fd, buffer, sizeof(buffer) - 1, 0);
     if (bytes_received <= 0) { return ""; }
     return std::string(buffer, bytes_received);
 }
 
-bool TCPClient::isConnected() const { return socket_fd >= 0; }
+bool TCPClient::isConnected() const { return _socket_fd >= 0; }
 
-int TCPClient::getSocketFd() const { return socket_fd; }
+int TCPClient::getSocketFd() const { return _socket_fd; }
 
 void TCPClient::disconnect() {
-    if (socket_fd >= 0) {
-        close(socket_fd);
-        socket_fd = -1;
+    if (_socket_fd >= 0) {
+        close(_socket_fd);
+        _socket_fd = -1;
     }
 }

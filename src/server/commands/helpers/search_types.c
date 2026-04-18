@@ -7,6 +7,29 @@
 
 #include "my_teams.h"
 
+int is_user_logged_in(server_t *server, client_t *client)
+{
+    if (!client || !client->username ||
+        !find_user_by_name(server, client->username)) {
+        send_response(client, CODE_NOT_LOGGED_IN, "Not logged in.");
+        return 0;
+    }
+    return 1;
+}
+
+int is_user_subscribed_to_team(user_t *user, uuid_t team_uuid)
+{
+    team_subscription_t *sub = NULL;
+
+    if (!user)
+        return 0;
+    TAILQ_FOREACH(sub, &user->subscribed_teams, entries) {
+        if (uuid_compare(sub->team_uuid, team_uuid) == 0)
+            return 1;
+    }
+    return 0;
+}
+
 int parse_and_verify_team(server_t *server, client_t *client, char *team_str,
     team_t **out_team)
 {
@@ -33,7 +56,7 @@ int parse_and_get_channel(server_t *server, client_t *client,
     else
         *out_channel = find_channel_by_uuid(server, chan_uuid);
     if (!*out_channel) {
-        send_response(client, CODE_NOT_FOUND, "Channel not found.");
+        send_response(client, CODE_CHANNEL_NOT_FOUND, "Channel not found.");
         return -1;
     }
     return 0;
@@ -49,7 +72,7 @@ int parse_and_get_thread(server_t *server, client_t *client, char *thread_str,
     else
         *out_thread = find_thread_by_uuid(server, thread_uuid);
     if (!*out_thread) {
-        send_response(client, CODE_NOT_FOUND, "Thread not found.");
+        send_response(client, CODE_THREAD_NOT_FOUND, "Thread not found.");
         return -1;
     }
     return 0;
