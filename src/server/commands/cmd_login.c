@@ -54,6 +54,7 @@ static void create_user_and_persist(server_t *server, client_t *client,
     server_event_user_created(uuid_buf, username);
     client->username = strdup(username);
     client->state = AUTHENTICATED;
+    fprintf(stderr, "Logged In Line 57\n");
     server_event_user_logged_in(uuid_buf);
     snprintf(buf, MAX_BUFFER, "Logged in as %s (%s).", username, uuid_buf);
     send_response(client, CODE_LOGIN_SUCCESS, buf);
@@ -86,6 +87,7 @@ static int handle_user(client_t *client, server_t *server, char *username)
         }
         login_existing_user(client, username);
         uuid_to_string(user->uuid, uuid_buf);
+        fprintf(stderr, "Logged In Line 57\n");
         server_event_user_logged_in(uuid_buf);
         snprintf(buf, MAX_BUFFER, "Logged in as %s (%s).", username, uuid_buf);
         send_response(client, CODE_LOGIN_SUCCESS, buf);

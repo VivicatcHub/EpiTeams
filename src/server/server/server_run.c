@@ -72,6 +72,21 @@ static void handle_events(server_t *server,
         handle_client_event(server, fds, client_map, i);
 }
 
+static void logout_all_clients(server_t *server)
+{
+    client_t *client;
+
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        client = server->clients[i];
+        if (client == NULL)
+            continue;
+        if (client->state == AUTHENTICATED || client->state == CONNECTED) {
+            send_response(client, CODE_LOGOUT_SUCCESS, "Logged out.");
+            remove_client(server, client);
+        }
+    }
+}
+
 void run_server(server_t *server)
 {
     struct pollfd fds[MAX_CLIENTS + 2];
@@ -91,4 +106,5 @@ void run_server(server_t *server)
         if (ret == 0)
             handle_events(server, fds, client_map, nfds);
     }
+    logout_all_clients(server);
 }

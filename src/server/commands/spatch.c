@@ -61,6 +61,7 @@ void dispatch_command(server_t *server, client_t *client, char *line)
     char *args;
 
     parse_command(line, name, &args);
+    printf("Command: '%s' handle\n", name);
     for (int i = 0; commands[i].name != NULL; i++) {
         if (strcasecmp(commands[i].name, name) != 0) {
             continue;
