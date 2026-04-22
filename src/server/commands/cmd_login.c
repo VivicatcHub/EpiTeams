@@ -52,6 +52,7 @@ static void create_user_and_persist(server_t *server, client_t *client,
     TAILQ_INIT(&new_user->subscribed_teams);
     TAILQ_INSERT_TAIL(&server->data.users, new_user, entries);
     server_event_user_created(uuid_buf, username);
+    server_event_user_logged_in(uuid_buf);
     client->username = strdup(username);
     client->state = AUTHENTICATED;
     fprintf(stderr, "Logged In Line 57\n");
