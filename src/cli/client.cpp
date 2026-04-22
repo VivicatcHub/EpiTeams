@@ -217,7 +217,7 @@ bool Client::run(const std::string &ip, int port) {
     }
 
     _is_connected = true;
-    _interactive_mode = false;
+    _interactive_mode = true;
     // _interactive_mode = isatty(STDIN_FILENO);
     std::cout << "Connected to " << ip << ":" << port << std::endl;
     std::cout << "Type /help for available commands" << std::endl;
