@@ -3,6 +3,7 @@
 #include <iostream>
 #include <poll.h>
 #include <unistd.h>
+#include <stdio.h>
 
 Client::Client() : _handler(_tcp_client, _context), _is_connected(false), _waiting_for_response(false), _stdin_closed(false), _interactive_mode(false) {}
 
@@ -145,7 +146,7 @@ bool Client::__runInteractive() {
     fds[1].fd = _tcp_client.getSocketFd();
     fds[1].events = POLLIN;
 
-    char buffer[256];
+    std::string buffer;
 
     __displayPrompt();
     while (_is_connected) {
@@ -157,7 +158,7 @@ bool Client::__runInteractive() {
         }
 
         if (fds[0].fd >= 0 && (fds[0].revents & POLLIN)) {
-            if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
+            if (!std::getline(std::cin, buffer)) {
                 _stdin_closed = true;
                 fds[0].fd = -1;
             } else {
