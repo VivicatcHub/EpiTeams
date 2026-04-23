@@ -7,7 +7,7 @@
 
 #include "my_teams.h"
 
-static void logout_and_respond(server_t *server, client_t *client)
+void logout_and_respond(server_t *server, client_t *client)
 {
     char uuid_buf[UUID_STR_LEN];
     char buf[MAX_BUFFER];
