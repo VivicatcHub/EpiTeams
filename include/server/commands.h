@@ -47,7 +47,8 @@ void cmd_list_threads(server_t *server, client_t *client, char *args);
 int count_connected_clients_by_username(server_t *server,
     char const *username);
 int is_username_connected(server_t *server, char const *username);
-void sync_user_connection_state(server_t *server, char const *username);
+void sync_user_connection_state(server_t *server, char const *username,
+    int is_login_mode);
 void notify_connected_clients(server_t *server, char const *username,
     char const *code, char const *msg);
 // Helpers

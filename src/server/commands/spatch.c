@@ -135,5 +135,4 @@ void dispatch_command(server_t *server, client_t *client, char *line)
     }
     printf("Command: '%s' handle\n", name);
     dispatch_for_loop(server, client, name, args);
-    send_response(client, CODE_SYNTAX_ERROR, "Unknown command.");
 }

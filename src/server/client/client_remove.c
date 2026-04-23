@@ -22,7 +22,7 @@ void remove_client(server_t *server, client_t *client)
         if (server->clients[i] != client)
             continue;
         if (client->username)
-            sync_user_connection_state(server, client->username);
+            sync_user_connection_state(server, client->username, 0);
         disconnect_client(client);
         server->clients[i] = NULL;
         return;

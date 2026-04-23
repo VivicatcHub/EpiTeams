@@ -19,7 +19,7 @@ void logout_and_respond(server_t *server, client_t *client)
     } else {
         uuid_buf[0] = '\0';
     }
-    sync_user_connection_state(server, client->username);
+    sync_user_connection_state(server, client->username, 0);
     snprintf(buf, MAX_BUFFER, "Logged out %s (%s).",
         client->username, uuid_buf);
     free(client->username);

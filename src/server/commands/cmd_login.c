@@ -67,7 +67,7 @@ static int handle_user(client_t *client, server_t *server, char *username)
 
     if (user) {
         login_existing_user(client, username);
-        sync_user_connection_state(server, username);
+        sync_user_connection_state(server, username, 1);
         uuid_to_string(user->uuid, uuid_buf);
         snprintf(buf, MAX_BUFFER, "Logged in as %s (%s).", username, uuid_buf);
         send_response(client, CODE_LOGIN_SUCCESS, buf);

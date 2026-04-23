@@ -28,24 +28,25 @@ int is_username_connected(server_t *server, char const *username)
     return count_connected_clients_by_username(server, username) > 0;
 }
 
-static void update_user_presence(user_t *user, int connected_count)
+static void update_user_presence(user_t *user, int connected_count,
+    int is_login_mode)
 {
     char uuid_buf[UUID_STR_LEN];
 
-    if (connected_count > 0 && user->status != ONLINE) {
+    if (is_login_mode) {
         user->status = ONLINE;
         uuid_to_string(user->uuid, uuid_buf);
         server_event_user_logged_in(uuid_buf);
         return;
-    }
-    if (connected_count == 0 && user->status != OFFLINE) {
-        user->status = OFFLINE;
+    } else {
+        user->status = connected_count > 0 ? ONLINE : OFFLINE;
         uuid_to_string(user->uuid, uuid_buf);
         server_event_user_logged_out(uuid_buf);
-    }
+    }²
 }
 
-void sync_user_connection_state(server_t *server, char const *username)
+void sync_user_connection_state(server_t *server, char const *username,
+    int is_login_mode)
 {
     user_t *user = NULL;
     int connected_count;
@@ -56,7 +57,7 @@ void sync_user_connection_state(server_t *server, char const *username)
     if (!user)
         return;
     connected_count = count_connected_clients_by_username(server, username);
-    update_user_presence(user, connected_count);
+    update_user_presence(user, connected_count, is_login_mode);
 }
 
 void notify_connected_clients(server_t *server, char const *username,
