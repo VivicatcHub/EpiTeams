@@ -55,22 +55,8 @@ static void create_user_and_persist(server_t *server, client_t *client,
     server_event_user_logged_in(uuid_buf);
     client->username = strdup(username);
     client->state = AUTHENTICATED;
-    fprintf(stderr, "Logged In Line 57\n");
     snprintf(buf, MAX_BUFFER, "Logged in as %s (%s).", username, uuid_buf);
     send_response(client, CODE_LOGIN_SUCCESS, buf);
-}
-
-static int is_name_connected(server_t *server, char const *name)
-{
-    for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (!server->clients[i])
-            continue;
-        if (!server->clients[i]->username)
-            continue;
-        if (strcmp(server->clients[i]->username, name) == 0)
-            return 1;
-    }
-    return 0;
 }
 
 static int handle_user(client_t *client, server_t *server, char *username)
@@ -80,15 +66,9 @@ static int handle_user(client_t *client, server_t *server, char *username)
     char buf[MAX_BUFFER];
 
     if (user) {
-        if (is_name_connected(server, username)) {
-            send_response(client, CODE_USER_ALREADY_CONNECTED,
-                "User already connected.");
-            return -1;
-        }
         login_existing_user(client, username);
+        sync_user_connection_state(server, username);
         uuid_to_string(user->uuid, uuid_buf);
-        fprintf(stderr, "Logged In Line 57\n");
-        server_event_user_logged_in(uuid_buf);
         snprintf(buf, MAX_BUFFER, "Logged in as %s (%s).", username, uuid_buf);
         send_response(client, CODE_LOGIN_SUCCESS, buf);
     } else

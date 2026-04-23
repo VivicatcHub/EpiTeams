@@ -40,19 +40,6 @@ static user_t *get_current_user_or_respond(server_t *server, client_t *client)
     return user;
 }
 
-static int is_user_online(server_t *server, user_t *user)
-{
-    if (!user)
-        return 0;
-    for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (!server->clients[i] || !server->clients[i]->username)
-            continue;
-        if (strcmp(server->clients[i]->username, user->name) == 0)
-            return 1;
-    }
-    return 0;
-}
-
 static void send_user_info_response(client_t *client, user_t *user, int online)
 {
     char uuid_buf[UUID_STR_LEN];
@@ -79,5 +66,6 @@ void cmd_info(server_t *server, client_t *client, char *args)
         if (!user)
             return;
     }
-    send_user_info_response(client, user, is_user_online(server, user));
+    send_user_info_response(client, user,
+        is_username_connected(server, user->name));
 }

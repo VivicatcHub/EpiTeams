@@ -7,19 +7,6 @@
 
 #include "my_teams.h"
 
-static int is_name_connected(server_t *server, char const *name)
-{
-    for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (!server->clients[i])
-            continue;
-        if (!server->clients[i]->username)
-            continue;
-        if (strcmp(server->clients[i]->username, name) == 0)
-            return 1;
-    }
-    return 0;
-}
-
 static int resolve_team(server_t *server, client_t *client, char *team_str,
     uuid_t out)
 {
@@ -58,7 +45,7 @@ static void send_user_sub_info(server_t *server, client_t *client,
     const char *status = "OFFLINE";
 
     uuid_to_string(user->uuid, uuid_buf);
-    if (is_name_connected(server, user->name) == 1)
+    if (is_username_connected(server, user->name))
         status = "ONLINE";
     snprintf(buf, MAX_BUFFER, "%s (%s) -> %s", user->name, uuid_buf, status);
     send_response(client, CODE_COMMAND_OK_WITH_INFO, buf);
@@ -105,20 +92,31 @@ static void list_team_subscribers(server_t *server, client_t *client,
     send_response(client, CODE_COMMAND_END, "No more team subscribers.");
 }
 
-void cmd_subscribed(server_t *server, client_t *client, char *args)
+static void handle_subscribed_request(server_t *server, client_t *client,
+    user_t *user, char *args)
 {
-    user_t *user = find_user_by_name(server, client->username);
+    team_t *team = NULL;
     uuid_t target;
 
-    if (!user) {
-        send_response(client, CODE_NOT_LOGGED_IN, "Not logged in.");
-        return;
-    }
     if (!args || args[0] == '\0') {
         list_subscribed_teams(server, client, user);
         return;
     }
     if (resolve_team(server, client, args, target) != 0)
         return;
+    team = find_team_by_uuid(server, target);
+    if (require_user_subscribed_to_team(server, client, user, team) != 0)
+        return;
     list_team_subscribers(server, client, target);
+}
+
+void cmd_subscribed(server_t *server, client_t *client, char *args)
+{
+    user_t *user = find_user_by_name(server, client->username);
+
+    if (!user) {
+        send_response(client, CODE_NOT_LOGGED_IN, "Not logged in.");
+        return;
+    }
+    handle_subscribed_request(server, client, user, args);
 }

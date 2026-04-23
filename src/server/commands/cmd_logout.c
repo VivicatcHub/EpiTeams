@@ -15,12 +15,11 @@ void logout_and_respond(server_t *server, client_t *client)
 
     user = find_user_by_name(server, client->username);
     if (user) {
-        user->status = OFFLINE;
         uuid_to_string(user->uuid, uuid_buf);
-        server_event_user_logged_out(uuid_buf);
     } else {
         uuid_buf[0] = '\0';
     }
+    sync_user_connection_state(server, client->username);
     snprintf(buf, MAX_BUFFER, "Logged out %s (%s).",
         client->username, uuid_buf);
     free(client->username);

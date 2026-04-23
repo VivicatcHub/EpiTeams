@@ -44,6 +44,12 @@ void cmd_list_channels(server_t *server, client_t *client, char *args);
 void cmd_list_comments(server_t *server, client_t *client, char *args);
 void cmd_list_teams(server_t *server, client_t *client, char *args);
 void cmd_list_threads(server_t *server, client_t *client, char *args);
+int count_connected_clients_by_username(server_t *server,
+    char const *username);
+int is_username_connected(server_t *server, char const *username);
+void sync_user_connection_state(server_t *server, char const *username);
+void notify_connected_clients(server_t *server, char const *username,
+    char const *code, char const *msg);
 // Helpers
 user_t *find_user_by_name(server_t *server, char const *username);
 user_t *find_user_by_uuid(server_t *server, uuid_t uuid);
@@ -87,6 +93,8 @@ int parse_and_get_thread_in_context(server_t *server, client_t *client,
     thread_context_params_t *params);
 int is_user_logged_in(server_t *server, client_t *client);
 int is_user_subscribed_to_team(user_t *user, uuid_t team_uuid);
+int require_user_subscribed_to_team(server_t *server, client_t *client,
+    user_t *user, team_t *team);
 int parse_and_verify_channel_in_team(server_t *server, client_t *client,
     channel_in_team_params_t *params);
 int parse_and_verify_thread_in_channel(server_t *server, client_t *client,

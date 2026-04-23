@@ -16,6 +16,8 @@ bool Client::__isFinalResponseCode(const std::string &response)
     return false;
 }
 
+bool Client::__sendServerReceipt() { return _tcp_client.send("ACK\r\n"); }
+
 void Client::__displayPrompt() {
     std::cout << "\n╭─ \033[32mmyteams\033[0m" <<
         (_context.isTeamContext() ? " ─ " + _context.getTeamUuid() : "") <<
@@ -125,6 +127,10 @@ bool Client::__runEcho() {
                     std::string line = response.substr(0, i);
                     if (!line.empty()) {
                         _response_handler.handleServerResponse(line);
+                        if (!__sendServerReceipt()) {
+                            _is_connected = false;
+                            break;
+                        }
                         if (_waiting_for_response && __isFinalResponseCode(line)) _waiting_for_response = false;
                     } else break;
                     response.erase(0, i + 1);
@@ -195,6 +201,10 @@ bool Client::__runInteractive() {
                     std::string line = response.substr(0, i);
                     if (!line.empty()) {
                         _response_handler.handleServerResponse(line);
+                        if (!__sendServerReceipt()) {
+                            _is_connected = false;
+                            break;
+                        }
                         if (_waiting_for_response && __isFinalResponseCode(line)) _waiting_for_response = false;
                     } else break;
                     response.erase(0, i + 1);

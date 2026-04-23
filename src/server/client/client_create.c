@@ -21,6 +21,9 @@ client_t *create_client(int socket, struct sockaddr_in *address)
     client->permission = USER;
     client->data_socket = -1;
     client->buffer_position = 0;
+    client->waiting_for_client_receipt = 0;
+    client->pending_commands_head = NULL;
+    client->pending_commands_tail = NULL;
     memset(client->buffer, 0, MAX_BUFFER);
     return client;
 }

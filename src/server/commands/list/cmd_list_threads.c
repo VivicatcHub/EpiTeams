@@ -58,20 +58,34 @@ void cmd_list_threads_for(server_t *server, channel_t *channel_ok,
     }
 }
 
+static int cmd_list_threads_check_channel(server_t *server, client_t *client,
+    char *args, channel_t **channel_ok)
+{
+    uuid_t uuid_args;
+    channel_t *channel = find_channel_by_name(server, args);
+    user_t *user = find_user_by_name(server, client->username);
+
+    string_to_uuid(args, uuid_args);
+    *channel_ok = (!channel) ? find_channel_by_uuid(server, uuid_args) :
+        channel;
+    if (channel_exist(server, client, args) == 0)
+        return 0;
+    if (require_user_subscribed_to_team(server, client, user,
+        find_team_by_uuid(server, (*channel_ok)->team_uuid)) != 0)
+        return 0;
+    return 1;
+}
+
 void cmd_list_threads(server_t *server, client_t *client, char *args)
 {
     int len = 0;
     char *result = malloc(sizeof(char) * (MAX_BUFFER + 1));
-    uuid_t uuid_args;
-    channel_t *channel = find_channel_by_name(server, args);
-    channel_t *channel_;
-    channel_t *channel_ok;
+    channel_t *channel_ok = NULL;
 
-    string_to_uuid(args, uuid_args);
-    channel_ = find_channel_by_uuid(server, uuid_args);
-    channel_ok = (!channel) ? channel_ : channel;
+    if (!result)
+        return;
     memset(result, 0, MAX_BUFFER + 1);
-    if (channel_exist(server, client, args) == 0) {
+    if (!cmd_list_threads_check_channel(server, client, args, &channel_ok)) {
         free(result);
         return;
     }

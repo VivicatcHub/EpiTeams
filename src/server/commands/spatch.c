@@ -55,13 +55,55 @@ static void parse_command(char *line, char *name, char **args)
     }
 }
 
-void dispatch_command(server_t *server, client_t *client, char *line)
+static int handle_ack(client_t *client, char const *name)
 {
-    char name[16];
-    char *args;
+    if (strcasecmp(name, "ACK") != 0)
+        return 0;
+    client->waiting_for_client_receipt = 0;
+    return 1;
+}
 
-    parse_command(line, name, &args);
-    printf("Command: '%s' handle\n", name);
+static int enqueue_pending_command(client_t *client, char const *line)
+{
+    pending_command_t *pending = malloc(sizeof(*pending));
+
+    if (!pending)
+        return -1;
+    pending->line = strdup(line);
+    if (!pending->line) {
+        free(pending);
+        return -1;
+    }
+    pending->next = NULL;
+    if (!client->pending_commands_tail) {
+        client->pending_commands_head = pending;
+        client->pending_commands_tail = pending;
+        return 0;
+    }
+    client->pending_commands_tail->next = pending;
+    client->pending_commands_tail = pending;
+    return 0;
+}
+
+static void execute_deferred_commands(server_t *server, client_t *client)
+{
+    pending_command_t *pending;
+
+    while (!client->waiting_for_client_receipt &&
+        client->pending_commands_head) {
+        pending = client->pending_commands_head;
+        client->pending_commands_head = pending->next;
+        if (!client->pending_commands_head)
+            client->pending_commands_tail = NULL;
+        dispatch_command(server, client, pending->line);
+        free(pending->line);
+        free(pending);
+    }
+}
+
+static void dispatch_for_loop(server_t *server, client_t *client, char *name,
+    char *args)
+{
     for (int i = 0; commands[i].name != NULL; i++) {
         if (strcasecmp(commands[i].name, name) != 0) {
             continue;
@@ -73,5 +115,25 @@ void dispatch_command(server_t *server, client_t *client, char *line)
         commands[i].handler(server, client, args);
         return;
     }
+}
+
+void dispatch_command(server_t *server, client_t *client, char *line)
+{
+    char name[16];
+    char *args;
+
+    parse_command(line, name, &args);
+    if (handle_ack(client, name)) {
+        execute_deferred_commands(server, client);
+        return;
+    }
+    if (client->waiting_for_client_receipt) {
+        if (enqueue_pending_command(client, line) == -1)
+            send_response(client, CODE_ACTION_ABORTED,
+                "Internal error while queueing command.");
+        return;
+    }
+    printf("Command: '%s' handle\n", name);
+    dispatch_for_loop(server, client, name, args);
     send_response(client, CODE_SYNTAX_ERROR, "Unknown command.");
 }

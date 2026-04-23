@@ -63,18 +63,10 @@ static void notify_connected_receiver(server_t *server, user_t *receiver,
 
     if (!receiver)
         return;
-    for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (!server->clients[i])
-            continue;
-        if (!server->clients[i]->username)
-            continue;
-        if (strcmp(server->clients[i]->username, receiver->name) == 0) {
-            snprintf(buf, MAX_BUFFER, "New message from %s : \"%s\"",
-                sender->name, message_body);
-            send_response(server->clients[i], CODE_MESSAGE_RECEIVED, buf);
-            return;
-        }
-    }
+    snprintf(buf, MAX_BUFFER, "New message from %s : \"%s\"",
+        sender->name, message_body);
+    notify_connected_clients(server, receiver->name, CODE_MESSAGE_RECEIVED,
+        buf);
 }
 
 static void notify_and_respond(server_t *server, client_t *client,

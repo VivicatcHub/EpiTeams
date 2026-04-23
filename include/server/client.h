@@ -28,6 +28,11 @@ enum client_mode {
     PASSIVE
 };
 
+typedef struct pending_command_s {
+    char *line;
+    struct pending_command_s *next;
+} pending_command_t;
+
 typedef struct client_s {
     int socket;
     struct sockaddr_in address;
@@ -37,6 +42,9 @@ typedef struct client_s {
     char *username;
     char buffer[MAX_BUFFER];
     int buffer_position;
+    int waiting_for_client_receipt;
+    pending_command_t *pending_commands_head;
+    pending_command_t *pending_commands_tail;
     int data_socket;
     struct sockaddr_in data_addr;
 } client_t;

@@ -47,6 +47,12 @@ typedef struct args_parser_s {
     int p2;
 } args_parser_t;
 
+typedef struct thread_prepare_ctx_s {
+    team_t *team;
+    channel_t *channel;
+    user_t *author;
+} thread_prepare_ctx_t;
+
 char *get_ip_address(struct in_addr *addr);
 int get_port(in_port_t *port);
 void logout_and_respond(server_t *server, client_t *client);

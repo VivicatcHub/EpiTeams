@@ -49,13 +49,17 @@ static void notify_thread_created(thread_t *thread, uuid_t channel_uuid,
     char channel_uuid_str[UUID_STR_LEN];
     char thread_uuid_str[UUID_STR_LEN];
     char user_uuid_str[UUID_STR_LEN];
+    char response[MAX_BUFFER];
 
     uuid_to_string(channel_uuid, channel_uuid_str);
     uuid_to_string(thread->uuid, thread_uuid_str);
     uuid_to_string(author->uuid, user_uuid_str);
     server_event_thread_created(channel_uuid_str, thread_uuid_str,
         user_uuid_str, thread->title, thread->message);
-    send_response(client, CODE_COMMAND_OK, "Thread created.");
+    snprintf(response, sizeof(response), "%s %s %ld \"%s\" \"%s\"",
+        thread_uuid_str, user_uuid_str, (long)thread->created_at,
+        thread->title, thread->message);
+    send_response(client, CODE_COMMAND_OK, response);
 }
 
 static user_t *get_author_or_respond_thread(server_t *server,
@@ -68,6 +72,35 @@ static user_t *get_author_or_respond_thread(server_t *server,
         return NULL;
     }
     return author;
+}
+
+static int resolve_thread_context(server_t *server, client_t *client,
+    thread_create_params_t *p, thread_prepare_ctx_t *ctx)
+{
+    channel_in_team_params_t params = {
+        .team_str = p->team_str,
+        .channel_str = p->channel_str,
+        .out_team = &ctx->team,
+        .out_channel = &ctx->channel,
+    };
+
+    if (parse_and_verify_channel_in_team(server, client, &params) != 0)
+        return -1;
+    ctx->author = get_author_or_respond_thread(server, client);
+    if (!ctx->author || require_user_subscribed_to_team(server, client,
+        ctx->author, ctx->team) != 0)
+        return -1;
+    return 0;
+}
+
+static void fill_thread_init(thread_init_t *init, thread_create_params_t *p,
+    thread_prepare_ctx_t *ctx)
+{
+    memcpy(init->channel_uuid, ctx->channel->uuid, sizeof(uuid_t));
+    memcpy(init->team_uuid, ctx->channel->team_uuid, sizeof(uuid_t));
+    memcpy(init->author_uuid, ctx->author->uuid, sizeof(uuid_t));
+    init->title = p->title;
+    init->msg = p->msg;
 }
 
 static int store_and_notify_thread(server_t *server, client_t *client,
@@ -88,26 +121,24 @@ static int store_and_notify_thread(server_t *server, client_t *client,
     return 0;
 }
 
+static int prepare_thread_init(server_t *server, client_t *client,
+    thread_create_params_t *p, thread_init_t *init)
+{
+    thread_prepare_ctx_t ctx = {0};
+
+    if (resolve_thread_context(server, client, p, &ctx) != 0)
+        return -1;
+    fill_thread_init(init, p, &ctx);
+    return 0;
+}
+
 static int process_create_thread_tokens(server_t *server,
     client_t *client, thread_create_params_t *p)
 {
-    team_t *team = NULL;
-    channel_t *channel = NULL;
-    user_t *author = NULL;
     thread_init_t init;
 
-    if (parse_and_verify_team(server, client, p->team_str, &team) != 0)
+    if (prepare_thread_init(server, client, p, &init) != 0)
         return -1;
-    if (parse_and_get_channel(server, client, p->channel_str, &channel) != 0)
-        return -1;
-    author = get_author_or_respond_thread(server, client);
-    if (!author)
-        return -1;
-    memcpy(init.channel_uuid, channel->uuid, sizeof(uuid_t));
-    memcpy(init.team_uuid, channel->team_uuid, sizeof(uuid_t));
-    memcpy(init.author_uuid, author->uuid, sizeof(uuid_t));
-    init.title = p->title;
-    init.msg = p->msg;
     return store_and_notify_thread(server, client, &init);
 }
 

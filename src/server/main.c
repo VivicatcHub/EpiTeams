@@ -9,7 +9,6 @@
 
 static void handle_signal(int signum UNUSED)
 {
-    // exit(130);
     signal(signum, SIG_DFL);
 }
 
@@ -46,7 +45,6 @@ int main(int argc, char **argv)
         return EXIT_ERROR;
     }
     signal(SIGPIPE, SIG_IGN);
-    // signal(SIGINT, SIG_DFL);
     signal(SIGINT, handle_signal);
     return start_server(argv[1]);
 }

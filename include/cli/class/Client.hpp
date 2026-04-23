@@ -8,7 +8,8 @@
 #include "class/CommandHandler.hpp"
 #include "class/ResponseHandler.hpp"
 
-class Client {
+class Client
+{
 private:
     TCPClient _tcp_client;
     CommandParser _parser;
@@ -27,6 +28,7 @@ private:
     bool __runInteractive();
     bool __runEcho();
     static bool __isFinalResponseCode(const std::string &response);
+    bool __sendServerReceipt();
     void __displayErrorResponse(const std::string &code, const std::string &message) const;
 
 public:

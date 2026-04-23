@@ -49,22 +49,36 @@ void cmd_info_channel_2(client_t *client, channel_t *channel_ok)
     send_response(client, CODE_COMMAND_OK, result);
 }
 
+static int get_channel_info(server_t *server, client_t *client, char *args,
+    channel_t **channel_ok)
+{
+    uuid_t uuid;
+    channel_t *channel = NULL;
+
+    string_to_uuid(args, uuid);
+    channel = find_channel_by_uuid(server, uuid);
+    if (!channel)
+        channel = find_channel_by_name(server, args);
+    if (!channel) {
+        send_response(client, CODE_NOT_FOUND, "Channel not found.");
+        return 0;
+    }
+    *channel_ok = channel;
+    return 1;
+}
+
 void cmd_info_channel(server_t *server, client_t *client, char *args)
 {
-    channel_t *channel;
-    channel_t *channel_n;
+    user_t *user = find_user_by_name(server, client->username);
     channel_t *channel_ok;
-    uuid_t uuid;
+    team_t *team;
 
     if (is_team_exist(server, client, args) == 0)
         return;
-    string_to_uuid(args, uuid);
-    channel = find_channel_by_uuid(server, uuid);
-    channel_n = find_channel_by_name(server, args);
-    if (!channel && !channel_n) {
-        send_response(client, CODE_NOT_FOUND, "Channel not found.");
+    if (get_channel_info(server, client, args, &channel_ok) == 0)
         return;
-    }
-    channel_ok = (!channel) ? channel_n : channel;
+    team = find_team_by_uuid(server, channel_ok->team_uuid);
+    if (require_user_subscribed_to_team(server, client, user, team) != 0)
+        return;
     cmd_info_channel_2(client, channel_ok);
 }

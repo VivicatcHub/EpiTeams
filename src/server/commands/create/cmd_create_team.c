@@ -45,15 +45,28 @@ static team_t *create_and_store_team(server_t *server, char *name,
 }
 
 static void notify_team_created(team_t *team, user_t *creator,
-    client_t *client)
+    server_t *server, client_t *client)
 {
     char team_uuid_str[UUID_STR_LEN];
     char user_uuid_str[UUID_STR_LEN];
+    char event_msg[MAX_BUFFER];
+    char response[MAX_BUFFER];
+    client_t *target = NULL;
 
     uuid_to_string(team->uuid, team_uuid_str);
     uuid_to_string(creator->uuid, user_uuid_str);
     server_event_team_created(team_uuid_str, team->name, user_uuid_str);
-    send_response(client, CODE_COMMAND_OK, "Team created.");
+    snprintf(event_msg, sizeof(event_msg), "%s \"%s\" \"%s\"",
+        team_uuid_str, team->name, team->description);
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        target = server->clients[i];
+        if (!target || target->state != AUTHENTICATED || !target->username)
+            continue;
+        send_response(target, CODE_TEAM_CREATED_EVENT, event_msg);
+    }
+    snprintf(response, sizeof(response), "%s (%s) - %s", team->name,
+        team_uuid_str, team->description);
+    send_response(client, CODE_COMMAND_OK, response);
 }
 
 void cmd_create_team(server_t *server, client_t *client, char *args)
@@ -77,5 +90,5 @@ void cmd_create_team(server_t *server, client_t *client, char *args)
     if (!team)
         return;
     save_teams(&server->data.teams);
-    notify_team_created(team, creator, client);
+    notify_team_created(team, creator, server, client);
 }

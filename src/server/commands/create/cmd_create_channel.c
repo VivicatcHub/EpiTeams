@@ -55,35 +55,57 @@ static void notify_channel_created(channel_t *channel, uuid_t team_uuid,
 {
     char team_uuid_str[UUID_STR_LEN];
     char channel_uuid_str[UUID_STR_LEN];
+    char response[MAX_BUFFER];
 
     uuid_to_string(team_uuid, team_uuid_str);
     uuid_to_string(channel->uuid, channel_uuid_str);
     server_event_channel_created(team_uuid_str, channel_uuid_str,
         channel->name);
-    send_response(client, CODE_COMMAND_OK, "Channel created.");
+    snprintf(response, sizeof(response), "%s (%s) - %s", channel->name,
+        channel_uuid_str, channel->description);
+    send_response(client, CODE_COMMAND_OK, response);
 }
 
-static int process_create_channel_tokens(server_t *server,
-    client_t *client, channel_create_params_t *p)
+static int resolve_channel_team(server_t *server, client_t *client,
+    char *team_str, team_t **team)
 {
     uuid_t team_uuid;
-    team_t *team = NULL;
-    channel_t *channel = NULL;
 
-    if (string_to_uuid(p->team_str, team_uuid) != 0)
-        team = find_team_by_name(server, p->team_str);
+    if (string_to_uuid(team_str, team_uuid) != 0)
+        *team = find_team_by_name(server, team_str);
     else
-        team = find_team_by_uuid(server, team_uuid);
-    if (!team) {
+        *team = find_team_by_uuid(server, team_uuid);
+    if (!*team) {
         send_response(client, CODE_NOT_FOUND, "Team not found.");
         return -1;
     }
+    return 0;
+}
+
+static int create_channel_for_team(server_t *server, client_t *client,
+    channel_create_params_t *p, team_t *team)
+{
+    user_t *user = find_user_by_name(server, client->username);
+    channel_t *channel = NULL;
+
+    if (require_user_subscribed_to_team(server, client, user, team) != 0)
+        return -1;
     channel = create_and_store_channel(server, team->uuid, p->name, p->desc);
     if (!channel)
         return -1;
     save_channels(&server->data.channels);
     notify_channel_created(channel, team->uuid, client);
     return 0;
+}
+
+static int process_create_channel_tokens(server_t *server,
+    client_t *client, channel_create_params_t *p)
+{
+    team_t *team = NULL;
+
+    if (resolve_channel_team(server, client, p->team_str, &team) != 0)
+        return -1;
+    return create_channel_for_team(server, client, p, team);
 }
 
 void cmd_create_channel(server_t *server, client_t *client, char *args)

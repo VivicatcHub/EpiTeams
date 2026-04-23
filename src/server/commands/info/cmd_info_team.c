@@ -27,6 +27,7 @@ void cmd_info_team_2(client_t *client, team_t *team_ok)
 
 void cmd_info_team(server_t *server, client_t *client, char *args)
 {
+    user_t *user = find_user_by_name(server, client->username);
     team_t *team;
     team_t *team_n;
     team_t *team_ok;
@@ -40,5 +41,7 @@ void cmd_info_team(server_t *server, client_t *client, char *args)
         return;
     }
     team_ok = (!team) ? team_n : team;
+    if (require_user_subscribed_to_team(server, client, user, team_ok) != 0)
+        return;
     cmd_info_team_2(client, team_ok);
 }

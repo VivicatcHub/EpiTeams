@@ -17,19 +17,6 @@ static int check_arg(client_t *client, char *args)
     return 0;
 }
 
-static int is_user_connected(server_t *server, char const *name)
-{
-    for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (!server->clients[i])
-            continue;
-        if (!server->clients[i]->username)
-            continue;
-        if (strcmp(server->clients[i]->username, name) == 0)
-            return 1;
-    }
-    return 0;
-}
-
 static void send_user_info(client_t *client, user_t *user, int online)
 {
     char uuid_buf[UUID_STR_LEN];
@@ -79,7 +66,7 @@ void cmd_user(server_t *server UNUSED, client_t *client, char *args)
     }
     TAILQ_FOREACH(user, &server->data.users, entries) {
         if (uuid_compare(user->uuid, target) == 0) {
-            online = is_user_connected(server, user->name);
+            online = is_username_connected(server, user->name);
             send_user_info(client, user, online);
             return;
         }

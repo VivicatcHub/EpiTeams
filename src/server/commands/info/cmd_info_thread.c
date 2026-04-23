@@ -42,22 +42,36 @@ void cmd_info_thread_2(client_t *client, thread_t *thread_ok)
     send_response(client, CODE_COMMAND_OK, result);
 }
 
-void cmd_info_thread(server_t *server, client_t *client, char *args)
+static thread_t *cmd_info_thread_get(server_t *server, client_t *client,
+    char *args)
 {
     thread_t *thread;
     thread_t *thread_n;
-    thread_t *thread_ok;
     uuid_t uuid;
 
-    if (is_channel_exist(server, client, args) == 0)
-        return;
     string_to_uuid(args, uuid);
     thread = find_thread_by_uuid(server, uuid);
     thread_n = find_thread_by_title(server, args);
     if (!thread && !thread_n) {
         send_response(client, CODE_NOT_FOUND, "thread not found.");
-        return;
+        return NULL;
     }
-    thread_ok = (!thread) ? thread_n : thread;
+    return thread ? thread : thread_n;
+}
+
+void cmd_info_thread(server_t *server, client_t *client, char *args)
+{
+    user_t *user = find_user_by_name(server, client->username);
+    thread_t *thread_ok;
+    team_t *team;
+
+    if (is_channel_exist(server, client, args) == 0)
+        return;
+    thread_ok = cmd_info_thread_get(server, client, args);
+    if (!thread_ok)
+        return;
+    team = find_team_by_uuid(server, thread_ok->team_uuid);
+    if (require_user_subscribed_to_team(server, client, user, team) != 0)
+        return;
     cmd_info_thread_2(client, thread_ok);
 }

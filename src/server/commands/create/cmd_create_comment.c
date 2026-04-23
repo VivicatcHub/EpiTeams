@@ -44,11 +44,15 @@ static void notify_comment_created(comment_t *comment, uuid_t thread_uuid,
 {
     char thread_uuid_str[UUID_STR_LEN];
     char user_uuid_str[UUID_STR_LEN];
+    char response[MAX_BUFFER];
 
     uuid_to_string(thread_uuid, thread_uuid_str);
     uuid_to_string(author->uuid, user_uuid_str);
     server_event_reply_created(thread_uuid_str, user_uuid_str, comment->body);
-    send_response(client, CODE_COMMAND_OK, "Comment created.");
+    snprintf(response, sizeof(response), "%s %s %ld \"%s\"",
+        thread_uuid_str, user_uuid_str, (long)comment->created_at,
+        comment->body);
+    send_response(client, CODE_COMMAND_OK, response);
 }
 
 static user_t *get_author_or_respond(server_t *server, client_t *client)
@@ -80,26 +84,43 @@ static int store_and_notify_comment(server_t *server, client_t *client,
     return 0;
 }
 
-static int process_create_comment_tokens(server_t *server, client_t *client,
-    comment_create_params_t *tcp)
+static int resolve_comment_author(server_t *server, client_t *client,
+    team_t *team, comment_init_t *init)
+{
+    user_t *author = get_author_or_respond(server, client);
+
+    if (!author)
+        return -1;
+    if (require_user_subscribed_to_team(server, client, author, team) != 0)
+        return -1;
+    memcpy(init->author_uuid, author->uuid, sizeof(uuid_t));
+    return 0;
+}
+
+static int resolve_comment_context(server_t *server, client_t *client,
+    comment_create_params_t *tcp, comment_init_t *init)
 {
     team_t *team = NULL;
     channel_t *channel = NULL;
     thread_t *thread = NULL;
-    user_t *author = NULL;
+    thread_in_channel_params_t params = {tcp->team_str, tcp->channel_str,
+        tcp->thread_str, &team, &channel, &thread};
+
+    if (parse_and_verify_thread_in_channel(server, client, &params) != 0)
+        return -1;
+    if (resolve_comment_author(server, client, team, init) != 0)
+        return -1;
+    memcpy(init->thread_uuid, thread->uuid, sizeof(uuid_t));
+    return 0;
+}
+
+static int process_create_comment_tokens(server_t *server, client_t *client,
+    comment_create_params_t *tcp)
+{
     comment_init_t init;
 
-    if (parse_and_verify_team(server, client, tcp->team_str, &team) != 0)
+    if (resolve_comment_context(server, client, tcp, &init) != 0)
         return -1;
-    if (parse_and_get_channel(server, client, tcp->channel_str, &channel) != 0)
-        return -1;
-    if (parse_and_get_thread(server, client, tcp->thread_str, &thread) != 0)
-        return -1;
-    author = get_author_or_respond(server, client);
-    if (!author)
-        return -1;
-    memcpy(init.thread_uuid, thread->uuid, sizeof(uuid_t));
-    memcpy(init.author_uuid, author->uuid, sizeof(uuid_t));
     init.body = tcp->body;
     return store_and_notify_comment(server, client, &init);
 }

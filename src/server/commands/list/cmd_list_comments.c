@@ -56,20 +56,33 @@ void cmd_list_comments_for(server_t *server,
     }
 }
 
+static int cmd_list_comments_prepare(server_t *server, client_t *client,
+    char *args, thread_t **thread_ok)
+{
+    user_t *user = find_user_by_name(server, client->username);
+    uuid_t uuid_args;
+    thread_t *thread = find_thread_by_title(server, args);
+    thread_t *thread_;
+
+    string_to_uuid(args, uuid_args);
+    thread_ = find_thread_by_uuid(server, uuid_args);
+    *thread_ok = (!thread) ? thread_ : thread;
+    if (thread_exist(server, client, args) == 0)
+        return 0;
+    if (require_user_subscribed_to_team(server, client, user,
+        find_team_by_uuid(server, (*thread_ok)->team_uuid)) != 0)
+        return 0;
+    return 1;
+}
+
 void cmd_list_comments(server_t *server, client_t *client, char *args)
 {
     int len = 0;
     char *result = malloc(sizeof(char) * (MAX_BUFFER + 1));
-    uuid_t uuid_args;
-    thread_t *thread = find_thread_by_title(server, args);
-    thread_t *thread_;
     thread_t *thread_ok;
 
-    string_to_uuid(args, uuid_args);
-    thread_ = find_thread_by_uuid(server, uuid_args);
-    thread_ok = (!thread) ? thread_ : thread;
     memset(result, 0, MAX_BUFFER + 1);
-    if (thread_exist(server, client, args) == 0) {
+    if (cmd_list_comments_prepare(server, client, args, &thread_ok) == 0) {
         free(result);
         return;
     }
