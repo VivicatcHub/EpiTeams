@@ -42,7 +42,7 @@ static void update_user_presence(user_t *user, int connected_count,
         user->status = connected_count > 0 ? ONLINE : OFFLINE;
         uuid_to_string(user->uuid, uuid_buf);
         server_event_user_logged_out(uuid_buf);
-    }²
+    }
 }
 
 void sync_user_connection_state(server_t *server, char const *username,
