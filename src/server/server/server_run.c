@@ -80,11 +80,11 @@ static void logout_all_clients(server_t *server)
         client = server->clients[i];
         if (client == NULL)
             continue;
-        if (client->state != OFFLINE && client->username) {
+        if (client->state == AUTHENTICATED && client->username) {
             logout_and_respond(server, client);
             continue;
         }
-        if (client->state != OFFLINE) {
+        if (client->state == AUTHENTICATED) {
             client->state = CONNECTED;
             send_response(client, CODE_LOGOUT_SUCCESS, "Logged out.");
         }

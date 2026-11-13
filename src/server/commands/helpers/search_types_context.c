@@ -69,13 +69,13 @@ int parse_and_verify_channel_in_team(server_t *server, client_t *client,
     channel_in_team_params_t *params)
 {
     if (params->team_str && parse_and_verify_team(server, client,
-        params->team_str, params->out_team) != 0)
+            params->team_str, params->out_team) != 0)
         return -1;
     if (parse_and_get_channel(server, client, params->channel_str,
-        params->out_channel) != 0)
+            params->out_channel) != 0)
         return -1;
     if (params->team_str && uuid_compare((*params->out_channel)->team_uuid,
-        (*params->out_team)->uuid) != 0) {
+            (*params->out_team)->uuid) != 0) {
         send_response(client, CODE_CHANNEL_NOT_FOUND, "Channel not found.");
         return -1;
     }

@@ -71,7 +71,7 @@ static int cmd_list_threads_check_channel(server_t *server, client_t *client,
     if (channel_exist(server, client, args) == 0)
         return 0;
     if (require_user_subscribed_to_team(server, client, user,
-        find_team_by_uuid(server, (*channel_ok)->team_uuid)) != 0)
+            find_team_by_uuid(server, (*channel_ok)->team_uuid)) != 0)
         return 0;
     return 1;
 }

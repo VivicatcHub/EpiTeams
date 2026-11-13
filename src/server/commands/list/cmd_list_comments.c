@@ -70,7 +70,7 @@ static int cmd_list_comments_prepare(server_t *server, client_t *client,
     if (thread_exist(server, client, args) == 0)
         return 0;
     if (require_user_subscribed_to_team(server, client, user,
-        find_team_by_uuid(server, (*thread_ok)->team_uuid)) != 0)
+            find_team_by_uuid(server, (*thread_ok)->team_uuid)) != 0)
         return 0;
     return 1;
 }

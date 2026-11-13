@@ -88,7 +88,7 @@ static int resolve_thread_context(server_t *server, client_t *client,
         return -1;
     ctx->author = get_author_or_respond_thread(server, client);
     if (!ctx->author || require_user_subscribed_to_team(server, client,
-        ctx->author, ctx->team) != 0)
+            ctx->author, ctx->team) != 0)
         return -1;
     return 0;
 }
