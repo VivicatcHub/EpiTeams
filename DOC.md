@@ -26,6 +26,13 @@
 
 ## Introduction
 
+This document describes the commands available in `myteams_cli` and the text protocol used between the client and `myteams_server`.
+
+- The client sends one command per line over TCP, in the form `COMMAND <arg> ...`, with each argument wrapped in double quotes on the client side (e.g. `/login "alice"`).
+- The server answers with a three-digit status code followed by a human-readable message, in the spirit of FTP: `2xx` means success, `4xx` an unknown resource, `5xx` a refused or malformed request.
+- Some responses are **events** pushed by the server without any request (new private message, team / channel / thread created, reply posted in a subscribed team).
+- `/use` sets the context (team, channel, thread) that `/create`, `/list` and `/info` act on.
+
 ## Commands
 
 ### Help (`/help`)

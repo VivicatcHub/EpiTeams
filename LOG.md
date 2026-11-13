@@ -1,7 +1,7 @@
 # Client
 
 - [x] int client_event_logged_in(char const \*user_uuid, const char \*user_name);
-- [~] int client_event_logged_out(char const \*user_uuid, const char \*user_name);
+- [x] int client_event_logged_out(char const \*user_uuid, const char \*user_name);
 - [x] int client_event_private_message_received(char const \*user_uuid, char const \*message_body);
 - [x] int client_event_thread_reply_received(char const \*team_uuid, char const \*thread_uuid, char const \*user_uuid, char const \*reply_body);
 - [x] int client_event_team_created(char const \*team_uuid, char const \*team_name, char const \*team_description);
