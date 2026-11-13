@@ -14,7 +14,7 @@ GREEN_	:=	\e[32m
 CYAN_	:=	\e[36m
 
 ## KEYWORDS ##
-CC	=	epiclang
+CC	:=	$(shell command -v epiclang >/dev/null 2>&1 && echo epiclang || echo gcc)
 CXX	=	g++
 RM	=	rm
 NAME_SERVER	=	myteams_server
@@ -57,8 +57,6 @@ else
 	CFLAGS	+=	-O2 -fno-builtin
 endif
 
-TESTS_PATH	=	tests/
-
 all:	$(NAME_SERVER) $(NAME_CLI)
 
 $(NAME_SERVER):	$(OBJS_SERVER)
@@ -90,8 +88,7 @@ $(OBJDIR_CLI)/%.o: src/cli/%.cpp
 clean:
 	@$(RM) -f $(OBJS_SERVER) $(OBJS_CLI) \
 	&& $(RM) -rf $(OBJDIR_SERVER) $(OBJDIR_CLI) \
-	&& $(call REMOVE,REMOVE,.o files) \
-	&& $(call REMOVE,REMOVE,.hi files)
+	&& $(call REMOVE,REMOVE,.o files)
 
 fclean: clean
 	@$(RM) -f $(NAME_SERVER) $(NAME_CLI) \
@@ -121,6 +118,7 @@ val_test_server: $(NAME_SERVER)
 	&& LD_LIBRARY_PATH=libs/myteams valgrind --leak-check=full \
 	--track-origins=yes ./myteams_server 4242
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re mango test_client val_test_client \
+	test_server val_test_server
 
 -include $(DEPS_SERVER) $(DEPS_CLI)
