@@ -66,3 +66,18 @@ data/
 *.txt
 *.pdf
 .editorconfig
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Logs / debug
+*.log
+vgcore.*
+
+# Environment
+.env
+
+# Local audit report
+AVIS.md
